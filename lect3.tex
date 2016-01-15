@@ -105,7 +105,7 @@ $$P_X(0) = \frac{1}{4}, \quad P_X(1) = \frac{3}{4}.$$
 $$P_Y(0) = P_Y(1) = \frac{1}{2}.$$
 We can construct the following game between the challenger and the distinguisher.
 \begin{itemize}
-\item For the challenger, she selects a bit $b$ at uniformly random, i.e. $b\getsr \bits$. If $b=0$, then she samples $x$ from the distribution $P_X$, i.e. $x\getsr P_X$. Otherwise, she samples $x$ from $P_Y$, i.e. $x\getsr P_Y$. Then she gives $x$ to the distinguisher.
+\item For the challenger, she selects a bit $b$ at uniformly random, i.e. $b\getsr \bits$. If $b=1$, then she samples $x$ from the distribution $P_X$, i.e. $x\getsr P_X$. Otherwise, she samples $x$ from $P_Y$, i.e. $x\getsr P_Y$. Then she gives $x$ to the distinguisher.
 \item For the distinguisher, given $x$ from the challenger, she outputs one bit $b'$ to decide whether $x$ is sampled from $P_X$ or $P_Y$.
 \end{itemize}
 \end{example}
@@ -151,15 +151,24 @@ Now we consider a concrete distinguisher.
 Given the probability distributions $P_X$ and $P_Y$ in Example \ref{eg:1}. Consider the distinguisher $D$ s.t.
 $$D(0)=1, \quad D(1)=0.$$
 By Fact \ref{fact}, we can compute the advantage of $D$.
-$$\Pr[x\getsr P_X: D(x)=1] = \Pr[x\getsr P_X: x=1, D(1)=1] + \Pr[x\getsr P_X: x=0, D(0)=1] =\frac{1}{4}.$$
-$$\Pr[x\getsr P_Y: D(x)=1] = \Pr[x\getsr P_Y: x=1, D(1)=1] + \Pr[x\getsr P_Y: x=0, D(0)=1] =\frac{1}{2}.$$
+$$
+\begin{aligned}
+\Pr[x\getsr P_X: D(x)=1] =& \Pr[x\getsr P_X: x=1, D(1)=1] + \Pr[x\getsr P_X: x=0, D(0)=1] \\
+=& \Pr[x\getsr P_X: x=0] = \frac{1}{4}.
+\end{aligned}
+$$
+$$
+\begin{aligned}
+\Pr[x\getsr P_Y: D(x)=1] =& \Pr[x\getsr P_Y: x=1, D(1)=1] + \Pr[x\getsr P_Y: x=0, D(0)=1] \\
+=& \Pr[x\getsr P_Y: x=0] =\frac{1}{2}.
+\end{aligned}$$
 $$\Adv_{P_X,P_Y}^{dist}(D) = \left| \Pr[x\getsr P_X: D(x)=1] - \Pr[x\getsr P_Y: D(x)=1]\right| = \left|\frac{1}{4}-\frac{1}{2}\right| = \frac{1}{4}.$$
 \end{example}
 
-We can use the advantage defined above to describe how close two distributions $P_X$ and $P_Y$ are. Intuitively, $P_X$ and $P_Y$ are ``close'' if the advantage $\Adv_{P_X,P_Y}^{dist}(D)$ is ``small'' for all distinguisher $D$. However, due to some technical reasons (see later), it is often too strong to assume for all distinguisher $D$. Instead, we prefer to assume for all \emph{efficient} (polynomial-time) distinguisher $D$.
+We can use the advantage defined above to describe how close two distributions $P_X$ and $P_Y$ are. Intuitively, $P_X$ and $P_Y$ are ``close'' if the advantage $\Adv_{P_X,P_Y}^{dist}(D)$ is ``small'' for all distinguisher $D$. However, due to some technical reasons (see Example \ref{eg:2}), it is often too strong to assume for all distinguisher $D$. Instead, we prefer to assume for all \emph{efficient} (polynomial-time) distinguisher $D$.
 
 \section{Pseudorandom Generators}
-Informally, a pseudorandom generator is an efficiently computable function $G$ that stretches a \emph{random} seed string $s$ into a pseudorandom string $G(s)$, which ``looks like'' a uniformly random string. 
+Informally speaking, a pseudorandom generator is an efficiently computable function $G$ that stretches a \emph{random} seed string $s$ into a pseudorandom string $G(s)$, which ``looks like'' a uniformly random string. 
 Let $G: \bits^\lambda \mapsto \bits^{\lambda'}$, where $\lambda$ is the length of input seed, and $\lambda'$ is the output length. We require $\lambda' > \lambda$, e.g. $\lambda' = \lambda+1$, $2\lambda$, $\lambda^2$, etc. Our goal is that if the seed $s\getsr \bits^\lambda$, then the output string $G(s)$ should ``look like'' a uniformly random string $y\getsr\bits^{\lambda'}$. The formal definition of PRG is based on this intuition.
 \begin{definition}
 A function family $G = \{G_\lambda\}_{\lambda\in\N}$ (where $G_\lambda : \bits^\lambda \mapsto \bits^{n(\lambda)}$, $n(\lambda)>\lambda$) is a {\bf Pseudorandom Generator} ({\bf PRG}) if:
@@ -171,6 +180,7 @@ Here $U_\lambda$ denotes the uniform distribution over $\bits^\lambda$. $G_\lamb
 \end{definition}
 
 \begin{example}
+\label{eg:2}
 Assume we are given a PRG $G_\lambda : \bits^\lambda \mapsto \bits^{\lambda+1}$. Consider the following distinguisher $D^*$: 
 \begin{enumerate}
 \item On input $y\in \bits^{\lambda+1}$, $D^*$ checks whether $y\in\mathrm{range}(G_\lambda)$, i.e., $\exists s$ s.t. $G_\lambda(s) = y$.
@@ -191,7 +201,7 @@ If $G:\bits^\lambda \mapsto \bits^{2\lambda}$ is a PRG, then $G$ is also a OWF.
 Assume by contradiction that $G$ is not one-way, then there exists a PPT adversary $A$ and a non-negligible function $\epsilon$ s.t.
 $$\epsilon(\lambda) \eqdef \Adv_{G,\lambda}^{owf}(A) =\Pr[s\getsr\bits^\lambda, s'\getsr A(G(s),\lambda): G(s)=G(s')].$$
 Our goal is to build a distinguisher $D$ from $A$ s.t. $\Adv_{G,\lambda}^{prg}(D)$ is also ``close'' to $\epsilon(\lambda)$.
-Let $s\getsr\bits^\lambda$. Given $y\gets G(s)$ \footnote{Note that since $G$ is deterministic, there is no random coin.} or $y\getsr \bits^{2\lambda}$, we define the distinguisher $D$ as following:
+Let $s\getsr\bits^\lambda$. Given $y\gets G(s)$ \footnote{Note that since $G$ is deterministic, there is no random coin.} or $y\getsr \bits^{2\lambda}$ as the input, we define the distinguisher $D$ as following:
 \begin{enumerate}
 \item $s' \getsr A(y, \lambda)$.
 \item If $G(s') = y$ then output 1. Otherwise, output 0.
@@ -215,12 +225,12 @@ which is negligible. Now $\Adv_{G,\lambda}^{prg}(D)$ is the distance between a n
 
 A much stronger result is that there exists a construction transforming \emph{any} OWF into a PRG. This construction was found by H\aa stad, Impagliazzo, Levin and Luby \cite{HILL99}.
 
-Another important fact is that we can construct PRG from one-way permutation, which is a one-to-one one-way function family $\pi: \bits^\lambda \mapsto \bits^\lambda$. The Goldreich-Levin construction \cite{GL89} $G^\pi : \bits^{2\lambda} \mapsto \bits^{2\lambda+1}$ is given by
+Another important fact is that we can construct PRG from one-way permutation (OWP), which is a one-to-one one-way function family $\pi: \bits^\lambda \mapsto \bits^\lambda$. The Goldreich-Levin construction \cite{GL89} $G^\pi : \bits^{2\lambda} \mapsto \bits^{2\lambda+1}$ is given by
 $$G^\pi(x; r) \eqdef (\pi(x), r, \angles{x,r}),$$
 where $x, r\in\bits^\lambda$, and $\angles{x,r}$ is the inner product of $x$ and $r$ defined as
 $$\angles{x,r} \eqdef \sum_{i=1}^\lambda x_ir_i \mod 2.$$
-
-The details will be given on next lecture.
+It turns out this construction is PRG, assuming $\pi$ is OWP. 
+The details will be given next lecture.
 
 \begin{thebibliography}{10}
 \bibitem{HILL99} 
