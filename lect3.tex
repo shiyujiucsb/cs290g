@@ -1,0 +1,237 @@
+\documentclass[12pt]{article}
+\usepackage{url,hyperref,amsmath,setspace,amssymb,amsthm,amsfonts}
+
+
+\setlength{\oddsidemargin}{.25in}
+\setlength{\evensidemargin}{.25in}
+\setlength{\textwidth}{6.25in}
+\setlength{\topmargin}{-0.4in}
+\setlength{\textheight}{8.5in}
+
+\newcommand{\heading}[5]{
+   \renewcommand{\thepage}{#1-\arabic{page}}
+   \noindent
+   \begin{center}
+   \framebox[\textwidth]{
+     \begin{minipage}{0.9\textwidth} \onehalfspacing
+       {\bf CS 290G -- Introduction to Modern Cryptography} \hfill #2
+
+       {\centering \Large #5
+       
+       }\medskip
+
+       {\it #3 \hfill #4}
+     \end{minipage}
+   }
+   \end{center}
+}
+
+\newcommand{\handout}[3]{\heading{#1}{#2}{Instructor:
+Stefano Tessaro}{Scribe: Shiyu Ji}{Lecture #1: #3}}
+
+\setlength{\parindent}{0in}
+
+\newcommand{\eqdef}{\stackrel{def}{=}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\bits}{\{0,1\}}
+\newcommand{\inr}{\in_{\mbox{\tiny R}}}
+%\newcommand{\getsr}{\gets_{\mbox{\tiny R}}}
+\newcommand{\getsr}{\stackrel{\$}{\gets}}
+\newcommand{\st}{\mbox{ s.t. }}
+\newcommand{\etal}{{\it et al }}
+\newcommand{\into}{\rightarrow}
+
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\e}{\epsilon}
+\newcommand{\ee}{\varepsilon}
+\newcommand{\ceil}[1]{{\lceil{#1}\rceil}}
+\newcommand{\floor}[1]{{\lfloor{#1}\rfloor}}
+\newcommand{\angles}[1]{\langle #1 \rangle}
+\newcommand{\Com}{{\sf Com}}
+\newcommand{\desc}{{\sf desc}}
+
+\newcommand{\rightstep}[1]{%
+$\underrightarrow{\quad #1 \quad}$ }
+
+\newcommand{\leftstep}[1]{%
+$\underleftarrow{\quad #1 \quad}$ }
+\newcommand{\Adv}{\textsf{Adv}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Theorems & Definitions
+
+
+\newtheorem{theorem}{Theorem}[section]
+
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{subclaim}{Claim}[theorem]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{observation}[theorem]{Observation}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{construction}[theorem]{Construction}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{algorithm1}[theorem]{Algorithm}
+\newtheorem{protocol}[theorem]{Protocol}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{fact}[theorem]{Fact}
+
+\bibliographystyle{plain}
+
+\begin{document}
+\handout{3}{Jan 14, 2016}{Pseudorandom Generator}
+\section{Recap}
+Last lecture we defined one-way functions to describe computational hardness. That is, given $f(x)$, it is hard to find $x'$ s.t. $f(x') = f(x)$. This lecture will introduce Pseudorandom Generators (PRGs), which are within another class called {\bf computational indistinguishability}. That is, it should be hard to distinguish the output of PRG from uniformly random strings.
+
+\section{Closeness of Probability Distributions}
+We would like to describe how close two probability distributions are. If they are very close, it should be hard to tell them apart.
+As usual, this can be defined via a game between the challenger and the distinguisher.
+Given two random variables $X$, $Y$ with probability distributions $P_X$, $P_Y$:
+$$P_X(x) = \Pr[X=x], \quad P_Y(y) = \Pr[Y=y].$$
+Let observer $D$ be a distinguisher. Suppose there is a string $x$, which can be sampled from $P_X$, i.e. $x \getsr P_X$, {\bf or} sampled from $P_Y$, i.e. $x \getsr P_Y$. Then $x$ is given to $D$, and $D$ should try to decide whether $x$ is sampled from $P_X$ or $P_Y$. For example, if $D$ decides that $x$ is from $P_X$, then she outputs 1. Otherwise, she decides $x$ is from $P_Y$ and outputs 0. That is, the output of $D$ is a bit from $\{0, 1\}$.
+
+\begin{example}
+\label{eg:1}
+There are two probability distributions $P_X$, $P_Y$ s.t.
+$$P_X(0) = \frac{1}{4}, \quad P_X(1) = \frac{3}{4}.$$
+$$P_Y(0) = P_Y(1) = \frac{1}{2}.$$
+We can construct the following game between the challenger and the distinguisher.
+\begin{itemize}
+\item For the challenger, she selects a bit $b$ at uniformly random, i.e. $b\getsr \bits$. If $b=0$, then she samples $x$ from the distribution $P_X$, i.e. $x\getsr P_X$. Otherwise, she samples $x$ from $P_Y$, i.e. $x\getsr P_Y$. Then she gives $x$ to the distinguisher.
+\item For the distinguisher, given $x$ from the challenger, she outputs one bit $b'$ to decide whether $x$ is sampled from $P_X$ or $P_Y$.
+\end{itemize}
+\end{example}
+
+In the example above: 
+\begin{itemize}
+\item If $\Pr[b=b'] = 1$, then the distinguisher is working perfectly, since her decision is always correct.
+\item If $\Pr[b=b'] = 0$, then the distinguisher is still working perfectly, since ``inverting'' the output gives always-correct guesses.
+\item If $\Pr[b=b'] = 1/2$, then the distinguisher is useless, since one can always achieve this by tossing coins.   
+\end{itemize}
+
+Intuitively, the distance between $\Pr[b=b']$ and $1/2$ should well evaluate the performance of the distinguisher. This motivates our definition of the advantage of a distinguisher on distinguishing two probability distributions.
+\begin{definition}
+Given two probability distributions $P_X$ and $P_Y$ and a distinguisher $D$, the {\bf advantage of distinguisher $D$} on $P_X$ and $P_Y$ is
+$$\Adv_{P_X,P_Y}^{dist}(D) \eqdef 2\left|\Pr[b=b'] - \frac{1}{2} \right| \in [0,1],$$
+where $b=1$ implies $x\getsr P_X$ and $b=0$ implies $x\getsr P_Y$, and $b'$ is the output bit of $D$, i.e. $b' \gets D(x)$.
+\end{definition}
+
+The following fact gives another form of advantage of a distinguisher, which is often more convenient to use.
+\begin{fact}
+\label{fact}
+Given two probability distributions $P_X$ and $P_Y$ and a distinguisher $D$,
+$$\Adv_{P_X,P_Y}^{dist}(D) = \left| \Pr[x\getsr P_X: D(x)=1] - \Pr[x\getsr P_Y: D(x)=1] \right|.$$
+\end{fact}
+\begin{proof}
+\[
+\begin{aligned}
+\Adv_{P_X,P_Y}^{dist}(D) =& 2\left|\Pr[b=b'] - \frac{1}{2} \right| \\
+=& 2\left|\Pr[b=b'=1] + \Pr[b=b'=0] - \frac{1}{2} \right| \\
+=& 2\left|\Pr[b=1]\Pr[b'=1|b=1] + \Pr[b=0]\Pr[b'=0|b=0] - \frac{1}{2} \right| \\
+=& 2\bigg|\Pr[b\getsr \bits: b=1]\Pr[x\getsr P_X: b'=D(x)=1] \\
+	&+ \Pr[b\getsr \bits: b=0]\Pr[x\getsr P_Y: b'=D(x)=0] - \frac{1}{2} \bigg| \\
+=& 2\left|\frac{1}{2}\Pr[x\getsr P_X: b'=D(x)=1] + \frac{1}{2}\Pr[x\getsr P_Y: b'=D(x)=0] - \frac{1}{2} \right| \\
+=& \left|\Pr[x\getsr P_X: b'=D(x)=1] + \Pr[x\getsr P_Y: b'=D(x)=0] - 1 \right| \\
+=& \left|\Pr[x\getsr P_X: D(x)=1] - \Pr[x\getsr P_Y: D(x)=1] \right|.
+\end{aligned}
+\]
+Note that the conditional probability $\Pr[b'=1|b=1]$ is the probability that the output $b'=D(x)=1$ if we \emph{already} know $b=1$, i.e., $x$ has been drawn from $P_X$. Thus $\Pr[b'=1|b=1] = \Pr[x\getsr P_X: b'=D(x)=1]$.
+\end{proof}
+
+Now we consider a concrete distinguisher.
+\begin{example}
+Given the probability distributions $P_X$ and $P_Y$ in Example \ref{eg:1}. Consider the distinguisher $D$ s.t.
+$$D(0)=1, \quad D(1)=0.$$
+By Fact \ref{fact}, we can compute the advantage of $D$.
+$$\Pr[x\getsr P_X: D(x)=1] = \Pr[x\getsr P_X: x=1, D(1)=1] + \Pr[x\getsr P_X: x=0, D(0)=1] =\frac{1}{4}.$$
+$$\Pr[x\getsr P_Y: D(x)=1] = \Pr[x\getsr P_Y: x=1, D(1)=1] + \Pr[x\getsr P_Y: x=0, D(0)=1] =\frac{1}{2}.$$
+$$\Adv_{P_X,P_Y}^{dist}(D) = \left| \Pr[x\getsr P_X: D(x)=1] - \Pr[x\getsr P_Y: D(x)=1]\right| = \left|\frac{1}{4}-\frac{1}{2}\right| = \frac{1}{4}.$$
+\end{example}
+
+We can use the advantage defined above to describe how close two distributions $P_X$ and $P_Y$ are. Intuitively, $P_X$ and $P_Y$ are ``close'' if the advantage $\Adv_{P_X,P_Y}^{dist}(D)$ is ``small'' for all distinguisher $D$. However, due to some technical reasons (see later), it is often too strong to assume for all distinguisher $D$. Instead, we prefer to assume for all \emph{efficient} (polynomial-time) distinguisher $D$.
+
+\section{Pseudorandom Generators}
+Informally, a pseudorandom generator is an efficiently computable function $G$ that stretches a \emph{random} seed string $s$ into a pseudorandom string $G(s)$, which ``looks like'' a uniformly random string. 
+Let $G: \bits^\lambda \mapsto \bits^{\lambda'}$, where $\lambda$ is the length of input seed, and $\lambda'$ is the output length. We require $\lambda' > \lambda$, e.g. $\lambda' = \lambda+1$, $2\lambda$, $\lambda^2$, etc. Our goal is that if the seed $s\getsr \bits^\lambda$, then the output string $G(s)$ should ``look like'' a uniformly random string $y\getsr\bits^{\lambda'}$. The formal definition of PRG is based on this intuition.
+\begin{definition}
+A function family $G = \{G_\lambda\}_{\lambda\in\N}$ (where $G_\lambda : \bits^\lambda \mapsto \bits^{n(\lambda)}$, $n(\lambda)>\lambda$) is a {\bf Pseudorandom Generator} ({\bf PRG}) if:
+\begin{enumerate}
+\item $G$ is efficiently computable and deterministic.
+\item For any PPT $D$, $\Adv_{G,\lambda}^{prg}(D) \eqdef \Adv_{G_\lambda(U_\lambda),U_{n(\lambda)}}^{dist}(D)$ is negligible in $\lambda$.
+\end{enumerate}
+Here $U_\lambda$ denotes the uniform distribution over $\bits^\lambda$. $G_\lambda(U_\lambda)$ denotes the distribution of $G_\lambda(s)$ if $s\getsr\bits^\lambda$.
+\end{definition}
+
+\begin{example}
+Assume we are given a PRG $G_\lambda : \bits^\lambda \mapsto \bits^{\lambda+1}$. Consider the following distinguisher $D^*$: 
+\begin{enumerate}
+\item On input $y\in \bits^{\lambda+1}$, $D^*$ checks whether $y\in\mathrm{range}(G_\lambda)$, i.e., $\exists s$ s.t. $G_\lambda(s) = y$.
+\item If $y\in\mathrm{range}(G_\lambda)$, then $D^*$ outputs 1. Otherwise, she outputs 0.
+\end{enumerate}
+We estimate the advantage of $D^*$. Note that $\Pr[s\getsr\bits^\lambda: D^*(G_\lambda(s))=1]=1$ since $G_\lambda(s)$ must be in the range of $G_\lambda$. The size of the range satisfies: $|\mathrm{range}(G_\lambda)|\leq 2^{\lambda}$. Hence
+$$\Pr[y\getsr \bits^{\lambda+1}: y\in\mathrm{range}(G_\lambda)] \leq \frac{2^\lambda}{2^{\lambda+1}}=\frac{1}{2}.$$
+Thus we have
+$$\Adv_{G,\lambda}^{prg}(D^*) = \left| \Pr[s\getsr\bits^\lambda: D^*(G_\lambda(s))=1] - \Pr[y\getsr\bits^{\lambda+1}:D^*(y)=1] \right| \geq \frac{1}{2}.$$
+\end{example}
+The example above implies that we \emph{cannot} require PRG to resist \emph{any} distinguisher, e.g. with unbounded computational capacity.
+
+PRG is closely related to one-way functions (OWFs). The following lemma indicates that a PRG can be a OWF.
+\begin{lemma}
+If $G:\bits^\lambda \mapsto \bits^{2\lambda}$ is a PRG, then $G$ is also a OWF.
+\end{lemma}
+\begin{proof}
+Assume by contradiction that $G$ is not one-way, then there exists a PPT adversary $A$ and a non-negligible function $\epsilon$ s.t.
+$$\epsilon(\lambda) \eqdef \Adv_{G,\lambda}^{owf}(A) =\Pr[s\getsr\bits^\lambda, s'\getsr A(G(s),\lambda): G(s)=G(s')].$$
+Our goal is to build a distinguisher $D$ from $A$ s.t. $\Adv_{G,\lambda}^{prg}(D)$ is also ``close'' to $\epsilon(\lambda)$.
+Let $s\getsr\bits^\lambda$. Given $y\gets G(s)$ \footnote{Note that since $G$ is deterministic, there is no random coin.} or $y\getsr \bits^{2\lambda}$, we define the distinguisher $D$ as following:
+\begin{enumerate}
+\item $s' \getsr A(y, \lambda)$.
+\item If $G(s') = y$ then output 1. Otherwise, output 0.
+\end{enumerate}
+We need to estimate the advantage of $D$:
+$$\Adv_{G,\lambda}^{prg}(D) = \left| \Pr[s\getsr \bits^\lambda : D(G(s))=1] - \Pr[y\getsr\bits^{2\lambda} : D(y)=1] \right|.$$
+The first term of probability is exactly the same as the advantage of $A$.
+\[
+\begin{aligned}
+\Pr[s\getsr\bits^\lambda : D(G(s))=1] &= \Pr[s\getsr\bits^\lambda, s'\getsr A(G(s),\lambda): G(s') = G(s)] \\
+&= \Adv_{G,\lambda}^{owf}(A) = \epsilon(\lambda).
+\end{aligned}
+\]
+For the second term, if $y$ is chosen outside the range of $G$, then $D$ always outputs 0. Hence
+\[
+\Pr[y\getsr\bits^{2\lambda} : D(y)=1] \leq \Pr[y\getsr\bits^{2\lambda} : y\in\mathrm{range}(G)] 
+\leq \frac{2^\lambda}{2^{2\lambda}} = 2^{-\lambda},
+\]
+which is negligible. Now $\Adv_{G,\lambda}^{prg}(D)$ is the distance between a negligible function $2^{-\lambda}$ and a non-negligible function $\epsilon(\lambda)$. Thus $\Adv_{G,\lambda}^{prg}(D)$ must be non-negligible. The last step still requires a proof!
+\end{proof}
+
+A much stronger result is that there exists a construction transforming \emph{any} OWF into a PRG. This construction was found by H\aa stad, Impagliazzo, Levin and Luby \cite{HILL99}.
+
+Another important fact is that we can construct PRG from one-way permutation, which is a one-to-one one-way function family $\pi: \bits^\lambda \mapsto \bits^\lambda$. The Goldreich-Levin construction \cite{GL89} $G^\pi : \bits^{2\lambda} \mapsto \bits^{2\lambda+1}$ is given by
+$$G^\pi(x; r) \eqdef (\pi(x), r, \angles{x,r}),$$
+where $x, r\in\bits^\lambda$, and $\angles{x,r}$ is the inner product of $x$ and $r$ defined as
+$$\angles{x,r} \eqdef \sum_{i=1}^\lambda x_ir_i \mod 2.$$
+
+The details will be given on next lecture.
+
+\begin{thebibliography}{10}
+\bibitem{HILL99} 
+J. H\aa stad, R. Impagliazzo, L.A. Levin and M. Luby, 1999. 
+A pseudorandom generator from any one-way function. 
+SIAM Journal on Computing, 28(4), pp.1364-1396.
+	
+\bibitem{GL89}
+O. Goldreich and L.A. Levin, 1989, February. 
+A hard-core predicate for all one-way functions. 
+In Proceedings of the twenty-first annual ACM symposium on Theory of computing (pp. 25-32). ACM.
+\end{thebibliography}
+
+\end{document}
