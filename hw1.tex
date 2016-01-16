@@ -113,9 +113,9 @@ $$f_4(n) = n^{-\log n} \leq n^{-\log n_c} = n^{-\log 2^c} = n^{-c}.$$
 \item $f_6$ is \emph{not} negligible. Let $c=1$. Note that when $n$ takes any even number larger than 1, we have $1/n < 1 = (-1)^n$. Hence there are infinite $n$'s s.t. $(-1)^n > n^{-c} = 1/n$.
 \end{itemize}
 
-{\bf b) [Points: 6]} Show that for any two negligible functions $f, g$, the following functions are negligible:
-$$n \mapsto f(n)+g(n), \quad n \mapsto f(g(n)),$$
-$$n \mapsto f(n)\cdot g(n), \quad n \mapsto p(n)\cdot f(n) \textrm{for a polynomial $p(n)$}$$
+{\bf b) [Points: 6]} Show that for any two negligible functions $f, g$, and any polynomial $p$ which is non-negative (i.e., $p(n)\geq 0$ on all $n\in\N$) the following functions are negligible:
+$$n \mapsto f(n)+g(n), \quad n \mapsto p(f(n)) \textrm{ where $p$ has no constant term},$$
+$$n \mapsto f(n)\cdot g(n), \quad n \mapsto p(n)\cdot f(n) \textrm{ for a polynomial $p(n)$}.$$
 
 {\bf Solution}:
 \begin{itemize}
@@ -124,20 +124,29 @@ $$n \mapsto f(n)\cdot g(n), \quad n \mapsto p(n)\cdot f(n) \textrm{for a polynom
 Since $f$ and $g$ are negligible, for any $c+1\in \N$, there exists $n_{c+1,f}$ s.t. for any $n\geq n_{c+1,f}$, $f(n) \leq n^{-(c+1)}$, and there exists $n_{c+1,g}$ s.t. for any $n\geq n_{c+1,g}$, $g(n) \leq n^{-(c+1)}$. Thus, for any $n\geq \max\{n_{c+1,f}, n_{c+1,g}\}$, we have $f(n) \leq n^{-(c+1)}$ and $g(n) \leq n^{-(c+1)}$. Now given any $c\in\N$, let $n_c = \max\{3, n_{c+1,f}, n_{c+1,g}\}$. Then for any $n\geq n_c$, we have $f(n)+g(n) \leq 2n^{-(c+1)} = \frac{2}{n}n^{-c} < n^{-c}$, which satisfies the definition of a negligible function.
 \end{proof}
 
-\item $f(g(n))$ is \emph{not} negligible.
+\item For a \emph{non-negative} polynomial $p(n)$ with no constant term, $p(f(n))$ is negligible.
 \begin{proof}
-A counter-example is $f(n) = g(n) = 2^{-n}$. Then $f(g(n)) = 2^{-2^{-n}}$. Let $c=1$. For any $n>1$, we have $2^{-2^{-n}} > 2^{-2^{-1}} = 1/\sqrt{2}>1/n = n^{-c}$.
+Suppose the degree of $p(n)$ is $d$, and $p(n) = \sum_{k=1}^d a_kn^k$, where each $a_k\in\R$. 
+%Then $a_d\geq 0$; otherwise, $p(n)$ cannot be non-negative. 
+$$\forall x\in [0,1], p(x) = \sum_{k=1}^d a_kx^k \leq \sum_{k=1}^d |a_k|x^k \leq \sum_{k=1}^d |a_k|x$$
+Define the coefficient magnitude sum of $p$: $S_p = \sum_{k=1}^d |a_k|$. Then for all $f(n)\in[0,1]$, $p(f(n)) \leq S_p \cdot f(n)$.
+On the other hand, since $f(n)$ is negligible, for any $c\in\N$, there exists $n_{c,f}$ s.t. for any $n\geq n_{c,f}$, we have $f(n)\leq n^{-c}$. 
+For all $c\in\N$, let $n_c = \max\{\lceil S_p \rceil+1, n_{c+1,f}, 2, n_{1,f}\}$. Then for any $n\geq n_c$, we have $f(n)\leq 1/n<1$ and thus
+$$p(f(n)) \leq S_p \cdot f(n) \leq S_p \cdot n^{-(c+1)} = \frac{S_p}{n}n^{-c} < n^{-c},$$
+which satisfies the definition of a negligible function.
 \end{proof}
 
 \item $f(n)\cdot g(n)$ is negligible.
 \begin{proof}
-Since $f$ and $g$ are negligible, for any $c\in \N$, there exists $n_{c,f}$ s.t. for any $n\geq n_{c,f}$, $f(n) \leq n^{-c}$, and there exists $n_{c,g}$ s.t. for any $n\geq n_{c,g}$, $g(n) \leq n^{-c}$. Let $n_c = \max\{n_{c,f}, n_{c,g}\}$. Then for any $n\geq n_c$, we have $f(n) \leq n^{-c}$ and $g(n) \leq n^{-c}$. Hence $f(n)\cdot g(n) \leq n^{-2c} < n^{-c}$, which satisfies the definition of a negligible function.
+Since $f$ and $g$ are negligible, for any $c\in \N$, there exists $n_{c,f}$ s.t. for any $n\geq n_{c,f}$, $f(n) \leq n^{-c}$, and there exists $n_{c,g}$ s.t. for any $n\geq n_{c,g}$, $g(n) \leq n^{-c}$. Let $n_c = \max\{n_{c,f}, n_{c,g}\}$. Then for any $n\geq n_c$, we have $f(n) \leq n^{-c}$ and $g(n) \leq n^{-c}$. Hence $f(n)\cdot g(n) \leq n^{-2c} \leq n^{-c}$, which satisfies the definition of a negligible function.
 \end{proof}
 
-\item For a \emph{positive} polynomial $p(n)$, $p(n)\cdot f(n)$ is negligible.
+\item For a \emph{non-negative} polynomial $p(n)$, $p(n)\cdot f(n)$ is negligible.
 \begin{proof}
-Without loss of generality, suppose the degree of $p(n)$ is $d$, and $p(n) = \sum_{k=0}^d a_kn^k$, where each $a_k\in\R$ and $a_d>0$ to be positive. Define the maximum coefficient: $a \eqdef \max_{k=0}^d \{a_k\}$. Note that 
-$$p(n) = \sum_{k=0}^d a_kn^k \leq a \sum_{k=0}^d n^k = a \frac{n^{d+1}-1}{n-1} < a \frac{n^{d+1}}{n-1}.$$
+Suppose the degree of $p(n)$ is $d$, and $p(n) = \sum_{k=0}^d a_kn^k$, where each $a_k\in\R$.
+Since $p(n)$ is non-negative, we have $a_d \geq 0$. Otherwise, a sufficiently large $n$ can give negative $p(n)$, which is dominated by the term $a_dn^d$.
+Define the maximum coefficient: $a \eqdef \max_{k=0}^d \{a_k\} \geq a_d \geq 0$. Note that 
+$$p(n) = \sum_{k=0}^d a_kn^k \leq a \sum_{k=0}^d n^k = a \frac{n^{d+1}-1}{n-1} \leq a \frac{n^{d+1}}{n-1}.$$
 When $n-1>a$, we have $p(n) < n^{d+1}$. 
 
 Since $f(n)$ is negligible, for any $c\in\N$, there exists $n_{c,f}$ s.t. for any $n\geq n_{c,f}$, $f(n) \leq n^{-c}$. 
