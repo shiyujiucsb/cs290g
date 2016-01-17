@@ -307,4 +307,61 @@ $$
 \end{aligned}$$
 \end{proof}
 
+\section{Task 3 - Hard-Core Predicates}
+Let $f : \bits^\lambda \mapsto \bits^{\lambda'}$ be a permutation family, and let $P : \bits^\lambda \mapsto \bits$ be a family of predicates. Then, recall that $P$ is a hardcore predicate for $f$ if for all PPT $A$, we have that
+$$\Adv_{f,P,\lambda}^{pred}(A) = 2 \left| \Pr[x\getsr\bits^\lambda : A(f(x)) = P(x)] -\frac{1}{2}\right|$$
+is negligible.
+
+{\bf a) [Points: 8]} Prove, giving an explicit reduction, that if $f : \bits^\lambda \mapsto \bits^{\lambda'}$ is a \emph{permutation}, and there exists some hardcore predicate $P$ for $f$, then $f$ must be one way.
+\begin{proof}
+Assume by contradiction $f$ is not one-way. Then there exists a PPT adversary $A$ s.t. the advantage $\Adv_{f,\lambda}^{owf}(A)$ is non-negligible. It suffices to build a distinguisher $D$ s.t. the advantage $\Adv_{f,P,\lambda}^{pred}(D)$ is also non-negligible. Given any input $y=f(x)$, we give the construction of $D$ as following:
+\begin{quote}
+Distinguisher $D(y)$:
+\begin{enumerate}
+\item $x' \getsr A(y)$.
+\item {\bf if} $f(x') = y$ {\bf then output} $P(x')$.
+\item {\bf else} $r\getsr\bits$, and {\bf output} $r$. 
+\end{enumerate}
+\end{quote}
+Now we can compute the advantage of $D$:
+$$
+\begin{aligned}
+&\Adv_{f,P,\lambda}^{pred}(D) = 2 \left| \Pr[x\getsr\bits^\lambda : D(f(x)) = P(x)] -\frac{1}{2}\right| \\
+=& 2 \bigg| \Pr[x\getsr\bits^\lambda, x'\getsr A(f(x)) : f(x')=f(x), D(f(x)) = P(x)] \\
+&+ \Pr[x\getsr\bits^\lambda, x'\getsr A(f(x)) : f(x')\not=f(x), D(f(x)) = P(x)] -\frac{1}{2}\bigg|.
+\end{aligned}
+$$
+We can compute both the terms of probability.
+$$
+\begin{aligned}
+&\Pr[x\getsr\bits^\lambda, x'\getsr A(f(x)) : f(x')=f(x), D(f(x)) = P(x)] \\
+&+\Pr[x\getsr\bits^\lambda, x'\getsr A(f(x)) : f(x')\not=f(x), D(f(x)) = P(x)] \\
+=&\Pr[x\getsr\bits^\lambda, x'\getsr A(f(x)) : f(x')=f(x)]\\
+&\cdot\Pr[x\getsr\bits^\lambda, x'\getsr A(f(x)), f(x')=f(x): P(x') = P(x)] \\
+&+\Pr[x\getsr\bits^\lambda, x'\getsr A(f(x)) : f(x')\not=f(x)]\\
+&\cdot\Pr[x\getsr\bits^\lambda, x'\getsr A(f(x)), f(x')\not=f(x), r\getsr\bits: r = P(x)] \\
+\end{aligned}
+$$
+Note that $\Adv_{f,\lambda}^{owf}(A) \eqdef \Pr[x\getsr\bits^\lambda, x'\getsr A(f(x)) : f(x')=f(x)]$, and since $f$ is one-to-one, $f(x')=f(x)$ iff $x'=x$. Hence we have
+$$
+\begin{aligned}
+&\Pr[x\getsr\bits^\lambda, x'\getsr A(f(x)) : f(x')=f(x), D(f(x)) = P(x)] \\
+&+\Pr[x\getsr\bits^\lambda, x'\getsr A(f(x)) : f(x')\not=f(x), D(f(x)) = P(x)] \\
+=&\Adv_{f,\lambda}^{owf}(A)\cdot\Pr[x\getsr\bits^\lambda, x'\getsr A(f(x)), x'=x: P(x') = P(x)] \\
+&+(1-\Adv_{f,\lambda}^{owf}(A))\cdot\Pr[x\getsr\bits^\lambda, x'\getsr A(f(x)), f(x')\not=f(x), r\getsr\bits: r = P(x)] \\
+=&\Adv_{f,\lambda}^{owf}(A)\cdot 1 + (1-\Adv_{f,\lambda}^{owf}(A))/2 = \frac{1}{2} + \frac{1}{2}\Adv_{f,\lambda}^{owf}(A).
+\end{aligned}
+$$
+Thus
+$$\Adv_{f,P,\lambda}^{pred}(D) = 2\left| \frac{1}{2} + \frac{1}{2}\Adv_{f,\lambda}^{owf}(A)-\frac{1}{2} \right| = \Adv_{f,\lambda}^{owf}(A),$$
+which is non-negligible.
+\end{proof}
+
+{\bf b) [Points: 2]} Why is it necessary in a) that $f$ is a permutation? Is the statement true for
+general $f$? Justify your answer!
+
+{\bf Claim}: The statement is not true for general $f$.
+
+{\bf Counterexample}: Suppose $f : \bits^\lambda \mapsto \bits$ is defined by $f(x) = 0$ for any $x\in\bits^\lambda$. Apparently $f$ is not one-way, but we claim the bitwise xor $\oplus_i x_i$ is a hardcore predicate of $f$. Note that the predicate $\oplus_i x_i$ is uniformly distributed over $\bits$ if $x\getsr\bits^\lambda$. Since given any input $f(x)$ which is always 0, any adversary has no knowledge about $x$, and thus the best way to guess $\oplus_i x_i$ is based on the statistical distribution of the predicate. However, it is a uniform distribution, and thus any adversary cannot have non-negligible advantage.
+
 \end{document}
