@@ -364,4 +364,15 @@ general $f$? Justify your answer!
 
 {\bf Counterexample}: Suppose $f : \bits^\lambda \mapsto \bits$ is defined by $f(x) = 0$ for any $x\in\bits^\lambda$. Apparently $f$ is not one-way, but we claim the bitwise xor $\oplus_i x_i$ is a hardcore predicate of $f$. Note that the predicate $\oplus_i x_i$ is uniformly distributed over $\bits$ if $x\getsr\bits^\lambda$. Since given any input $f(x)$ which is always 0, any adversary has no knowledge about $x$, and thus the best way to guess $\oplus_i x_i$ is based on the statistical distribution of the predicate. However, it is a uniform distribution, and thus any adversary cannot have non-negligible advantage.
 
+
+\section{Task 4 – Pseudorandom Generators}
+Throughout this task let $G : \bits^\lambda \mapsto \bits^{n(\lambda)}$ for $\lambda<n=n(\lambda)$ be a PRG.
+
+{\bf a) [Points: 4]} Prove that $G' : \bits^{\lambda + n(\lambda)} \mapsto \bits^{2n(\lambda)}$ such that
+$$G'(x||y) = (G(x)\oplus y)||y$$
+for all $x\in\bits^\lambda$ and $y\in \bits^{n(\lambda)}$ is a pseudorandom generator.
+\begin{proof}
+
+\end{proof}
+
 \end{document}
