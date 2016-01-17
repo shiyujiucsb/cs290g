@@ -202,12 +202,12 @@ Hence $A'$ has a non-negligible advantage.
 
 {\bf Claim}: $x \mapsto f(g(x))$ is \emph{not} one-way.
 
-{\bf Counterexample}: Suppose $h : \bits^\lambda \mapsto \bits^\lambda$ is one-way. We construct two functions $f,g : \bits^{2\lambda} \mapsto \bits^{2\lambda}$ as following, given any inputs $x, y \in \bits^\lambda$:
+{\bf Counterexample}: Suppose $h, j : \bits^\lambda \mapsto \bits^\lambda$ are one-way functions (not permutations) and w.l.o.g $0^\lambda$ is not in the range of $j$. We construct two functions $f,g : \bits^{2\lambda} \mapsto \bits^{2\lambda}$ as following, given any inputs $x, y \in \bits^\lambda$:
 $$g(x,y) \eqdef h(x) || h(x).$$
 $$f(x,y) \eqdef
 \begin{cases}
 0^{2\lambda} & \textrm{if $x=y$,} \\
-g(x,y) & \textrm{otherwise.}
+(j(x),j(y)) & \textrm{otherwise.}
 \end{cases}$$
 Apparently $f(g(z)) = 0^{2\lambda}$ for all $z\in\bits^{2\lambda}$. Thus $h\eqdef f\circ g$ is \emph{not} one-way over $\bits^{2\lambda}$.
 We claim that both $f$ and $g$ are one-way.
@@ -226,11 +226,11 @@ Adversary $A' (y)$:
 We can estimate the advantage of $A'$:
 $$
 \begin{aligned}
-&\Adv_{h,\lambda}^{owf}(A') \\
-=& \Pr[x\getsr \bits^\lambda, x' \getsr A'(h(x)) : h(x')=h(x)] \\
-=& \Pr[x\getsr \bits^\lambda, (x', y') \getsr A(h(x) || h(x)) : h(x')=h(x)] \\
-=& \Pr[x\getsr \bits^\lambda, (x', y') \getsr A(h(x) || h(x)) : h(x')||h(x') = h(x)||h(x), ] \\
-=& \Pr[x \getsr \bits^\lambda, y \getsr \bits^\lambda, (x', y') \getsr A(g(x, y)) : g(x', y') = g(x, y), ] \\
+&\Adv_{h,\lambda}^{owf}(A') = \Pr[x\getsr \bits^\lambda, x' \getsr A'(h(x)) : h(x')=h(x)] \\
+=& \Pr[(x,y)\getsr \bits^{2\lambda}, x' \getsr A'(h(x)) : h(x')=h(x)] \\
+=& \Pr[(x,y)\getsr \bits^{2\lambda}, (x', y') \getsr A(h(x) || h(x)) : h(x')=h(x)] \\
+=& \Pr[(x,y)\getsr \bits^{2\lambda}, (x', y') \getsr A(h(x) || h(x)) : h(x')||h(x') = h(x)||h(x)] \\
+=& \Pr[(x,y)\getsr \bits^{2\lambda}, (x', y') \getsr A(g(x, y)) : g(x', y') = g(x, y)] \\
 =& \Adv_{g,\lambda}^{owf}(A) = \epsilon(\lambda),
 \end{aligned}
 $$
@@ -238,13 +238,73 @@ which is also non-negligible.
 \end{proof}
 
 \begin{lemma}
-Given one way function $h : \bits^\lambda \mapsto \bits^\lambda$, the function
+Given one way function $j : \bits^\lambda \mapsto \bits^\lambda$ s.t. $0^\lambda \not\in \mathrm{range}(j)$, the function $f : \bits^{2\lambda} \mapsto \bits^{2\lambda}$ given by
 $$f(x,y) \eqdef
 \begin{cases}
 0^{2\lambda} & \textrm{if $x=y$,} \\
-g(x,y) & \textrm{otherwise.}
+(j(x),j(y)) & \textrm{otherwise.}
 \end{cases}$$
 is also one-way.
 \end{lemma}
+\begin{proof}
+Assume by contradiction $f(x,y)$ is not one-way. Then there exists a PPT adversary $A$ s.t. the advantage $\epsilon(\lambda) = \Adv_{f,\lambda}^{owf}(A)$ is non-negligible. It suffices to build an algorithm $A'$ s.t. the advantage $\Adv_{j,\lambda}^{owf}(A')$ is also non-negligible. Given any input $y_1 = j(x_1)$, we give the construction of $A'$ as following:
+\begin{quote}
+Adversary $A' (y_1)$:
+\begin{enumerate}
+\item $x_2 \getsr \bits^\lambda$.
+\item $(x_1',x_2') \getsr A(y_1,j(x_2))$.
+\item {\bf output} $x_1'$.
+\end{enumerate}
+\end{quote} 
+We can estimate the advantage of $A'$:
+$$
+\begin{aligned}
+&\Adv_{j,\lambda}^{owf}(A') \\
+=& \Pr[x_1 \getsr \bits^\lambda, x_1' \getsr A'(j(x_1)) : j(x_1') = j(x_1)] \\
+=& \Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(j(x_1),j(x_2)) : j(x_1') = j(x_1)] \\
+=& \Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(j(x_1),j(x_2)) : x_1=x_2, j(x_1') = j(x_1)] \\
+&+\Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(j(x_1),j(x_2)) : x_1\not=x_2, j(x_1') = j(x_1)].
+\end{aligned}
+$$
+Note that the first term of probability 
+$$\Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(j(x_1),j(x_2)) : x_1=x_2, j(x_1') = j(x_1)]$$
+$$\leq \Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(j(x_1),j(x_2)) : x_1=x_2] = 2^{-\lambda},$$
+is negligible. From Task 1, it suffices to show that the second term of probability
+$$\Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(j(x_1),j(x_2)) : x_1\not=x_2, j(x_1') = j(x_1)]$$
+is non-negligible.
+By conditional probability,
+$$
+\begin{aligned}
+&\Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(j(x_1),j(x_2)) : x_1\not=x_2, j(x_1') = j(x_1)]\\
+=&\Pr[(x_1, x_2) \getsr \bits^{2\lambda}: x_1\not=x_2]\Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(j(x_1),j(x_2)), \\
+&x_1\not=x_2 : j(x_1') = j(x_1)]\\
+=&(1-2^{-\lambda})\Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(j(x_1),j(x_2)), x_1\not=x_2 : j(x_1') = j(x_1)].
+\end{aligned}
+$$
+Similarly by Task 1, we only need to show that the probability
+\begin{equation}
+\label{eq:1}
+\Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(j(x_1),j(x_2)), x_1\not=x_2 : j(x_1') = j(x_1)]
+\end{equation}
+is non-negligible. On the other hand, again by using conditional probabilities,
+$$
+\begin{aligned}
+&\epsilon(\lambda) = \Adv_{f,\lambda}^{owf}(A) \\
+=&\Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(f(x_1,x_2)) : f(x_1',x_2') = f(x_1,x_2)]\\
+=&(1-2^{-\lambda})\Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(f(x_1,x_2)), x_1\not=x_2: f(x_1',x_2') = f(x_1,x_2)]\\
+&+2^{-\lambda}\Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(f(x_1,x_2)), x_1=x_2: f(x_1',x_2') = f(x_1,x_2)].
+\end{aligned}
+$$
+Define 
+$$\epsilon'(\lambda) \eqdef \Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(f(x_1,x_2)), x_1\not=x_2: f(x_1',x_2') = f(x_1,x_2)],$$
+which is non-negligible. Since if $x_1\not=x_2$, we have $f(x_1,x_2)\not= 0^{2\lambda}$, and thus $f(x_1,x_2) = f(x_1',x_2') \not=0^{2\lambda}$ implies $j(x_1)=j(x_1')$. Hence we can show the probability in (\ref{eq:1}) is non-negligible.
+$$
+\begin{aligned}
+&\Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(j(x_1),j(x_2)), x_1\not=x_2 : j(x_1') = j(x_1)] \\
+=& \Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(f(x_1,x_2)), x_1\not=x_2 : j(x_1') = j(x_1)] \\
+\geq & \Pr[(x_1, x_2) \getsr \bits^{2\lambda}, (x_1', x_2') \getsr A(f(x_1,x_2)), x_1\not=x_2 : f(x_1,x_2) = f(x_1',x_2')] \\
+=& \epsilon'(\lambda).
+\end{aligned}$$
+\end{proof}
 
 \end{document}
