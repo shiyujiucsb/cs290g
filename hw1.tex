@@ -78,6 +78,7 @@ $\underleftarrow{\quad #1 \quad}$ }
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{construction}[theorem]{Construction}
 \newtheorem{example}[theorem]{Example}
+\newtheorem{counterexample}[theorem]{Counterexample}
 \newtheorem{algorithm1}[theorem]{Algorithm}
 \newtheorem{protocol}[theorem]{Protocol}
 \newtheorem{remark}[theorem]{Remark}
@@ -155,5 +156,73 @@ $$p(n)\cdot f(n) < n^{d+1} f(n) \leq n^{d+1} n^{-(c+d+1)} = n^{-c},$$
 which satisfies the definition of a negligible function.
 \end{proof}
 \end{itemize}
+
+\section{Task 2 - One-Way Functions}
+Let $f, g : \bits^\lambda \mapsto \bits^\lambda$ be both one-way functions. Which of the following statements
+are true and which ones are false? Formally justify your claims – i.e., either with a proof
+of one-wayness or a counterexample.
+
+{\bf a) [Points: 2]} $x \mapsto f(x) \oplus g(x)$, where $\oplus$ denotes bitwise xor.
+
+{\bf Claim}: $x \mapsto f(x) \oplus g(x)$ is \emph{not} one-way.
+
+{\bf Counterexample}:
+Consider $f(x) = g(x)$, i.e., $f$ and $g$ are the same one-way function. Then we have
+$$\forall x\in\bits^\lambda, f(x) \oplus g(x) = f(x) \oplus f(x) = 0^\lambda.$$
+Given any $h(x) \eqdef f(x) \oplus g(x)$, the adversary just chooses $x' \getsr \bits^\lambda$ and inverts $h(x)$ (i.e. $h(x')=h(x)$) with advantage 1.
+
+{\bf b) [Points: 2]} $(x, y) \mapsto f(x) || g(y)$.
+
+{\bf Claim}: $(x, y) \mapsto f(x) || g(y)$ is one-way.
+\begin{proof}
+Assume by contradiction $h(x, y) \eqdef f(x) || g(y)$ is not one-way. Then there exists a PPT adversary $A$ s.t. the advantage $\epsilon(\lambda) \eqdef \Adv_{h,\lambda}^{owf}(A)$ is non-negligible. We are going to build an algorithm $A'$ and argue that $A'$ can invert $f(x)$ with non-negligible advantage $\Adv_{f,\lambda}^{owf}(A')$. Given input $z \in\bits^{\lambda}$, the construction of $A'$ is given as following:
+\begin{quote}
+Adversary $A' (z)$:
+\begin{enumerate}
+\item $y \getsr \bits^\lambda$.
+\item $(x', y') \getsr A(z || g(y))$.
+\item {\bf output} $x'$.
+\end{enumerate}
+\end{quote}
+We can estimate the advantage of $A'$:
+$$
+\begin{aligned}
+& \Adv_{f,\lambda}^{owf}(A') \\
+=& \Pr[x\getsr \bits^\lambda, x' \getsr A'(f(x)) : f(x')=f(x)] \\
+=& \Pr[x\getsr \bits^\lambda, y\getsr \bits^\lambda, (x', y') \getsr A(f(x) || g(y)) : f(x')=f(x)] \\
+\geq & \Pr[x\getsr \bits^\lambda, y\getsr \bits^\lambda, (x', y') \getsr A(f(x) || g(y)) : f(x')=f(x), g(y')=g(y)] \\
+=& \Pr[x\getsr \bits^\lambda, y\getsr \bits^\lambda, (x', y') \getsr A(h(x, y)) : h(x', y')=h(x, y)] \\
+=& \Adv_{h,\lambda}^{owf}(A) = \epsilon(\lambda).
+\end{aligned}
+$$
+Hence $A'$ has a non-negligible advantage.
+\end{proof}
+
+{\bf c) [Points: 2]} $x \mapsto f(g(x))$.
+
+{\bf Claim}: $x \mapsto f(g(x))$ is \emph{not} one-way.
+
+{\bf Counterexample}: Suppose $h : \bits^\lambda \mapsto \bits^\lambda$ is one-way. We construct two functions $f,g : \bits^{2\lambda} \mapsto \bits^{2\lambda}$ as following, given any inputs $x, y \in \bits^\lambda$:
+$$g(x,y) \eqdef h(x) || h(x).$$
+$$f(x,y) \eqdef
+\begin{cases}
+0^{2\lambda} & \textrm{if $x=y$,} \\
+g(x,y) & \textrm{otherwise.}
+\end{cases}$$
+Apparently $f(g(z)) = 0^{2\lambda}$ for all $z\in\bits^{2\lambda}$. 
+We claim that both $f$ and $g$ are one-way.
+\begin{lemma}
+Given one way function $h : \bits^\lambda \mapsto \bits^\lambda$, $g(x,y) \eqdef h(x) || h(x)$ is also one-way.
+\end{lemma}
+
+\begin{lemma}
+Given one way function $h : \bits^\lambda \mapsto \bits^\lambda$, the function
+$$f(x,y) \eqdef
+\begin{cases}
+0^{2\lambda} & \textrm{if $x=y$,} \\
+g(x,y) & \textrm{otherwise.}
+\end{cases}$$
+is also one-way.
+\end{lemma}
 
 \end{document}
