@@ -499,11 +499,55 @@ $$
 Note that $\Pr[x\getsr P_0: D(x)=1] + \Pr[x\getsr P_0: D(x)=0] = 1$.
 \end{proof}
 
-{\bf b) [Points: 4]} The statistical distance between $P_0$ and $P_1$ is the quantity
+{\bf b) [Points: 4]} The \emph{statistical distance} between $P_0$ and $P_1$ is the quantity
 $$SD(P_0, P_1) = \frac{1}{2}\sum_{x\in\mathcal{X}}|P_0(x) - P_1(x)|.$$
 Exhibit a distinguisher $D$ such that $\Adv_{P_0,P_1}^{dist}(D) = SD(P_0,P_1)$. If both distributions are
 on $\mathcal{X} = \bits^\lambda$, is your distinguisher efficient (i.e., polynomial-time) in $\lambda$?
+\begin{lemma}
+$$SD(P_0, P_1) = \sum_{x\in\mathcal{X}, P_0(x)\geq P_1(x)} (P_0(x) - P_1(x)).$$
+\end{lemma} 
+\begin{proof}
+By definition,
+$$SD(P_0, P_1) = \frac{1}{2}\sum_{x\in\mathcal{X}, P_0(x)\geq P_1(x)} (P_0(x) - P_1(x)) + \frac{1}{2}\sum_{x\in\mathcal{X}, P_0(x) < P_1(x)} (P_1(x) - P_0(x)).$$
+Note that 
+$$\sum_{x\in\mathcal{X}, P_0(x) < P_1(x)} P_0(x) + \sum_{x\in\mathcal{X}, P_0(x) \geq P_1(x)} P_0(x) = 1.$$
+$$\sum_{x\in\mathcal{X}, P_0(x) < P_1(x)} P_1(x) + \sum_{x\in\mathcal{X}, P_0(x) \geq P_1(x)} P_1(x) = 1.$$
+Thus
+$$SD(P_0, P_1) = \frac{1}{2}\sum_{x\in\mathcal{X}, P_0(x)\geq P_1(x)} (P_0(x) - P_1(x))$$
+$$ + \frac{1}{2} \left((1-\sum_{x\in\mathcal{X}, P_0(x) \geq P_1(x)} P_1(x))-(1-\sum_{x\in\mathcal{X}, P_0(x) \geq P_1(x)} P_0(x))\right).$$
+That is,
+$$SD(P_0, P_1) = \sum_{x\in\mathcal{X}, P_0(x)\geq P_1(x)} (P_0(x) - P_1(x)).$$
+\end{proof}
+Now we give the construction of the distinguisher $D(x)$ given the input $x\getsr P_b$ for any bit $b$:
+\begin{quote}
+Distinguisher $D(x)$:
+\begin{enumerate}
+\item {\bf if} $P_1(x) \geq P_0(x)$ {\bf then output} 1.
+\item {\bf else output} 0.
+\end{enumerate}
+\end{quote}
+We can compute the advantage of $D$:
+$$
+\begin{aligned}
+& \Adv_{P_0,P_1}^{dist}(D) = \bigg| \Pr[x\getsr P_1: D(x)=1] - \Pr[x\getsr P_0: D(x)=1] \bigg| \\
+=& \bigg| \sum_{x\in\mathcal{X}, P_1(x) \geq P_0(x)} P_1(x) - \sum_{x\in\mathcal{X}, P_1(x) \geq P_0(x)} P_0(x) \bigg| \\
+=& \sum_{x\in\mathcal{X}, P_1(x) \geq P_0(x)} \bigg| P_1(x) - P_0(x) \bigg| = \sum_{x\in\mathcal{X}, P_1(x) \geq P_0(x)} (P_1(x) - P_0(x)).
+\end{aligned}
+$$
+which is exactly $SD(P_1, P_0)$ by the lemma above. by the definition of statistical distance, it is easy to see $SD(P_1, P_0) = SD(P_0, P_1)$.
 
-{\bf Solution}. 
+Our distinguisher itself is PPT. However, if the statistical distance between $P_0$ and $P_1$ is negligible on $\lambda$, then repeating $D$ by feeding independent inputs $x$ by only polynomial times cannot give a non-negligible advantage. Thus if $SD(P_0,P_1)$ is negligible on $\lambda$, our construction of $D$ may not be efficient (i.e., giving non-negligible $\Adv_{P_0,P_1}^{dist}(D)$ in polynomial time).
+
+{\bf c) [Points: 8]} Consider a function $f : \bits^\lambda \mapsto \bits^{\lambda'}$ and a predicate $P : \bits^\lambda \mapsto \bits$.
+Also let:
+\begin{itemize}
+\item $P_0$ be the distribution over pairs $(y, u)$ obtained by sampling $x\getsr\bits^\lambda$, $y\gets f(x)$, $u\gets P(x)$.
+\item $P_1$ be the distribution over pairs $(y, u)$ obtained by sampling $x\getsr\bits^\lambda$, $y\gets f(x)$, $u\getsr \bits$.
+\end{itemize}
+Prove that for all distinguisher $D$ there exists an adversary $A$ such that
+$$\Adv_{P_0,P_1}^{dist}(D) = \frac{1}{2}\Adv_{f,P,\lambda}^{pred}(A).$$
+\begin{proof}
+In fact, we can construct such an adversary $A$ given any distinguisher $D$ as following:
+\end{proof}
 
 \end{document}
