@@ -453,7 +453,29 @@ Hence for both cases we can construct distinguishers against $G$ with non-neglig
 $$G'''(x) = G(x)||G(\overline{x})$$
 for all $x\in\bits^\lambda$ is \emph{not} a pseudorandom generator, where $\overline{x}$ is the bit-wise complement of $x$ (i.e., each bit is flipped).
 \begin{proof}
-
+Consider the Goldreich-Levin PRG construction $G^\pi : \bits^{2\lambda} \mapsto \bits^{2\lambda+1}$ given by
+$$G^\pi(x||r) \eqdef \pi(x)||r||\angles{x,r}$$
+where $\pi$ is a OWP over $\bits^\lambda$, $x,r \in \bits^\lambda$ and $\angles{x,r}$ denotes the mod 2 inner product of $x$ and $r$:
+$$\angles{x,r} \eqdef \sum_{k=1}^\lambda x_ir_i\mod 2.$$
+Now the function $G''' : \bits^{2\lambda} \mapsto \bits^{4\lambda+2}$ is
+$$G'''(x||r) = G^\pi(x||r)||G^\pi(\overline{x||r}) = \pi(x)||r||\angles{x,r}||\pi(\overline{x})||\overline{r}||\angles{\overline{x},\overline{r}}.$$
+Note that $r$ gives two complementary segments in the output of $G'''$. This gives us chance to build an efficient distinguisher as following:
+\begin{quote}
+Distinguisher $D(y_1||y_2||b_1||y_3||y_4||b_2)$: (here $y_1,y_2,y_3,y_4 \in \bits^\lambda$, $b_1,b_2\in\bits$)
+\begin{enumerate}
+\item {\bf if} $y_2 \oplus y_4 = 0^\lambda$ {\bf then output} 1.
+\item {\bf else output} 0.
+\end{enumerate}
+\end{quote}
+We compute the advantage of $D$:
+$$
+\begin{aligned}
+&\Adv_{G''',\lambda}^{prg}(D) = \bigg| \Pr[s\getsr \bits^{2\lambda}: D(G'''(s))=1] - \Pr[x\getsr \bits^{4\lambda+2}: D(x)=1] \bigg| \\
+=& \bigg| 1 - \Pr[y_2,y_4 \getsr\bits^\lambda: y_2 \oplus y_4 = 0^\lambda] \bigg| \\
+=& | 1 - 2^{-\lambda} |,
+\end{aligned}
+$$
+which is a overwhelming advantage on $\lambda$. Hence the construction $D$ is an efficient distinguisher.
 \end{proof}
 
 
