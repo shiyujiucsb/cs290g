@@ -622,6 +622,8 @@ $$\begin{aligned}
 & \Pr[x\getsr\bits^\lambda, u\getsr\bits, b'\getsr D(f(x),u): b'=1] \\
 =&\Pr[x\getsr\bits^\lambda, u\getsr\bits, b'\getsr D(f(x),u): u=P(x), b'=1] \\
 &+\Pr[x\getsr\bits^\lambda, u\getsr\bits, b'\getsr D(f(x),u): u=1-P(x), b'=1] \\
+=&\Pr[x\getsr\bits^\lambda, u\getsr\bits: u=P(x)] \Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),P(x)): b'=1] \\
+&+\Pr[x\getsr\bits^\lambda, u\getsr\bits: u=1-P(x)] \Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),1-P(x)): b'=1]. \\
 =&\frac{1}{2}\Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),P(x)): b'=1] \\
 &+\frac{1}{2}\Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),1-P(x)): b'=1]. \\
 \end{aligned}$$
