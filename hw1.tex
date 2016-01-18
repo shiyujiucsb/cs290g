@@ -372,7 +372,138 @@ Throughout this task let $G : \bits^\lambda \mapsto \bits^{n(\lambda)}$ for $\la
 $$G'(x||y) = (G(x)\oplus y)||y$$
 for all $x\in\bits^\lambda$ and $y\in \bits^{n(\lambda)}$ is a pseudorandom generator.
 \begin{proof}
+Assume by contradiction $G'$ as constructed above is not a PRG. Then there exists a PPT distinguisher $A$ s.t. the advantage $\Adv_{G',\lambda}^{prg}(A)$ is non-negligible. It suffices to build a PPT distinguisher $A'$ s.t. the advantage $\Adv_{G,\lambda}^{prg}(A')$ is also non-negligible. Given any input $y = G(s)$, we give the construction of $A'$ as following:
+\begin{quote}
+Distinguisher $A'(y)$:
+\begin{enumerate}
+\item $z\getsr \bits^{n(\lambda)}$.
+\item $b' \getsr A((y\oplus z)||z)$.
+\item {\bf output} $b'$.
+\end{enumerate}
+\end{quote}
+Now we can estimate the advantage of $A'$ as following:
+$$
+\begin{aligned}
+&\Adv_{G,\lambda}^{prg}(A') = \left| \Pr[s\getsr\bits^\lambda : A'(G(s))=1] - \Pr[y\getsr\bits^{n(\lambda)} : A'(y)=1] \right| \\
+=&\bigg| \Pr[s\getsr\bits^\lambda, z\getsr \bits^{n(\lambda)} : A((G(s)\oplus z)||z)=1]\\
+ &- \Pr[y\getsr\bits^{n(\lambda)}, z\getsr \bits^{n(\lambda)} : A((y\oplus z)||z)=1] \bigg| \\
+=&\bigg| \Pr[s\getsr\bits^\lambda, z\getsr \bits^{n(\lambda)} : A(G'(s||z))=1] - \Pr[y''\getsr\bits^{2n(\lambda)} : A(y'')=1] \bigg| \\
+=&\Adv_{G',\lambda}^{prg}(A),
+\end{aligned}
+$$
+which is non-negligible. Note that in above if $y$ and $z$ are sampled at uniformly random, then $y'' \eqdef (y\oplus z)||z$ is also uniformly distributed. This can be shown by direct probability computation: let $x_1$ and $x_2$ be \emph{any} string in $\bits^{n(\lambda)}$, and $y,z \getsr\bits^{n(\lambda)}$. Then we have
+$$\Pr[(y\oplus z)||z = x_1||x_2] = \Pr[y\oplus z = x_1 | z=x_2]\Pr[z=x_2]$$
+$$=\Pr[y = x_1\oplus x_2]\Pr[z=x_2] = 2^{-2n(\lambda)}.$$
+\end{proof}
+
+{\bf b) [Points: 6]} Prove that the function $G'' : \bits^{2\lambda} \mapsto \bits^{2n(\lambda)}$ such that
+$$G''(x||y) = G(x)||G(y)$$
+for all $x,y\in\bits^\lambda$ is a pseudorandom generator.
+\begin{proof}
+Assume by contradiction $G''$ is not a PRG. Then there exists a PPT distinguisher $D$ s.t. the advantage $\Adv_{G'',\lambda}^{prg}(D)$ is non-negligible. We first give the construction of the hybrids:
+\begin{itemize}
+\item $H_0$: $G(x)||G(y)$, where $x, y \getsr\bits^\lambda$.
+\item $H_1$: $z||G(y)$, where $z\getsr\bits^{n(\lambda)}$, $y\getsr\bits^\lambda$.
+\item $H_2$: $z||w$, where $z,w\getsr\bits^{n(\lambda)}$.
+\end{itemize}
+Note that $H_0$ is the output distribution of $G''$ given uniformly random seeds as inputs, and $H_2 = U_{2n(\lambda)}$.
+Since $D$ can distinguish between $H_0$ and $H_2$, by Hybrid Lemma, $D$ can distinguish between $H_0$ and $H_1$, \emph{or} distinguish between $H_1$ and $H_2$. If $D$ can distinguish $H_0$ and $H_1$ with a non-negligible advantage $\epsilon_1(\lambda) \eqdef \Adv_{H_0,H_1}^{dist}(D)$, then by using $D$ we can construct a distinguisher $D'$ s.t. $\Adv_{G,\lambda}^{prg}(D')$ is non-negligible:
+\begin{quote}
+Distinguisher $D' (x)$, where $x=G(s)$, $s\in\bits^\lambda$
+\begin{enumerate}
+\item $y\getsr\bits^{\lambda}$.
+\item $b' \getsr D(x||G(y))$.
+\item {\bf output} $b'$.
+\end{enumerate}
+\end{quote}
+The advantage of $D'$ is 
+$$
+\begin{aligned}
+& \Adv_{G,\lambda}^{prg}(D') \\
+=& \bigg| \Pr[s\getsr\bits^\lambda : D'(G(s))=1] - \Pr[z\getsr\bits^{n(\lambda)}: D'(z)=1] \bigg| \\
+=& \bigg| \Pr[s\getsr\bits^\lambda, y\getsr\bits^\lambda : D(G(s)||G(y))=1]\\
+& - \Pr[z\getsr\bits^{n(\lambda)}, y\getsr\bits^\lambda: D(z||G(y))=1] \bigg| \\
+=& \epsilon_1(\lambda),
+\end{aligned}
+$$
+which is non-negligible. For the other case, if $D$ can distinguish $H_1$ and $H_2$ with a non-negligible advantage $\epsilon_2(\lambda) \eqdef \Adv_{H_1,H_2}^{dist}(D)$, then by using $D$ we can construct another distinguisher $D''$ s.t. $\Adv_{G,\lambda}^{prg}(D'')$ is also non-negligible:
+\begin{quote}
+Distinguisher $D'' (x)$, where $x=G(s)$, $s\in\bits^\lambda$
+\begin{enumerate}
+\item $z\getsr\bits^{n(\lambda)}$.
+\item $b' \getsr D(z||x)$.
+\item {\bf output} $b'$.
+\end{enumerate}
+\end{quote}
+The advantage of $D''$ is
+$$
+\begin{aligned}
+& \Adv_{G,\lambda}^{prg}(D'') \\
+=& \bigg| \Pr[s\getsr\bits^\lambda : D''(G(s))=1] - \Pr[x\getsr\bits^{n(\lambda)}: D''(x)=1] \bigg| \\
+=& \bigg| \Pr[s\getsr\bits^\lambda, z\getsr\bits^{n(\lambda)} : D(z||G(s))=1]\\
+& - \Pr[x\getsr\bits^{n(\lambda)}, z\getsr\bits^{n(\lambda)}: D(z||x)=1] \bigg| \\
+=& \epsilon_2(\lambda),
+\end{aligned}
+$$
+which is non-negligible.
+Hence for both cases we can construct distinguishers against $G$ with non-negligible advantage, implying $G$ is not PRG. Contradiction.
+\end{proof}
+
+{\bf c) [Points: 6]} Prove that the function $G''' : \bits^{\lambda} \mapsto \bits^{2n(\lambda)}$ such that
+$$G'''(x) = G(x)||G(\overline{x})$$
+for all $x\in\bits^\lambda$ is \emph{not} a pseudorandom generator, where $\overline{x}$ is the bit-wise complement of $x$ (i.e., each bit is flipped).
+\begin{proof}
 
 \end{proof}
+
+
+\section{Task 5 – Distinguishing Advantages}
+Let $P_0, P_1 : \mathcal{X} \mapsto [0,1]$ be probability distributions on a finite set $\mathcal{X}$, i.e., we have $\sum_{x\in\mathcal{X}}P_b(x) = 1$ for $b\in\bits$. As in class, denote by $x\getsr P_b$ the process of sampling a value $x$ according to the probability distribution $P_b$, i.e., every value $x$ is taken with probability $P_b(x)$.
+
+We consider the following two definitions of distinguishing advantage:
+\begin{enumerate}
+\item {\bf Comparing probabilities.} The first definition compares the probabilities of a distinguisher
+outputting one in two different experiments. I.e., we define
+$$\Adv_{P_0,P_1}^{dist}(D) = \bigg| \Pr[x\getsr P_0: D(x)=1] - \Pr[x\getsr P_1: D(x)=1] \bigg|.$$
+\item {\bf Guessing Game.} The second definition considers a single random experiment where
+the distinguisher is given a sample from either of the two distributions, and its task
+is to guess which one of the distributions was used. Formally,
+$$\Adv_{P_0, P_1}^{dist'}(D) = 2\bigg| \Pr[b \getsr \bits, x\getsr P_b: D(x)=b] -\frac{1}{2} \bigg|.$$
+\end{enumerate}
+{\bf a) [Points: 4]} Prove that the following identity holds for all distinguishers $D$:
+$$\Adv_{P_0,P_1}^{dist}(D) = \Adv_{P_1,P_0}^{dist'}(D).$$
+\begin{proof}
+We may directly prove by definitions.
+$$\begin{aligned}
+&\Adv_{P_1, P_0}^{dist'}(D) = 2\bigg| \Pr[b \getsr \bits, x\getsr P_b: D(x)=b] -\frac{1}{2} \bigg| \\
+=& 2\bigg| \Pr[b \getsr \bits, x\getsr P_b: b=0, D(x)=b] + \Pr[b \getsr \bits, x\getsr P_b: b=1, D(x)=b] -\frac{1}{2} \bigg|.
+\end{aligned}
+$$
+Using conditional probability, one has 
+$$\begin{aligned}
+& \Pr[b \getsr \bits, x\getsr P_b: b=0, D(x)=b] \\
+=& \Pr[b \getsr \bits : b=0] \Pr[b \getsr \bits, x\getsr P_b: D(x)=b | b=0] \\
+=& \frac{1}{2} \Pr[x\getsr P_0: D(x)=0].
+\end{aligned}$$
+Similarly, 
+$$\Pr[b \getsr \bits, x\getsr P_b: b=1, D(x)=b] = \frac{1}{2} \Pr[x\getsr P_1: D(x)=1]$$
+Hence
+$$\begin{aligned}
+&\Adv_{P_1, P_0}^{dist'}(D) \\
+=& 2\bigg| \frac{1}{2} \Pr[x\getsr P_0: D(x)=0] + \frac{1}{2} \Pr[x\getsr P_1: D(x)=1] -\frac{1}{2} \bigg| \\
+=& \bigg| \Pr[x\getsr P_0: D(x)=0] + \Pr[x\getsr P_1: D(x)=1] -1 \bigg| \\
+=& \bigg| \Pr[x\getsr P_1: D(x)=1] - \Pr[x\getsr P_0: D(x)=1] \bigg| \\
+=& \Adv_{P_0,P_1}^{dist}(D).
+\end{aligned}
+$$
+Note that $\Pr[x\getsr P_0: D(x)=1] + \Pr[x\getsr P_0: D(x)=0] = 1$.
+\end{proof}
+
+{\bf b) [Points: 4]} The statistical distance between $P_0$ and $P_1$ is the quantity
+$$SD(P_0, P_1) = \frac{1}{2}\sum_{x\in\mathcal{X}}|P_0(x) - P_1(x)|.$$
+Exhibit a distinguisher $D$ such that $\Adv_{P_0,P_1}^{dist}(D) = SD(P_0,P_1)$. If both distributions are
+on $\mathcal{X} = \bits^\lambda$, is your distinguisher efficient (i.e., polynomial-time) in $\lambda$?
+
+{\bf Solution}. 
 
 \end{document}
