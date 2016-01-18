@@ -463,7 +463,7 @@ Note that $r$ gives two complementary segments in the output of $G'''$. This giv
 \begin{quote}
 Distinguisher $D(y_1||y_2||b_1||y_3||y_4||b_2)$: (here $y_1,y_2,y_3,y_4 \in \bits^\lambda$, $b_1,b_2\in\bits$)
 \begin{enumerate}
-\item {\bf if} $y_2 \oplus y_4 = 0^\lambda$ {\bf then output} 1.
+\item {\bf if} $y_2 \oplus y_4 = 1^\lambda$ {\bf then output} 1.
 \item {\bf else output} 0.
 \end{enumerate}
 \end{quote}
@@ -471,8 +471,7 @@ We compute the advantage of $D$:
 $$
 \begin{aligned}
 &\Adv_{G''',\lambda}^{prg}(D) = \bigg| \Pr[s\getsr \bits^{2\lambda}: D(G'''(s))=1] - \Pr[x\getsr \bits^{4\lambda+2}: D(x)=1] \bigg| \\
-=& \bigg| 1 - \Pr[y_2,y_4 \getsr\bits^\lambda: y_2 \oplus y_4 = 0^\lambda] \bigg| \\
-=& | 1 - 2^{-\lambda} |,
+=& \bigg| 1 - \Pr[y_2,y_4 \getsr\bits^\lambda: y_2 \oplus y_4 = 1^\lambda] \bigg| = 1 - 2^{-\lambda},
 \end{aligned}
 $$
 which is a overwhelming advantage on $\lambda$. Hence the construction $D$ is an efficient distinguisher.
@@ -570,6 +569,85 @@ Prove that for all distinguisher $D$ there exists an adversary $A$ such that
 $$\Adv_{P_0,P_1}^{dist}(D) = \frac{1}{2}\Adv_{f,P,\lambda}^{pred}(A).$$
 \begin{proof}
 In fact, we can construct such an adversary $A$ given any distinguisher $D$ as following:
+\begin{quote}
+Adversary $A(y)$: (here $y=f(x)\in\bits^{\lambda'}$)
+\begin{enumerate}
+\item $u \getsr \bits$.
+\item $b' \getsr D(y,u)$.
+\item {\bf if} $b'=1$ {\bf then output} $u$.
+\item {\bf else output} $1-u$.
+\end{enumerate}
+\end{quote}
+Before the formal treatment of $\Adv_{f,P,\lambda}^{pred}(A)$. We first claim that for all hardcore predicate $P(x)$, its output is a uniformly random bit if the input $x$ is chosen at uniformly random.
+\begin{lemma}
+For any hardcore predicate $P : \bits^\lambda \mapsto \bits$ of OWF $f$,
+$$\Pr[x\getsr\bits^\lambda, u\getsr\bits : u = P(x)] = \frac{1}{2}.$$
+\end{lemma}
+\begin{proof}
+Assume by contradiction $x\getsr\bits^\lambda$, $P(x)$ is not uniformly distributed over $\bits$. Without loss of generality we assume $\Pr[x\getsr\bits^\lambda: P(x)=1] = \frac{1}{2}+\epsilon$, where $\epsilon>0$. Then we can construct an adversary $A$ who always guesses 1 when predicting the hardcore bit. Then the advantage
+$$\Adv_{f,P,\lambda}^{pred}(A) = 2\bigg| \Pr[x\getsr\bits^\lambda: P(x)=1] -\frac{1}{2} \bigg| = 2\epsilon.$$
+Since $\epsilon$ can be any positive \emph{constant}, it cannot be negligible. Hence $A$ is an efficient adversary against $P(x)$. Contradiction.
+\end{proof}
+Now we can compute the advantage of $A$:
+$$
+\begin{aligned}
+&\Adv_{f,P,\lambda}^{pred}(A) \\
+=& 2\bigg| \Pr[x\getsr\bits^\lambda: A(f(x)) = P(x)] - \frac{1}{2} \bigg| \\
+=& 2\bigg| \Pr[x\getsr\bits^\lambda, u\getsr\bits, b'\getsr D(f(x),u): b'=1, u = P(x)]\\
+&+ \Pr[x\getsr\bits^\lambda, u\getsr\bits, b'\getsr D(f(x),u): b'=0, 1-u = P(x)] - \frac{1}{2} \bigg|.
+\end{aligned}
+$$
+Note that by the lemma above
+$$\begin{aligned}
+&\Pr[x\getsr\bits^\lambda, u\getsr\bits, b'\getsr D(f(x),u): b'=1, u = P(x)] \\
+=& \Pr[x\getsr\bits^\lambda, u\getsr\bits : u = P(x)]\Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),P(x)): b'=1]\\
+=&\frac{1}{2}\Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),P(x)): b'=1].
+\end{aligned}$$
+And similarly
+$$\begin{aligned}
+&\Pr[x\getsr\bits^\lambda, u\getsr\bits, b'\getsr D(f(x),u): b'=0, 1-u = P(x)] \\
+=& \Pr[x\getsr\bits^\lambda, u\getsr\bits: 1-u=P(x)] \Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),1-P(x)): b'=0]\\
+=&\frac{1}{2}\Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),1-P(x)): b'=0].
+\end{aligned}$$
+Thus
+$$\begin{aligned}
+&\Adv_{f,P,\lambda}^{pred}(A) \\
+=& 2\bigg| \frac{1}{2}\Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),P(x)): b'=1] \\
+&+ \frac{1}{2}\Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),1-P(x)): b'=0] - \frac{1}{2} \bigg|\\
+=& \bigg| \Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),P(x)): b'=1] \\
+&- \Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),1-P(x)): b'=1] \bigg|.
+\end{aligned}$$
+For the second probability, note that by conditional probabilities,
+$$\begin{aligned}
+& \Pr[x\getsr\bits^\lambda, u\getsr\bits, b'\getsr D(f(x),u): b'=1] \\
+=&\Pr[x\getsr\bits^\lambda, u\getsr\bits, b'\getsr D(f(x),u): u=P(x), b'=1] \\
+&+\Pr[x\getsr\bits^\lambda, u\getsr\bits, b'\getsr D(f(x),u): u=1-P(x), b'=1] \\
+=&\frac{1}{2}\Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),P(x)): b'=1] \\
+&+\frac{1}{2}\Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),1-P(x)): b'=1]. \\
+\end{aligned}$$
+Thus
+$$\begin{aligned}
+&\Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),1-P(x)): b'=1]\\
+=&2\Pr[x\getsr\bits^\lambda, u\getsr\bits, b'\getsr D(f(x),u): b'=1]\\
+&-\Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),P(x)): b'=1].
+\end{aligned}$$
+Now back to the advantage of $A$:
+$$\begin{aligned}
+&\Adv_{f,P,\lambda}^{pred}(A) \\
+=& \bigg| \Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),P(x)): b'=1] \\
+&- \Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),1-P(x)): b'=1] \bigg| \\
+=& \bigg| \Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),P(x)): b'=1] \\
+&- 2\Pr[x\getsr\bits^\lambda, u\getsr\bits, b'\getsr D(f(x),u): b'=1]\\
+&+\Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),P(x)): b'=1].
+\end{aligned}$$
+Hence
+$$\begin{aligned}
+&\Adv_{f,P,\lambda}^{pred}(A) \\
+=& 2\bigg| \Pr[x\getsr\bits^\lambda, b'\getsr D(f(x),P(x)): b'=1] \\
+&-\Pr[x\getsr\bits^\lambda, u\getsr\bits, b'\getsr D(f(x),u): b'=1] \bigg| \\
+=& 2\Adv_{P_0,P_1}^{dist}(D).
+\end{aligned}$$
+
 \end{proof}
 
 \end{document}
