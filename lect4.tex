@@ -189,7 +189,7 @@ This is because the advantage of $D^*$ is negligible since $G$ is PRG, and $t$ i
 
 To give the construction of $D^*$, we first define $t+1$ \emph{hybrid} distributions $H_0, H_1, \cdots, H_t$:
 \begin{quote}
-$H_i$ (for $i \in \{1, 2, \cdots, t\}$)
+$H_i$: (for $i \in \{1, 2, \cdots, t\}$)
 \begin{enumerate}
 \item {\bf for} $j=1$ to $i$ {\bf do}
 \item \tab $z_j \getsr \bits^k$.
@@ -217,7 +217,7 @@ Distinguisher $D^* (y)$: ($y \in \bits^{\lambda+k}$, $G : \bits^\lambda \mapsto 
 \item \tab $z_j \getsr \bits^k$.
 \item $(s_i, z_i) \gets y$.
 \item {\bf for} $j=i+1$ to $t$ {\bf do}
-\item \tab $(s_j, z_j) \gets G(s_j-1)$.
+\item \tab $(s_j, z_j) \gets G(s_{j-1})$.
 \item $b \getsr D(z_1, z_2, \cdots, z_t, s_t)$.
 \item {\bf output} $b$.
 \end{enumerate}
