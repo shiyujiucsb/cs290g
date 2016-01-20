@@ -419,11 +419,11 @@ Distinguisher $D' (x)$, where $x=G(s)$, $s\in\bits^\lambda$
 The advantage of $D'$ is 
 $$
 \begin{aligned}
-& \Adv_{G,\lambda}^{prg}(D') \\
-=& \bigg| \Pr[s\getsr\bits^\lambda : D'(G(s))=1] - \Pr[z\getsr\bits^{n(\lambda)}: D'(z)=1] \bigg| \\
+& \Adv_{G,\lambda}^{prg}(D') 
+= \bigg| \Pr[s\getsr\bits^\lambda : D'(G(s))=1] - \Pr[z\getsr\bits^{n(\lambda)}: D'(z)=1] \bigg| \\
 =& \bigg| \Pr[s\getsr\bits^\lambda, y\getsr\bits^\lambda : D(G(s)||G(y))=1]\\
-& - \Pr[z\getsr\bits^{n(\lambda)}, y\getsr\bits^\lambda: D(z||G(y))=1] \bigg| \\
-=& \epsilon_1(\lambda),
+& - \Pr[z\getsr\bits^{n(\lambda)}, y\getsr\bits^\lambda: D(z||G(y))=1] \bigg| 
+= \epsilon_1(\lambda),
 \end{aligned}
 $$
 which is non-negligible. For the other case, if $D$ can distinguish $H_1$ and $H_2$ with a non-negligible advantage $\epsilon_2(\lambda) \eqdef \Adv_{H_1,H_2}^{dist}(D)$, then by using $D$ we can construct another distinguisher $D''$ s.t. $\Adv_{G,\lambda}^{prg}(D'')$ is also non-negligible:
@@ -438,25 +438,48 @@ Distinguisher $D'' (x)$, where $x=G(s)$, $s\in\bits^\lambda$
 The advantage of $D''$ is
 $$
 \begin{aligned}
-& \Adv_{G,\lambda}^{prg}(D'') \\
-=& \bigg| \Pr[s\getsr\bits^\lambda : D''(G(s))=1] - \Pr[x\getsr\bits^{n(\lambda)}: D''(x)=1] \bigg| \\
+& \Adv_{G,\lambda}^{prg}(D'') 
+= \bigg| \Pr[s\getsr\bits^\lambda : D''(G(s))=1] - \Pr[x\getsr\bits^{n(\lambda)}: D''(x)=1] \bigg| \\
 =& \bigg| \Pr[s\getsr\bits^\lambda, z\getsr\bits^{n(\lambda)} : D(z||G(s))=1]\\
-& - \Pr[x\getsr\bits^{n(\lambda)}, z\getsr\bits^{n(\lambda)}: D(z||x)=1] \bigg| \\
-=& \epsilon_2(\lambda),
+& - \Pr[x\getsr\bits^{n(\lambda)}, z\getsr\bits^{n(\lambda)}: D(z||x)=1] \bigg| 
+= \epsilon_2(\lambda),
 \end{aligned}
 $$
 which is non-negligible.
-Hence for both cases we can construct distinguishers against $G$ with non-negligible advantage, implying $G$ is not PRG. Contradiction. Or in other words, for any distinguisher $D$, its advantage
+Hence for both cases we can construct distinguishers against $G$ with non-negligible advantage, implying $G$ is not PRG. Contradiction. 
+%Or in other words, for any distinguisher $D$, its advantage
+%$$\begin{aligned}
+%&\Adv_{G'',\lambda}^{prg}(D) \\
+%\eqdef & \bigg| \Pr[x,y\getsr\bits^\lambda : D(G''(x||y))=1] - \Pr[y\getsr\bits^{2n(\lambda)} : D(y)=1] \bigg| \\
+%=& \bigg| \Pr[x,y\getsr\bits^\lambda : D(G''(x||y))=1] - \Pr[y\getsr\bits^\lambda, z\getsr\bits^{n(\lambda)} : D(z||G(y))=1] \\
+%& + \Pr[y\getsr\bits^\lambda, z\getsr\bits^{n(\lambda)} : D(z||G(y))=1] - \Pr[y\getsr\bits^{2n(\lambda)} : D(y)=1] \bigg| \\
+%\leq & \bigg| \Pr[x,y\getsr\bits^\lambda : D(G''(x||y))=1] - \Pr[y\getsr\bits^\lambda, z\getsr\bits^{n(\lambda)} : D(z||G(y))=1] \bigg| \\
+%& + \bigg| \Pr[y\getsr\bits^\lambda, z\getsr\bits^{n(\lambda)} : D(z||G(y))=1] - \Pr[y\getsr\bits^{2n(\lambda)} : D(y)=1] \bigg| \\
+%=& \epsilon_1(\lambda) + \epsilon_2(\lambda) = \Adv_{G,\lambda}^{prg}(D') + \Adv_{G,\lambda}^{prg}(D'').
+%\end{aligned}$$
+%That is, there exist two distinguishers $D'$ and $D''$, whose advantages against PRG $G$ must be negligible. Hence $\Adv_{G'',\lambda}^{prg}(D)$ must also be negligible.  
+
+\emph{An alternative proof}: we can construct another distinguisher $D^*$ as following.
+\begin{quote}
+Distinguisher $D^* (x)$, where $x=G(s)$, $s\in\bits^\lambda$
+\begin{enumerate}
+\item $u \getsr \bits$.
+\item {\bf if} $u=0$ {\bf then} $b \getsr D'(x)$,
+\item {\bf else} $b \getsr D''(x)$.
+\item {\bf output} $b$.
+\end{enumerate}
+\end{quote}
+By the same reasoning in the lectures, we finish the proof by computing:
 $$\begin{aligned}
-&\Adv_{G'',\lambda}^{prg}(D) \\
-\eqdef & \bigg| \Pr[x,y\getsr\bits^\lambda : D(G''(x||y))=1] - \Pr[y\getsr\bits^{2n(\lambda)} : D(y)=1] \bigg| \\
-=& \bigg| \Pr[x,y\getsr\bits^\lambda : D(G''(x||y))=1] - \Pr[y\getsr\bits^\lambda, z\getsr\bits^{n(\lambda)} : D(z||G(y))=1] \\
-& + \Pr[y\getsr\bits^\lambda, z\getsr\bits^{n(\lambda)} : D(z||G(y))=1] - \Pr[y\getsr\bits^{2n(\lambda)} : D(y)=1] \bigg| \\
-\leq & \bigg| \Pr[x,y\getsr\bits^\lambda : D(G''(x||y))=1] - \Pr[y\getsr\bits^\lambda, z\getsr\bits^{n(\lambda)} : D(z||G(y))=1] \bigg| \\
-& + \bigg| \Pr[y\getsr\bits^\lambda, z\getsr\bits^{n(\lambda)} : D(z||G(y))=1] - \Pr[y\getsr\bits^{2n(\lambda)} : D(y)=1] \bigg| \\
-=& \epsilon_1(\lambda) + \epsilon_2(\lambda) = \Adv_{G,\lambda}^{prg}(D') + \Adv_{G,\lambda}^{prg}(D'').
+&\Adv_{G,\lambda}^{prg}(D^*) \\
+=& \frac{1}{2} \bigg| \Pr[s \getsr \bits^\lambda: D'(G(s))=1] + \Pr[s \getsr \bits^\lambda: D''(G(s))=1] \\
+& - \Pr[y \getsr \bits^{n(\lambda)}: D'(y)=1] - \Pr[y \getsr \bits^{n(\lambda)}: D''(y)=1] \bigg| \\
+=& \frac{1}{2} \bigg| \Pr[s,x \getsr \bits^\lambda: D(G(s)||G(x))=1] + \Pr[s \getsr \bits^\lambda, z \getsr \bits^{n(\lambda)}: D''(z||G(s))=1] \\
+& - \Pr[y \getsr \bits^{n(\lambda)}, x\getsr \bits^\lambda : D(y||G(x))=1] - \Pr[y,x \getsr \bits^{n(\lambda)}: D(x||y)=1] \bigg| \\
+=& \frac{1}{2} \bigg| \Pr[s,x \getsr \bits^\lambda: D(G(s)||G(x))=1] - \Pr[y,x \getsr \bits^{n(\lambda)}: D(x||y)=1] \bigg| \\
+=& \frac{1}{2} \bigg| \Pr[s,x \getsr \bits^\lambda: D(G''(s||x))=1] - \Pr[y,x \getsr \bits^{n(\lambda)}: D(x||y)=1] \bigg| \\
+=& \frac{1}{2} \Adv_{G'',\lambda}^{prg}(D).
 \end{aligned}$$
-That is, there exist two distinguishers $D'$ and $D''$, whose advantage against PRG $G$ must be negligible. Hence $\Adv_{G'',\lambda}^{prg}(D)$ must also be negligible.
 \end{proof}
 
 {\bf c) [Points: 6]} Prove that the function $G''' : \bits^{\lambda} \mapsto \bits^{2n(\lambda)}$ such that
