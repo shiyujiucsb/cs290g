@@ -400,11 +400,11 @@ $$=\Pr[y = x_1\oplus x_2]\Pr[z=x_2] = 2^{-2n(\lambda)}.$$
 $$G''(x||y) = G(x)||G(y)$$
 for all $x,y\in\bits^\lambda$ is a pseudorandom generator.
 \begin{proof}
-Assume by contradiction $G''$ is not a PRG. Then there exists a PPT distinguisher $D$ s.t. the advantage $\Adv_{G'',\lambda}^{prg}(D)$ is non-negligible. We first give the construction of the hybrids:
+Assume by contradiction $G''$ is not a PRG. Then there exists a PPT distinguisher $D$ s.t. the advantage $\Adv_{G'',\lambda}^{prg}(D)$ is non-negligible. We first give the construction of the hybrid distributions:
 \begin{itemize}
-\item $H_0$: $G(x)||G(y)$, where $x, y \getsr\bits^\lambda$.
-\item $H_1$: $z||G(y)$, where $z\getsr\bits^{n(\lambda)}$, $y\getsr\bits^\lambda$.
-\item $H_2$: $z||w$, where $z,w\getsr\bits^{n(\lambda)}$.
+\item $H_0$: the distribution of $G(x)||G(y)$, where $x, y \getsr\bits^\lambda$.
+\item $H_1$: the distribution of $z||G(y)$, where $z\getsr\bits^{n(\lambda)}$, $y\getsr\bits^\lambda$.
+\item $H_2$: the distribution of $z||w$, where $z,w\getsr\bits^{n(\lambda)}$.
 \end{itemize}
 Note that $H_0$ is the output distribution of $G''$ given uniformly random seeds as inputs, and $H_2 = U_{2n(\lambda)}$.
 Since $D$ can distinguish between $H_0$ and $H_2$, by Hybrid Lemma, $D$ can distinguish between $H_0$ and $H_1$, \emph{or} distinguish between $H_1$ and $H_2$. If $D$ can distinguish $H_0$ and $H_1$ with a non-negligible advantage $\epsilon_1(\lambda) \eqdef \Adv_{H_0,H_1}^{dist}(D)$, then by using $D$ we can construct a distinguisher $D'$ s.t. $\Adv_{G,\lambda}^{prg}(D')$ is non-negligible:
@@ -446,7 +446,17 @@ $$
 \end{aligned}
 $$
 which is non-negligible.
-Hence for both cases we can construct distinguishers against $G$ with non-negligible advantage, implying $G$ is not PRG. Contradiction.
+Hence for both cases we can construct distinguishers against $G$ with non-negligible advantage, implying $G$ is not PRG. Contradiction. Or in other words, for any distinguisher $D$, its advantage
+$$\begin{aligned}
+&\Adv_{G'',\lambda}^{prg}(D) \\
+\eqdef & \bigg| \Pr[x,y\getsr\bits^\lambda : D(G''(x||y))=1] - \Pr[y\getsr\bits^{2n(\lambda)} : D(y)=1] \bigg| \\
+=& \bigg| \Pr[x,y\getsr\bits^\lambda : D(G''(x||y))=1] - \Pr[y\getsr\bits^\lambda, z\getsr\bits^{n(\lambda)} : D(z||G(y))=1] \\
+& + \Pr[y\getsr\bits^\lambda, z\getsr\bits^{n(\lambda)} : D(z||G(y))=1] - \Pr[y\getsr\bits^{2n(\lambda)} : D(y)=1] \bigg| \\
+\leq & \bigg| \Pr[x,y\getsr\bits^\lambda : D(G''(x||y))=1] - \Pr[y\getsr\bits^\lambda, z\getsr\bits^{n(\lambda)} : D(z||G(y))=1] \bigg| \\
+& + \bigg| \Pr[y\getsr\bits^\lambda, z\getsr\bits^{n(\lambda)} : D(z||G(y))=1] - \Pr[y\getsr\bits^{2n(\lambda)} : D(y)=1] \bigg| \\
+=& \epsilon_1(\lambda) + \epsilon_2(\lambda) = \Adv_{G,\lambda}^{prg}(D') + \Adv_{G,\lambda}^{prg}(D'').
+\end{aligned}$$
+That is, there exist two distinguishers $D'$ and $D''$, whose advantage against PRG $G$ must be negligible. Hence $\Adv_{G'',\lambda}^{prg}(D)$ must also be negligible.
 \end{proof}
 
 {\bf c) [Points: 6]} Prove that the function $G''' : \bits^{\lambda} \mapsto \bits^{2n(\lambda)}$ such that
