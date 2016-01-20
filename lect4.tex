@@ -58,8 +58,10 @@ $\underrightarrow{\quad #1 \quad}$ }
 
 \newcommand{\leftstep}[1]{%
 $\underleftarrow{\quad #1 \quad}$ }
-\newcommand{\Adv}{\textsf{Adv}}
 
+\newcommand{\Adv}{\mathsf{Adv}}
+
+\newcommand{\tab}{\hspace{0.3in}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Theorems & Definitions
 
@@ -134,8 +136,111 @@ Given a OWF $f$ and a predicate $P$, there are two distributions on strings with
 \end{itemize}
 If $P$ is a hardcore predicate, can any efficient adversary distinguish these two distributions? The answer is no.
 \begin{lemma}
+\label{lem:pred}
 If $P$ is a hardcore predicate for $f$, then the advantage $\Adv_{P_0,P_1,\lambda}^{dist}(D)$ is negligible for all PPT $D$.
 \end{lemma}
+
+Now we consider the case $f : \bits^\lambda \mapsto \bits^{\lambda'}$ is one-way permutation, i.e., $\lambda = \lambda'$ and $f$ is one-to-one.
+The following theorem constructs a PRG given a OWP and its hardcore predicate.
+\begin{theorem}
+Given a function $f$ and a hardcore predicate $P$ for $f$, define $G^f : \bits^\lambda \mapsto \bits^{\lambda+1}$ as
+$$G^f(x) \eqdef (f(x), P(x)).$$
+If $f$ is OWP, then $G^f$ is a PRG.
+\end{theorem}
+\begin{proof}
+Let $D$ be any distinguisher.
+$$\begin{aligned}
+&\Adv_{G^f, \lambda}^{prg}(D) 
+=\bigg| \Pr[s \getsr \bits^\lambda : D(G^f(s)) = 1] - \Pr[y \getsr \bits^{\lambda+1} : D(y) = 1] \bigg| \\
+=&\bigg| \Pr[s \getsr \bits^\lambda : D(f(s), P(s)) = 1] - \Pr[s \getsr \bits^\lambda, u \getsr \bits : D(f(s), u) = 1] \\
+&+ \Pr[s \getsr \bits^\lambda, u \getsr \bits : D(f(s), u) = 1] - \Pr[y \getsr \bits^{\lambda+1} : D(y) = 1] \bigg|.
+\end{aligned}$$
+Define
+$$\Delta_1 \eqdef \Pr[s \getsr \bits^\lambda : D(f(s), P(s)) = 1] - \Pr[s \getsr \bits^\lambda, u \getsr \bits : D(f(s), u) = 1],$$
+$$\Delta_2 \eqdef \Pr[s \getsr \bits^\lambda, u \getsr \bits : D(f(s), u) = 1] - \Pr[y \getsr \bits^{\lambda+1} : D(y) = 1].$$
+Hence 
+$$\Adv_{G^f, \lambda}^{prg}(D) = |\Delta_1 + \Delta_2| \leq |\Delta_1| + |\Delta_2|.$$
+Note that since $P(s)$ is a hardcore predicate, by Lemma \ref{lem:pred} it follows that $|\Delta_1|$ is negligible. Since $f$ is OWP, if $s$ is uniformly distributed over $\bits^\lambda$, then so is $f(s)$. Thus $\Delta_2 = 0$. It follows that $\Adv_{G^f, \lambda}^{prg}(D)$ must be negligible for any $D$.
+\end{proof}
+The theorem above requires $F$ to be OWP. In fact, we can transform every OWF into a PRG \cite{HILL99}.\footnote{In \cite{HILL99} the construction is not very efficient in practical sense, making around $\lambda^3$ calls to $f$.}
+
+\section{Extending PRG and Hybrid Argument}
+Given a PRG $G : \bits^\lambda \mapsto \bits^{\lambda+k}$, $k\geq 1$, our goal is to build a PRG $G' : \bits^\lambda \mapsto \bits^{\lambda+k'}$, where $k'$ is much larger than $k$.
+
+Given a parameter $t$ in $\N^+$, we give a construction $G_t : \bits^\lambda \mapsto \bits^{\lambda+tk}$ as following:
+\begin{quote}
+Algorithm $G_t (s)$, $s\in\bits^\lambda$
+\begin{enumerate}
+\item $s_0 \gets s$.
+\item {\bf for} $i=1$ to $t$ {\bf do}
+\item \tab $s_i || z_i \gets G(s_{i-1})$.
+\item {\bf return} $(z_1, z_2, \cdots, z_t, s_t)$.
+\end{enumerate}
+\end{quote}
+We are going to argue that $G_t$ is also a PRG. The proof idea is via {\bf hybrid argument}, which will be often used!
+
+\begin{theorem}
+If $G$ is a PRG, and $t$ is polynomial in $\lambda$, then so is $G_t$.
+\end{theorem}
+\begin{proof}
+It suffices to show that for all PPT $D$, there exists a distinguisher $D^*$ s.t.
+$$\Adv_{G_t,\lambda}^{prg}(D) = t\cdot \Adv_{G,\lambda}^{prg}(D^*).$$
+This is because the advantage of $D^*$ is negligible since $G$ is PRG, and $t$ is polynomial in $\lambda$. It immediately follows that $t\cdot \Adv_{G,\lambda}^{prg}(D^*)$ is also negligible.
+
+To give the construction of $D^*$, we first define $t+1$ \emph{hybrid} distributions $H_0, H_1, \cdots, H_t$:
+\begin{quote}
+$H_i$ (for $i \in \{1, 2, \cdots, t\}$)
+\begin{enumerate}
+\item {\bf for} $j=1$ to $i$ {\bf do}
+\item \tab $z_j \getsr \bits^k$.
+\item $s_i \getsr \bits^\lambda$.
+\item {\bf for} $j=i+1$ to $t$ {\bf do}
+\item \tab $s_j||z_j \gets G(s_{j-1})$.
+\item {\bf return} $(z_1, z_2, \cdots, z_t, s_t)$.
+\end{enumerate}
+\end{quote}
+Note that $H_0$ is the distribution of $G_t(s)$ given $s \getsr \bits^\lambda$. $H_t$ is the uniform distribution $U_{\lambda+tk}$.
+
+Now let us look at $H_i$ and $H_{i+1}$, $i \in \{1, 2, \cdots, t-1\}$. The only difference between $H_i$ and $H_{i+1}$ is $z_{i+1}$:
+\begin{itemize}
+\item $z_{i+1}$ is computed through $G$ in $H_i$.
+\item $z_{i+1}$ is uniformly random in $H_{i+1}$.
+\end{itemize}
+Thus if $G$ is PRG, then $H_i$ and $H_{i+1}$ are computationally indistinguishable.
+
+Based on the motivation above, we build $D^*$ as following:
+\begin{quote}
+Distinguisher $D^* (y)$: ($y \in \bits^{\lambda+k}$, $G : \bits^\lambda \mapsto \bits^{\lambda+k}$)
+\begin{enumerate}
+\item $i \getsr \{1, 2, \cdots, t\}$.
+\item {\bf for} $j=1$ to $i-1$ {\bf do}
+\item \tab $z_j \getsr \bits^k$.
+\item $(s_i, z_i) \gets y$.
+\item {\bf for} $j=i+1$ to $t$ {\bf do}
+\item \tab $(s_j, z_j) \gets G(s_j-1)$.
+\item $b \getsr D(z_1, z_2, \cdots, z_t, s_t)$.
+\item {\bf output} $b$.
+\end{enumerate}
+\end{quote}
+Let $D_i^*$ be $D^*$ with fixed $i$. Then the advantage of $D^*$ is
+$$\begin{aligned}
+&\Adv_{G,\lambda}^{prg}(D^*) \\
+=& \bigg| \Pr[s \getsr \bits^\lambda : D^*(G(s)) = 1] - \Pr[y \getsr \bits^{\lambda+k} : D^*(y) = 1] \bigg| \\
+=& \bigg| \frac{1}{t}\sum_{i=1}^t \Pr[s \getsr \bits^\lambda : D_i^*(G(s)) = 1] - \frac{1}{t}\sum_{i=1}^t \Pr[y \getsr \bits^{\lambda+k} : D_i^*(y) = 1] \bigg| \\
+=& \frac{1}{t}\bigg| \sum_{i=1}^t \Pr[s \getsr \bits^\lambda : D_i^*(G(s)) = 1] - \sum_{i=1}^t \Pr[y \getsr \bits^{\lambda+k} : D_i^*(y) = 1] \bigg| \\
+\end{aligned}$$
+Define
+$$p_i \eqdef \Pr[s \getsr \bits^\lambda : D_i^*(G(s)) = 1].$$
+$$q_i \eqdef \Pr[y \getsr \bits^{\lambda+k} : D_i^*(y) = 1].$$
+We claim that
+\begin{enumerate}
+\item $p_i = \Pr[D(H_{i-1}) = 1]$.
+\item $q_i = \Pr[D(H_i) = 1]$.
+\end{enumerate}
+Then it follows that $q_i = p_{i+1}$. Thus
+$$\Adv_{G,\lambda}^{prg}(D^*) = \frac{1}{t}|p_1 - q_t| = \frac{1}{t} \Adv_{G_t, \lambda}^{prg}(D).$$
+\end{proof}
+The proof of the claims above will be given next lecture.
 
 \begin{thebibliography}{10}
 \bibitem{HILL99} 
