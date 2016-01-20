@@ -1,0 +1,157 @@
+\documentclass[12pt]{article}
+\usepackage{url,hyperref,amsmath,setspace,amssymb,amsthm,amsfonts}
+
+
+\setlength{\oddsidemargin}{.25in}
+\setlength{\evensidemargin}{.25in}
+\setlength{\textwidth}{6.25in}
+\setlength{\topmargin}{-0.4in}
+\setlength{\textheight}{8.5in}
+
+\newcommand{\heading}[5]{
+   \renewcommand{\thepage}{#1-\arabic{page}}
+   \noindent
+   \begin{center}
+   \framebox[\textwidth]{
+     \begin{minipage}{0.9\textwidth} \onehalfspacing
+       {\bf CS 290G -- Introduction to Modern Cryptography} \hfill #2
+
+       {\centering \Large #5
+       
+       }\medskip
+
+       {\it #3 \hfill #4}
+     \end{minipage}
+   }
+   \end{center}
+}
+
+\newcommand{\handout}[3]{\heading{#1}{#2}{Instructor:
+Stefano Tessaro}{Scribe: Shiyu Ji}{Lecture #1: #3}}
+
+\setlength{\parindent}{0in}
+
+\newcommand{\eqdef}{\stackrel{def}{=}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\bits}{\{0,1\}}
+\newcommand{\inr}{\in_{\mbox{\tiny R}}}
+%\newcommand{\getsr}{\gets_{\mbox{\tiny R}}}
+\newcommand{\getsr}{\stackrel{\$}{\gets}}
+\newcommand{\st}{\mbox{ s.t. }}
+\newcommand{\etal}{{\it et al }}
+\newcommand{\into}{\rightarrow}
+
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\e}{\epsilon}
+\newcommand{\ee}{\varepsilon}
+\newcommand{\ceil}[1]{{\lceil{#1}\rceil}}
+\newcommand{\floor}[1]{{\lfloor{#1}\rfloor}}
+\newcommand{\angles}[1]{\langle #1 \rangle}
+\newcommand{\Com}{{\sf Com}}
+\newcommand{\desc}{{\sf desc}}
+
+\newcommand{\rightstep}[1]{%
+$\underrightarrow{\quad #1 \quad}$ }
+
+\newcommand{\leftstep}[1]{%
+$\underleftarrow{\quad #1 \quad}$ }
+\newcommand{\Adv}{\textsf{Adv}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Theorems & Definitions
+
+
+\newtheorem{theorem}{Theorem}[section]
+
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{subclaim}{Claim}[theorem]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{observation}[theorem]{Observation}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{construction}[theorem]{Construction}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{algorithm1}[theorem]{Algorithm}
+\newtheorem{protocol}[theorem]{Protocol}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{fact}[theorem]{Fact}
+
+%\bibliographystyle{plain}
+
+\begin{document}
+\handout{4}{Jan 19, 2016}{Hardcore Predicates}
+\section{Recap}
+Last lecture we defined Pseudorandom Generator (PRG). That is, PRG is a function family 
+$G : \bits^\lambda \mapsto \bits^{n(\lambda)}$, where $n(\lambda) > \lambda$, such that for all PPT distinguisher $D$, the advantage
+$$\Adv_{G, \lambda}^{prg} (D) \eqdef \bigg| \Pr[s \getsr \bits^\lambda : D(G(s)) = 1] - \Pr[y \getsr \bits^{n(\lambda)} : D(y) = 1] \bigg|$$
+is negligible in $\lambda$.
+
+\section{Hardcore Predicates}
+To build PRG from one-way permutation (OWP), we need hardcore predicates. 
+Informally, given a family of one-way functions $f : \bits^\lambda \mapsto \bits^{\lambda'}$ and a family of predicates $P : \bits^\lambda \mapsto \bits$, we say $P$ is a hardcore predicate for $f$ if given $f(x)$ for $x \getsr \bits^\lambda$, it is hard to predict $P(x)$.
+
+We can formalize the intuition as following.
+\begin{definition}
+$P$ is a {\bf hardcore predicate} for OWF $f$, if for all PPT adversary $A$,
+$$\Adv_{f,P,\lambda}^{pred} (A) \eqdef 2 \bigg| \Pr[x \getsr \bits^\lambda : A(f(x)) = P(x)] - \frac{1}{2} \bigg|$$
+is negligible in $\lambda$.
+\end{definition}
+Let us see how to construct a hardcore predicate.
+Assume the functions $f$ as above. We build another function family $g^f : \bits^{2\lambda} \mapsto \bits^{\lambda + \lambda'}$ defined by
+$$g^f (x, r) \eqdef (f(x), r).$$
+In Lecture 2, we have shown that if $f$ is OWF, then so is $g^f$.
+
+Goldreich and Levin \cite{GL89} have given a hardcore predicate that can be constructed from any such OWF.
+\begin{theorem}
+If $f$ is OWF, then $P(x, r) \eqdef \angles{x, r}$ is a hardcore predicate for $g^f$, where the inner product is defined as
+$$\angles{x, r} \eqdef \sum_{i=1}^\lambda x_ir_i \mod 2.$$
+\end{theorem}
+A little example for the inner product is: let $x=101$ and $r=111$, then $\angles{x,r} = 1\cdot 1 + 0\cdot 1 + 1\cdot 1 \mod 2 = 0$.
+
+Blum and Micali \cite{BM84} have given a concrete construction of hardcore predicate, assuming the hardness of Discrete Logarithm Problem.
+\begin{theorem}
+For a multiplicative group $\Z_p^*$ with a large prime $p$ and a generator $g$, given a function $f(x) \eqdef g^x \mod p$, define the predicate for $f$ as the most significant bit (MSB) of $x$:
+$$P(x) \eqdef MSB(x) = \begin{cases}
+1, & \textrm{if } x>\frac{p-1}{2}, \\
+0, & \textrm{if } x\leq\frac{p-1}{2}.
+\end{cases}.$$
+Then $P$ is a hardcore predicate, assuming $f$ is one-way (by DLP).
+\end{theorem}
+
+\section{Predicting iff Distinguishing}
+Given a OWF $f$ and a predicate $P$, there are two distributions on strings with length $\lambda' + 1$:
+\begin{itemize}
+\item $P_0$: $x \getsr \bits^\lambda$, return $(f(x), P(x))$.
+\item $P_1$: $x \getsr \bits^\lambda$, $u \getsr \bits$, return $(f(x), u)$.
+\end{itemize}
+If $P$ is a hardcore predicate, can any efficient adversary distinguish these two distributions? The answer is no.
+\begin{lemma}
+If $P$ is a hardcore predicate for $f$, then the advantage $\Adv_{P_0,P_1,\lambda}^{dist}(D)$ is negligible for all PPT $D$.
+\end{lemma}
+
+\begin{thebibliography}{10}
+\bibitem{HILL99} 
+J. H\aa stad, R. Impagliazzo, L.A. Levin and M. Luby, 1999. 
+A pseudorandom generator from any one-way function. 
+SIAM Journal on Computing, 28(4), pp. 1364-1396.
+	
+\bibitem{GL89}
+O. Goldreich and L.A. Levin, 1989, February. 
+A hard-core predicate for all one-way functions. 
+In Proceedings of the twenty-first annual ACM symposium on Theory of computing (pp. 25-32). ACM.
+
+\bibitem{BM84}
+M. Blum and S. Micali, 1984. 
+How to generate cryptographically strong sequences of pseudorandom bits. 
+SIAM journal on Computing, 13(4), pp. 850-864.
+\end{thebibliography}
+
+\end{document}
