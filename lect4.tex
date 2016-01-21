@@ -1,5 +1,5 @@
 \documentclass[12pt]{article}
-\usepackage{url,hyperref,amsmath,setspace,amssymb,amsthm,amsfonts}
+\usepackage{url,amsmath,setspace,amssymb,amsthm,amsfonts}
 
 
 \setlength{\oddsidemargin}{.25in}
@@ -87,6 +87,8 @@ $\underleftarrow{\quad #1 \quad}$ }
 \newtheorem{fact}[theorem]{Fact}
 
 %\bibliographystyle{plain}
+\usepackage{tikz}
+\usetikzlibrary{calc,decorations.pathreplacing}
 
 \begin{document}
 \handout{4}{Jan 19, 2016}{Hardcore Predicates}
@@ -165,6 +167,41 @@ Note that since $P(s)$ is a hardcore predicate, by Lemma \ref{lem:pred} it follo
 The theorem above requires $F$ to be OWP. In fact, we can transform every OWF into a PRG \cite{HILL99}.\footnote{In \cite{HILL99} the construction is not very efficient in practical sense, making around $\lambda^3$ calls to $f$.}
 
 \section{Extending PRG and Hybrid Argument}
+
+\begin{figure}[!t]
+\centering{}
+\begin{tikzpicture}
+% s_i
+\draw (0,0) rectangle (1,2); \node at (0.5, 1) {$s_0$};
+\draw (2,0) rectangle (3,2); \node at (2.5, 1) {$s_1$};
+\draw (4,0) rectangle (5,2); \node at (4.5, 1) {$s_2$};
+\draw (6,0) rectangle (7,2); \node at (6.5, 1) {$s_3$};
+\draw (10,0) rectangle (11,2); \node at (10.5, 1) {$s_{t-1}$};
+\draw (12,0) [fill=lightgray] rectangle (13,2); \node at (12.5, 1) {$s_t$};
+% z_i
+\draw [fill = lightgray] (2,2) rectangle (3,3); \node at (2.5, 2.5) {$z_1$}; 
+\draw [fill = lightgray] (4,2) rectangle (5,3); \node at (4.5, 2.5) {$z_2$};
+\draw [fill = lightgray] (6,2) rectangle (7,3); \node at (6.5, 2.5) {$z_3$};
+\draw [fill = lightgray] (10,2) rectangle (11,3); \node at (10.5, 2.5) {$z_{t-1}$};
+\draw [fill = lightgray] (12,2) rectangle (13,3); \node at (12.5, 2.5) {$z_t$};
+% arrows
+\draw [->, thick] (1,1) -- (2,1); \node [above] at (1.5,1) {$G$};
+\draw [->, thick] (3,1) -- (4,1); \node [above] at (3.5,1) {$G$};
+\draw [->, thick] (5,1) -- (6,1); \node [above] at (5.5,1) {$G$};
+\draw [->, thick] (7,1) -- (8,1); \node [above] at (7.5,1) {$G$};
+\node at (8.5,1) {$\cdots$};
+\draw [->, thick] (9,1) -- (10,1); \node [above] at (9.5,1) {$G$};
+\draw [->, thick] (11,1) -- (12,1); \node [above] at (11.5,1) {$G$};
+% misc
+\draw [decorate,decoration={brace, amplitude=7pt}] (0,0) -- (0,2);
+\node [left] at (-0.2,1) {$\lambda$};
+\draw [decorate,decoration={brace, amplitude=7pt}] (2,2) -- (2,3);
+\node [left] at (1.8,2.5) {$k$};
+\end{tikzpicture}
+\caption{Extended PRG $G_t : \bits^\lambda \mapsto \bits^{\lambda+tk}$ based on $G : \bits^\lambda \mapsto \bits^{\lambda+k}$.}
+\label{fig:extended_prg}
+\end{figure}
+
 Given a PRG $G : \bits^\lambda \mapsto \bits^{\lambda+k}$, $k\geq 1$, our goal is to build a PRG $G' : \bits^\lambda \mapsto \bits^{\lambda+k'}$, where $k'$ is much larger than $k$.
 
 Given a parameter $t$ in $\N^+$, we give a construction $G_t : \bits^\lambda \mapsto \bits^{\lambda+tk}$ as following:
@@ -177,6 +214,8 @@ Algorithm $G_t (s)$, $s\in\bits^\lambda$
 \item {\bf return} $(z_1, z_2, \cdots, z_t, s_t)$.
 \end{enumerate}
 \end{quote}
+Figure \ref{fig:extended_prg} depicts the construction above.
+
 We are going to argue that $G_t$ is also a PRG. The proof idea is via {\bf hybrid argument}, which will be often used!
 
 \begin{theorem}
@@ -199,6 +238,71 @@ $H_i$: (for $i \in \{1, 2, \cdots, t\}$)
 \item {\bf return} $(z_1, z_2, \cdots, z_t, s_t)$.
 \end{enumerate}
 \end{quote}
+Figure \ref{fig:2h} depicts the distributions $H_i$ and $H_{i+1}$.
+
+\begin{figure}[!t]
+\centering{}
+\begin{tikzpicture}
+% s_i
+\node at (1.3,1) {$\cdots$};
+\draw (4,0) rectangle (5,2); \node at (4.5, 1) {$s_i$};
+\draw (6,0) rectangle (7,2); \node at (6.5, 1) {$s_{i+1}$};
+\draw (10,0) rectangle (11,2); \node at (10.5, 1) {$s_{t-1}$};
+\draw (12,0) [fill = lightgray] rectangle (13,2); \node at (12.5, 1) {$s_t$};
+% z_i
+\draw [fill = lightgray] (-2,2) rectangle (-1,3); \node at (-1.5, 2.5) {$z_1$}; 
+\draw [fill = lightgray] (-0.5,2) rectangle (0.5,3); \node at (0, 2.5) {$z_2$};
+\draw [fill = lightgray] (2,2) rectangle (3,3); \node at (2.5, 2.5) {$z_{i-1}$};
+\draw [fill = lightgray] (4,2) rectangle (5,3); \node at (4.5, 2.5) {$z_i$};
+\draw [fill = lightgray] (6,2) rectangle (7,3); \node at (6.5, 2.5) {$z_{i+1}$};
+\draw [fill = lightgray] (10,2) rectangle (11,3); \node at (10.5, 2.5) {$z_{t-1}$};
+\draw [fill = lightgray] (12,2) rectangle (13,3); \node at (12.5, 2.5) {$z_t$};
+% arrows
+\draw [->, thick] (5,1) -- (6,1); \node [above] at (5.5,1) {$G$};
+\draw [->, thick] (7,1) -- (8,1); \node [above] at (7.5,1) {$G$};
+\node at (8.5,1) {$\cdots$};
+\draw [->, thick] (9,1) -- (10,1); \node [above] at (9.5,1) {$G$};
+\draw [->, thick] (11,1) -- (12,1); \node [above] at (11.5,1) {$G$};
+% misc
+\draw [decorate,decoration={brace, amplitude=7pt}] (4,0) -- (4,2);
+\node [left] at (3.8,1) {$\lambda$};
+\draw [decorate,decoration={brace, amplitude=7pt}] (0.5,3) -- (0.5,2);
+\node [right] at (0.7,2.5) {$k$};
+\node at (-1,1) {$H_i$};
+\end{tikzpicture}
+
+\hspace{.5in}
+
+\begin{tikzpicture}
+% s_i
+\node at (1.3,1) {$\cdots$};
+\draw (6,0) rectangle (7,2); \node at (6.5, 1) {$s_{i+1}$};
+\draw (10,0) rectangle (11,2); \node at (10.5, 1) {$s_{t-1}$};
+\draw (12,0) [fill = lightgray] rectangle (13,2); \node at (12.5, 1) {$s_t$};
+% z_i
+\draw [fill = lightgray] (-2,2) rectangle (-1,3); \node at (-1.5, 2.5) {$z_1$}; 
+\draw [fill = lightgray] (-0.5,2) rectangle (0.5,3); \node at (0, 2.5) {$z_2$};
+\draw [fill = lightgray] (2,2) rectangle (3,3); \node at (2.5, 2.5) {$z_{i-1}$};
+\draw [fill = lightgray] (4,2) rectangle (5,3); \node at (4.5, 2.5) {$z_i$};
+\draw [fill = lightgray] (6,2) rectangle (7,3); \node at (6.5, 2.5) {$z_{i+1}$};
+\draw [fill = lightgray] (10,2) rectangle (11,3); \node at (10.5, 2.5) {$z_{t-1}$};
+\draw [fill = lightgray] (12,2) rectangle (13,3); \node at (12.5, 2.5) {$z_t$};
+% arrows
+\draw [->, thick] (7,1) -- (8,1); \node [above] at (7.5,1) {$G$};
+\node at (8.5,1) {$\cdots$};
+\draw [->, thick] (9,1) -- (10,1); \node [above] at (9.5,1) {$G$};
+\draw [->, thick] (11,1) -- (12,1); \node [above] at (11.5,1) {$G$};
+% misc
+\draw [decorate,decoration={brace, amplitude=7pt}] (6,0) -- (6,2);
+\node [left] at (5.8,1) {$\lambda$};
+\draw [decorate,decoration={brace, amplitude=7pt}] (0.5,3) -- (0.5,2);
+\node [right] at (0.7,2.5) {$k$};
+\node at (-1,1) {$H_{i+1}$};
+\end{tikzpicture}
+\caption{The distributions $H_i$ and $H_{i+1}$.}
+\label{fig:2h}
+\end{figure}
+
 Note that $H_0$ is the distribution of $G_t(s)$ given $s \getsr \bits^\lambda$. $H_t$ is the uniform distribution $U_{\lambda+tk}$.
 
 Now let us look at $H_i$ and $H_{i+1}$, $i \in \{1, 2, \cdots, t-1\}$. The only difference between $H_i$ and $H_{i+1}$ is $z_{i+1}$:
