@@ -115,7 +115,7 @@ In Lecture 2, we have shown that if $f$ is OWF, then so is $g^f$.
 
 Goldreich and Levin \cite{GL89} have given a hardcore predicate that can be constructed from any such OWF.
 \begin{theorem}
-If $f$ is OWF, then $P(x, r) \eqdef \angles{x, r}$ is a hardcore predicate for $g^f$, where the inner product is defined as
+If $f$ is OWF, then $P(x, r) = \angles{x, r}$ is a hardcore predicate for $g^f$, where the inner product is defined as
 $$\angles{x, r} \eqdef \sum_{i=1}^\lambda x_ir_i \mod 2.$$
 \end{theorem}
 A little example for the inner product is: let $x=101$ and $r=111$, then $\angles{x,r} = 1\cdot 1 + 0\cdot 1 + 1\cdot 1 \mod 2 = 0$.
@@ -123,7 +123,7 @@ A little example for the inner product is: let $x=101$ and $r=111$, then $\angle
 Blum and Micali \cite{BM84} have given a concrete construction of hardcore predicate, assuming the hardness of Discrete Logarithm Problem.
 \begin{theorem}
 For a multiplicative group $\Z_p^*$ with a large prime $p$ and a generator $g$, given a function $f(x) \eqdef g^x \mod p$, define the predicate for $f$ as the most significant bit (MSB) of $x$:
-$$P(x) \eqdef MSB(x) = \begin{cases}
+$$P(x) = MSB(x) \eqdef \begin{cases}
 1, & \textrm{if } x>\frac{p-1}{2}, \\
 0, & \textrm{if } x\leq\frac{p-1}{2}.
 \end{cases}.$$

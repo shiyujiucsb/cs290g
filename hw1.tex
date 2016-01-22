@@ -164,7 +164,7 @@ of one-wayness or a counterexample.
 
 {\bf a) [Points: 2]} $x \mapsto f(x) \oplus g(x)$, where $\oplus$ denotes bitwise xor.
 
-{\bf Claim}: $x \mapsto f(x) \oplus g(x)$ is \emph{not} one-way.
+{\bf Claim}: $x \mapsto f(x) \oplus g(x)$ is \emph{not} always one-way.
 
 {\bf Counterexample}:
 Consider $f(x) = g(x)$, i.e., $f$ and $g$ are the same one-way function. Then we have
@@ -365,7 +365,7 @@ general $f$? Justify your answer!
 {\bf Counterexample}: Suppose $f : \bits^\lambda \mapsto \bits$ is defined by $f(x) = 0$ for any $x\in\bits^\lambda$. Apparently $f$ is not one-way, but we claim the bitwise xor $\oplus_i x_i$ is a hardcore predicate of $f$. Note that the predicate $\oplus_i x_i$ is uniformly distributed over $\bits$ if $x\getsr\bits^\lambda$. Since given any input $f(x)$ which is always 0, any adversary has no knowledge about $x$, and thus the best way to guess $\oplus_i x_i$ is based on the statistical distribution of the predicate. However, it is a uniform distribution, and thus any adversary cannot have non-negligible advantage.
 
 
-\section{Task 4 – Pseudorandom Generators}
+\section{Task 4 - Pseudorandom Generators}
 Throughout this task let $G : \bits^\lambda \mapsto \bits^{n(\lambda)}$ for $\lambda<n=n(\lambda)$ be a PRG.
 
 {\bf a) [Points: 4]} Prove that $G' : \bits^{\lambda + n(\lambda)} \mapsto \bits^{2n(\lambda)}$ such that
@@ -511,7 +511,7 @@ which is a overwhelming advantage on $\lambda$. Hence the construction $D$ is an
 \end{proof}
 
 
-\section{Task 5 – Distinguishing Advantages}
+\section{Task 5 - Distinguishing Advantages}
 Let $P_0, P_1 : \mathcal{X} \mapsto [0,1]$ be probability distributions on a finite set $\mathcal{X}$, i.e., we have $\sum_{x\in\mathcal{X}}P_b(x) = 1$ for $b\in\bits$. As in class, denote by $x\getsr P_b$ the process of sampling a value $x$ according to the probability distribution $P_b$, i.e., every value $x$ is taken with probability $P_b(x)$.
 
 We consider the following two definitions of distinguishing advantage:
