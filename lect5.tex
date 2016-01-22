@@ -204,6 +204,7 @@ $$
 =& \frac{1}{t}|p_1 - q_t| = \frac{1}{t} \Adv_{G_t, \lambda}^{prg}(D).
 \end{aligned}
 $$
+Note that our observations can cancel out $t-2$ terms.
 
 Last lecture we also saw a concrete construction of PRG given by Blum and Micali \cite{BM84}.
 Given a large prime modulus $p$, and a generator $g$ of $\Z_p^*$, the seed is $s \in \Z_p^* = \{1,2,\cdots,p-1\}$, and we build a generator $BM_t : \Z_p^* \mapsto \bits^t$ as following.
@@ -237,6 +238,19 @@ It turns out this goal can be achieved, and it gives rise to pseudorandom functi
 We start from a simple example. Assume we have a doubling PRG $G : \bits^\lambda \mapsto \bits^{2\lambda}$. The goal is to build a PRG $G' : \bits^\lambda \mapsto \bits^{4\lambda}$. Rather than calculating the bits sequentially as before, we can do it in a more parallel mode (Figure \ref{fig:2tree}). 
 
 \begin{figure}[!t]
+\centering{}
+\begin{tikzpicture}
+\draw (4,4) rectangle (6,5); \node at (5,4.5) {$s$};
+\draw [->, thick] (5,4) -- (5,3); \node [left] at (5,3.5) {$G$};
+\draw (3,2) rectangle (5,3); \node at (4,2.5) {$s_0$};
+\draw [->, thick] (4,2) -- (4,1); \node [left] at (4,1.5) {$G$};
+\draw (5,2) rectangle (7,3); \node at (6,2.5) {$s_1$};
+\draw [->, thick] (6,2) -- (6,1); \node [right] at (6,1.5) {$G$};
+\draw (0.5,0) rectangle (2.5,1); \node at (1.5,0.5) {$s_{00}$};
+\draw (2.5,0) rectangle (4.5,1); \node at (3.5,0.5) {$s_{01}$};
+\draw (5.5,0) rectangle (7.5,1); \node at (6.5,0.5) {$s_{10}$};
+\draw (7.5,0) rectangle (9.5,1); \node at (8.5,0.5) {$s_{11}$};
+\end{tikzpicture}
 \caption{A PRG $G' : \bits^\lambda \mapsto \bits^{4\lambda}$ based on PRG $G : \bits^\lambda \mapsto \bits^{2\lambda}$.}
 \label{fig:2tree}
 \end{figure}
@@ -245,6 +259,32 @@ We can easily extend this tree-like construction to the case of $\bits^\lambda \
 If we want to get any bits at the $2^n$ $\lambda$-bit blocks, we can make $n$ calls to $G$ along the path by index.
 
 \begin{figure}[!t]
+\centering{}
+\begin{tikzpicture}
+\draw (4,4) rectangle (6,5); \node at (5,4.5) {$s$};
+\draw [->, thick] (5,4) -- (5,3); \node [left] at (5,3.5) {$G$};
+\draw (3,2) rectangle (5,3); \node at (4,2.5) {$s_0$};
+\draw [->, thick] (4,2) -- (4,1); \node [left] at (4,1.5) {$G$};
+\draw (5,2) rectangle (7,3); \node at (6,2.5) {$s_1$};
+\draw [->, thick] (6,2) -- (6,1); \node [right] at (6,1.5) {$G$};
+\draw (0.5,0) rectangle (2.5,1); \node at (1.5,0.5) {$s_{00}$};
+\draw [->, thick] (1.5,0) -- (1.5,-1); \node [right] at (1.5,-0.5) {$G$}; \node at (1.5,-1.5) {$\cdots$};
+\draw (2.5,0) rectangle (4.5,1); \node at (3.5,0.5) {$s_{01}$};
+\draw [->, thick] (3.5,0) -- (3.5,-1); \node [right] at (3.5,-0.5) {$G$}; \node at (3.5,-1.5) {$\cdots$};
+\draw (5.5,0) rectangle (7.5,1); \node at (6.5,0.5) {$s_{10}$};
+\draw [->, thick] (6.5,0) -- (6.5,-1); \node [right] at (6.5,-0.5) {$G$}; \node at (6.5,-1.5) {$\cdots$};
+\draw (7.5,0) rectangle (9.5,1); \node at (8.5,0.5) {$s_{11}$};
+\draw [->, thick] (8.5,0) -- (8.5,-1); \node [right] at (8.5,-0.5) {$G$}; \node at (8.5,-1.5) {$\cdots$};
+\draw (0,-3) rectangle (2,-2); \draw (2,-3) rectangle (4,-2);
+\node at (1,-2.5) {$s_{000\cdots 00}$}; \node at (3,-2.5) {$s_{000\cdots 01}$};
+\node at (5,-2.5) {$\cdots$};
+\draw (6,-3) rectangle (8,-2); \draw (8,-3) rectangle (10,-2);
+\node at (7,-2.5) {$s_{111\cdots 10}$}; \node at (9,-2.5) {$s_{111\cdots 11}$};
+\node at (12, 4.5) {$1$};
+\node at (12, 2.5) {$2$};
+\node at (12, 0.5) {$2^2$};
+\node at (12, -2.5) {$2^n$};
+\end{tikzpicture}
 \caption{A PRG $G' : \bits^\lambda \mapsto \bits^{2^n\cdot\lambda}$ based on PRG $G : \bits^\lambda \mapsto \bits^{2\lambda}$.}
 \label{fig:ntree}
 \end{figure}
@@ -304,7 +344,7 @@ The definition of PRF can be illustrated by a random experiment (Figure \ref{fig
 \draw [->] (11,0.6) -- (13,0.6); \node [above] at (12,0.6) {$x_i$};
 \draw [->] (13,0.4) -- (11,0.4); \node [below] at (12,0.4) {$y_i$};
 \end{tikzpicture}
-\caption{Random experiment between the distinguisher $D$ and a black box, which can be either $F(s,\cdot)$ given $s\getsr\bits^\lambda$ or $RF_{n,m}$.}
+\caption{Random experiment between the distinguisher $D$ and a black box, which can be either $RF_{n,m}$ or $F(s,\cdot)$ given $s\getsr\bits^\lambda$.}
 \label{fig:re}
 \end{figure}
 
