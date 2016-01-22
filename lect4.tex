@@ -120,7 +120,7 @@ $$\angles{x, r} \eqdef \sum_{i=1}^\lambda x_ir_i \mod 2.$$
 \end{theorem}
 A little example for the inner product is: let $x=101$ and $r=111$, then $\angles{x,r} = 1\cdot 1 + 0\cdot 1 + 1\cdot 1 \mod 2 = 0$.
 
-Blum and Micali \cite{BM84} have given a concrete construction of hardcore predicate, assuming the hardness of Discrete Logarithm Problem.
+Blum and Micali \cite{BM84} have given a concrete construction of hardcore predicate, assuming the hardness of Discrete Logarithm Problem (DLP).
 \begin{theorem}
 For a multiplicative group $\Z_p^*$ with a large prime $p$ and a generator $g$, given a function $f(x) \eqdef g^x \mod p$, define the predicate for $f$ as the most significant bit (MSB) of $x$:
 $$P(x) = MSB(x) \eqdef \begin{cases}
@@ -164,7 +164,7 @@ Hence
 $$\Adv_{G^f, \lambda}^{prg}(D) = |\Delta_1 + \Delta_2| \leq |\Delta_1| + |\Delta_2|.$$
 Note that since $P(s)$ is a hardcore predicate, by Lemma \ref{lem:pred} it follows that $|\Delta_1|$ is negligible. Since $f$ is OWP, if $s$ is uniformly distributed over $\bits^\lambda$, then so is $f(s)$. Thus $\Delta_2 = 0$. It follows that $\Adv_{G^f, \lambda}^{prg}(D)$ must be negligible for any $D$.
 \end{proof}
-The theorem above requires $F$ to be OWP. In fact, we can transform every OWF into a PRG \cite{HILL99}.\footnote{In \cite{HILL99} the construction is not very efficient in practical sense, making around $\lambda^3$ calls to $f$.}
+The theorem above requires $F$ to be OWP. In fact, we can transform every OWF $f$ into a PRG \cite{HILL99}.\footnote{In \cite{HILL99} the construction is not very efficient in practical sense, making around $\lambda^3$ calls to $f$.}
 
 \section{Extending PRG and Hybrid Argument}
 
@@ -271,7 +271,7 @@ Figure \ref{fig:2h} depicts the distributions $H_i$ and $H_{i+1}$.
 \node at (-1,1) {$H_i$};
 \end{tikzpicture}
 
-\hspace{.5in}
+\vspace{.2in}
 
 \begin{tikzpicture}
 % s_i
@@ -331,7 +331,7 @@ $$\begin{aligned}
 &\Adv_{G,\lambda}^{prg}(D^*) \\
 =& \bigg| \Pr[s \getsr \bits^\lambda : D^*(G(s)) = 1] - \Pr[y \getsr \bits^{\lambda+k} : D^*(y) = 1] \bigg| \\
 =& \bigg| \frac{1}{t}\sum_{i=1}^t \Pr[s \getsr \bits^\lambda : D_i^*(G(s)) = 1] - \frac{1}{t}\sum_{i=1}^t \Pr[y \getsr \bits^{\lambda+k} : D_i^*(y) = 1] \bigg| \\
-=& \frac{1}{t}\bigg| \sum_{i=1}^t \Pr[s \getsr \bits^\lambda : D_i^*(G(s)) = 1] - \sum_{i=1}^t \Pr[y \getsr \bits^{\lambda+k} : D_i^*(y) = 1] \bigg| \\
+=& \frac{1}{t}\bigg| \sum_{i=1}^t \Pr[s \getsr \bits^\lambda : D_i^*(G(s)) = 1] - \Pr[y \getsr \bits^{\lambda+k} : D_i^*(y) = 1] \bigg| \\
 \end{aligned}$$
 Define
 $$p_i \eqdef \Pr[s \getsr \bits^\lambda : D_i^*(G(s)) = 1].$$
