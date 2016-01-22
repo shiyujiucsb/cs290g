@@ -228,6 +228,95 @@ If DLP is hard to solve, then $BM_t$ is a PRG.
 \end{theorem}
 
 \section{Pseudorandom Functions}
+Given $\lambda$ bits of input, a PRG can output at most poly($\lambda$) pseudorandom bits. 
+However, this is not always what we want.
+The question is: is it possible to build an efficient generator that can output $2^\lambda$ of pseudorandom bits given $\lambda$ input bits?
+The answer is no, because it requires at least $2^\lambda$ time and thus is not efficient. This motivates our second-best goal: given $s\in\bits^\lambda$ and an index $i\in\{1,2,3,\cdots,2^\lambda\}$, can we efficiently compute the individual bits of $G(s)$?
+It turns out this goal can be achieved, and it gives rise to pseudorandom functions (PRFs).
+
+We start from a simple example. Assume we have a doubling PRG $G : \bits^\lambda \mapsto \bits^{2\lambda}$. The goal is to build a PRG $G' : \bits^\lambda \mapsto \bits^{4\lambda}$. Rather than calculating the bits sequentially as before, we can do it in a more parallel mode (Figure \ref{fig:2tree}). 
+
+\begin{figure}[!t]
+\caption{A PRG $G' : \bits^\lambda \mapsto \bits^{4\lambda}$ based on PRG $G : \bits^\lambda \mapsto \bits^{2\lambda}$.}
+\label{fig:2tree}
+\end{figure}
+
+We can easily extend this tree-like construction to the case of $\bits^\lambda \mapsto \bits^{2^n\cdot\lambda}$ (Figure \ref{fig:ntree}).
+If we want to get any bits at the $2^n$ $\lambda$-bit blocks, we can make $n$ calls to $G$ along the path by index.
+
+\begin{figure}[!t]
+\caption{A PRG $G' : \bits^\lambda \mapsto \bits^{2^n\cdot\lambda}$ based on PRG $G : \bits^\lambda \mapsto \bits^{2\lambda}$.}
+\label{fig:ntree}
+\end{figure}
+
+Based on this idea, Goldreich, Goldwasser and Micali \cite{GGM86} gave the construction $GGM : \bits^\lambda \times \bits^n \mapsto \bits^\lambda$ as following:
+\begin{quote}
+Procedure $GGM(s,x)$: ($x=x_1x_2\cdots x_n$)
+\begin{enumerate}
+\item $s_0 \gets s$.
+\item {\bf for} $i=1$ to $n$ {\bf do}
+\item \tab $(y_0, y_1) \gets G(s_{i-1})$.
+\item \tab $s_i \gets y_{x_i}$.
+\item {\bf return} $s_n$.
+\end{enumerate}
+\end{quote}
+It turns out $GGM$ is a PRF, which should behave like a ``random function'' (RF). We need to formally define what RF is.
+\begin{definition}
+$RF_{n,m}$ is a ``system'' that takes inputs from $\bits^n$ and produces outputs from $\bits^m$. Its behaviors are given below:
+
+We use a table $T$ to keep the states, i.e., for any $x\in\bits^n$, $T[x] \in \bits^m \cup \{\bot\}$, where $\bot$ is a special symbol meaning $T[x]$ is not set. Initially, $T[x] = \bot$ for any $x\in\bits^n$. Then upon input $x$, $RF_{n,m}(x)$ is defined as:
+\begin{quote}
+Procedure $RF_{n,m}(x)$:
+\begin{enumerate}
+\item {\bf if} $T[x] = \bot$ {\bf then}
+\item \tab $T[x] \getsr \bits^m$.
+\item {\bf return} $T[x]$.
+\end{enumerate}
+\end{quote}
+\end{definition}
+Informally, random function $RF_{n,m}$ is a box answering queries $x_1,x_2,\cdots$ by returning the query results $y_1,y_2,\cdots$. The query results should be consistent, i.e., $x_i = x_j$ implies $y_i = y_j$. The table $T$ can guarantee the consistence.
+
+Now we can give the formal definition of PRF.
+\begin{definition}
+A function $F : \bits^\lambda \times \bits^{n(\lambda)} \mapsto \bits^{m(\lambda)}$ is a PRF if
+\begin{enumerate}
+\item It is efficiently computable.
+\item For any PPT distinguisher $D$,
+$$\Adv_{F,\lambda}^{prf}(D) \eqdef \bigg| \Pr[s \getsr \bits^\lambda: D^{F(s,\cdot)}=1] - \Pr[D^{RF_{n,m}}=1] \bigg|$$
+is negligible. Here $D^{O}$ means that $D$ can make queries to $O$, which is a black box (aka oracle) that answers each query. 
+\end{enumerate}
+\end{definition}
+
+The definition of PRF can be illustrated by a random experiment (Figure \ref{fig:re}).
+
+\begin{figure}[!t]
+\caption{Random experiment between the distinguisher $D$ and a black box, which can be either $F(s,\cdot)$ given $s\getsr\bits^\lambda$ or $RF_{n,m}$.}
+\label{fig:re}
+\end{figure}
+
+We give an example which is \emph{not} a PRF.
+\begin{example}
+A function $F : \bits^\lambda \times \bits^\lambda \mapsto \bits^{\lambda}$ s.t. $F(s,x) = s \oplus x$.
+
+To show $F$ is not a PRF, we need to find a distinguisher $D$ s.t. $\Adv_{F,\lambda}^{prf}(D)$ is non-negligible.
+\begin{quote}
+Distinguisher $D^O$:
+\begin{enumerate}
+\item $s' \gets O(0^\lambda)$.
+\item $y \gets O(s')$.
+\item {\bf if} $y=0^\lambda$ {\bf then return} 1.
+\item {\bf else return} 0.
+\end{enumerate}
+\end{quote}
+Here $O(q)$ denotes the answer from the black box $O$ to the query $q$ from $D$.
+
+It is straightforward to see $\Pr[D^{F(s,\cdot)}=1]=1$ and $\Pr[D^{RF_{n,m}}=1]=2^{-\lambda}$. Thus $\Adv_{F,\lambda}^{prf}(D)=1-2^{-\lambda}$, which is overwhelming.
+\end{example}
+
+In fact, $GGM$ is a PRF construction based on PRG $G$.
+\begin{theorem}
+If $G$ is a PRG, then $GGM$ is a PRF.
+\end{theorem}
 
 \begin{thebibliography}{10}
 
