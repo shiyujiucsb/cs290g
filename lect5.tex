@@ -290,6 +290,20 @@ is negligible. Here $D^{O}$ means that $D$ can make queries to $O$, which is a b
 The definition of PRF can be illustrated by a random experiment (Figure \ref{fig:re}).
 
 \begin{figure}[!t]
+\centering{}
+\begin{tikzpicture}
+\draw (1,0) rectangle (3,1); \node at (2,0.5) {$D$}; \draw [->] (1,0.5) -- (0,0.5); \node [above] at (0.5,0.5) {$0/1$};
+\draw (5,0) rectangle (7,1); \node at (6,0.5) {$F(s,\cdot)$}; 
+\draw [->] (3,0.6) -- (5,0.6); \node [above] at (4,0.6) {\scriptsize $x_i\in\bits^n$};
+\draw [->] (5,0.4) -- (3,0.4); \node [below] at (4,0.4) {\scriptsize $y_i = F(s,x_i)$};
+
+\draw [dashed, thick] (7.5,0) -- (7.5,1);
+
+\draw (9,0) rectangle (11,1); \node at (10,0.5) {$D$};  \draw [->] (9,0.5) -- (8,0.5); \node [above] at (8.5,0.5) {$0/1$};
+\draw (13,0) rectangle (15,1); \node at (14,0.5) {$RF_{n,m}$}; 
+\draw [->] (11,0.6) -- (13,0.6); \node [above] at (12,0.6) {$x_i$};
+\draw [->] (13,0.4) -- (11,0.4); \node [below] at (12,0.4) {$y_i$};
+\end{tikzpicture}
 \caption{Random experiment between the distinguisher $D$ and a black box, which can be either $F(s,\cdot)$ given $s\getsr\bits^\lambda$ or $RF_{n,m}$.}
 \label{fig:re}
 \end{figure}
@@ -308,7 +322,7 @@ Distinguisher $D^O$:
 \item {\bf else return} 0.
 \end{enumerate}
 \end{quote}
-Here $O(q)$ denotes the answer from the black box $O$ to the query $q$ from $D$.
+Here $O(q)$ denotes the answer given by the black box $O$ to the query $q$ from $D$.
 
 It is straightforward to see $\Pr[D^{F(s,\cdot)}=1]=1$ and $\Pr[D^{RF_{n,m}}=1]=2^{-\lambda}$. Thus $\Adv_{F,\lambda}^{prf}(D)=1-2^{-\lambda}$, which is overwhelming.
 \end{example}
