@@ -95,7 +95,7 @@ $\underleftarrow{\quad #1 \quad}$ }
 \section{Recap}
 Last lecture we constructed a PRG with extended outputs. That is, given a PRG $G : \bits^\lambda \mapsto \bits^{\lambda+k}$, we built another generator $G_t : \bits^\lambda \mapsto \bits^{\lambda+tk}$, and we also proved that if $G$ is a PRG and $t$ is polynomial in $\lambda$, then $G_t$ is also a PRG. The proof idea is to show that for all PPT distinguisher $D$, there exists a PPT distinguisher $D^*$ s.t.
 $$\Adv_{G_t,\lambda}^{prg}(D) = t\cdot \Adv_{G,\lambda}^{prg}(D^*).$$
-We ``fix'' some $D$, which expects input of $\lambda+kt$ bits, and construct $D^*$ based on the fixed $D$. $D^*$ expects $\lambda+k$ bits of input.
+We ``fix'' some $D$, which expects input of $\lambda+tk$ bits, and construct $D^*$ based on the fixed $D$. $D^*$ expects $\lambda+k$ bits of input.
 \begin{quote}
 Distinguisher $D^* (y)$: here $y\in\bits^{\lambda+k}$ (it can be $y = G(s)$, $s\getsr\bits^\lambda$ or $y\getsr\bits^{\lambda+k}$)
 \begin{enumerate}
@@ -119,7 +119,7 @@ since in $D_1^*(G(s))$ every $z_i$ is produced by $G$, i.e., $H_1(G(s))=H_0(s)$ 
 
 \begin{observation}
 $$\Pr [y \getsr \bits^{\lambda+k} : D_t^*(y)=1] = \Pr [(z_1, z_2, \cdots, z_t, s_t) \getsr \bits^{\lambda+tk} : D(z_1, z_2, \cdots, z_t, s_t)=1],$$
-since in $D_t^*$ every $z_t$ is at uniformly random, i.e., $H_t(y) = U_{\lambda+tk}$ given $y \getsr \bits^{\lambda+k}$.
+since in $D_t^*$ every $z_i$ is at uniformly random, i.e., $H_t(y) = U_{\lambda+tk}$ given $y \getsr \bits^{\lambda+k}$.
 \end{observation}
 
 \begin{observation}

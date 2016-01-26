@@ -27,7 +27,7 @@
 }
 
 \newcommand{\handout}[3]{\heading{#1}{#2}{Instructor:
-Stefano Tessaro}{Student: Shiyu Ji}{#3}}
+Stefano Tessaro}{Student: Shiyu Ji, Yi Yang}{#3}}
 
 \setlength{\parindent}{0in}
 
@@ -200,9 +200,9 @@ Hence $A'$ has a non-negligible advantage.
 
 {\bf c) [Points: 2]} $x \mapsto f(g(x))$.
 
-{\bf Claim}: $x \mapsto f(g(x))$ is \emph{not} one-way.
+{\bf Claim}: $x \mapsto f(g(x))$ is \emph{not} one-way. A simple counterexample can be: given one-way function $h : \bits^\lambda \mapsto \bits^\lambda$, suppose for any $x,y \in \bits^\lambda$, $f(x||y) \eqdef h(x)||1^\lambda$ and $g(x||y) \eqdef 1^\lambda || h(y)$. Following a similar proof from Lecture 2, it is easy to see both $f$ and $g$ are one-way. However, $f \circ g (x||y) = f(1^\lambda||h(y)) = h(1^\lambda)||1^\lambda$, which holds for any $x||y$, and thus is not one-way. We also found another slightly more complex counterexample.
 
-{\bf Counterexample}: Suppose $h, j : \bits^\lambda \mapsto \bits^\lambda$ are one-way functions (not permutations) and w.l.o.g $0^\lambda$ is not in the range of $j$. We construct two functions $f,g : \bits^{2\lambda} \mapsto \bits^{2\lambda}$ as following, given any inputs $x, y \in \bits^\lambda$:
+{\bf Another Counterexample}: Suppose $h, j : \bits^\lambda \mapsto \bits^\lambda$ are one-way functions (not permutations) and w.l.o.g $0^\lambda$ is not in the range of $j$. We construct two functions $f,g : \bits^{2\lambda} \mapsto \bits^{2\lambda}$ as following, given any inputs $x, y \in \bits^\lambda$:
 $$g(x,y) \eqdef h(x) || h(x).$$
 $$f(x,y) \eqdef
 \begin{cases}
@@ -362,7 +362,18 @@ general $f$? Justify your answer!
 
 {\bf Claim}: The statement is not true for general $f$.
 
-{\bf Counterexample}: Suppose $f : \bits^\lambda \mapsto \bits$ is defined by $f(x) = 0$ for any $x\in\bits^\lambda$. Apparently $f$ is not one-way, but we claim the bitwise xor $\oplus_i x_i$ is a hardcore predicate of $f$. Note that the predicate $\oplus_i x_i$ is uniformly distributed over $\bits$ if $x\getsr\bits^\lambda$. Since given any input $f(x)$ which is always 0, any adversary has no knowledge about $x$, and thus the best way to guess $\oplus_i x_i$ is based on the statistical distribution of the predicate. However, it is a uniform distribution, and thus any adversary cannot have non-negligible advantage.
+{\bf Counterexample}: Suppose $f : \bits^\lambda \mapsto \bits$ is defined by $f(x) = 0$ for any $x\in\bits^\lambda$. Apparently $f$ is not one-way, but we claim the bitwise xor $\oplus_i x_i$ is a hardcore predicate of $f$. Note that the predicate $\oplus_i x_i$ is uniformly distributed over $\bits$ if $x\getsr\bits^\lambda$. For the base case of 2 terms, 
+$$\begin{aligned}
+&\Pr[x_1,x_2\getsr\bits: x_1\oplus x_2 = 0] \\
+= &\Pr[x_1,x_2\getsr\bits: x_1 = 0, x_2=0] + \Pr[x_1,x_2\getsr\bits: x_1 = 1, x_2=1] = \frac{1}{4} + \frac{1}{4} = \frac{1}{2}.
+\end{aligned}$$ 
+$$\begin{aligned}
+&\Pr[x_1,x_2\getsr\bits: x_1\oplus x_2 = 1] \\
+= &\Pr[x_1,x_2\getsr\bits: x_1 = 1, x_2=0] + \Pr[x_1,x_2\getsr\bits: x_1 = 0, x_2=1] = \frac{1}{4} + \frac{1}{4} = \frac{1}{2}.
+\end{aligned}$$ 
+It is easy to show the induction step, since $\oplus_{i=1}^k x_i$ and $x_{k+1}$ are independent, and the same reasoning as above follows by replacing $x_i$ by $\oplus_{i=1}^k x_i$ and $x_2$ by $x_{k+1}$.
+
+Since given any input $f(x)$ which is always 0, any adversary has no knowledge about $x$, and thus the best way to guess $\oplus_i x_i$ is based on the statistical distribution of the predicate. However, it is a uniform distribution, and thus any adversary cannot have non-negligible advantage.
 
 
 \section{Task 4 - Pseudorandom Generators}
