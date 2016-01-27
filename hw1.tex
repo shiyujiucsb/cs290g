@@ -115,17 +115,17 @@ $$f_4(n) = n^{-\log n} \leq n^{-\log n_c} = n^{-\log 2^c} = n^{-c}.$$
 \end{itemize}
 
 {\bf b) [Points: 6]} Show that for any two negligible functions $f, g$, and any polynomial $p$ which is non-negative (i.e., $p(n)\geq 0$ on all $n\in\N$) the following functions are negligible:
-$$n \to f(n)+g(n), \quad n \to p(f(n)) \textrm{ where $p$ has no constant term},$$
-$$n \to f(n)\cdot g(n), \quad n \to p(n)\cdot f(n) \textrm{ for a polynomial $p(n)$}.$$
+$$n \mapsto f(n)+g(n), \quad n \mapsto p(f(n)) \textrm{ where $p$ has no constant term},$$
+$$n \mapsto f(n)\cdot g(n), \quad n \mapsto p(n)\cdot f(n) \textrm{ for a polynomial $p(n)$}.$$
 
 {\bf Solution}:
 \begin{itemize}
-\item $f(n)+g(n)$ is negligible.
+\item $n \mapsto f(n)+g(n)$ is negligible.
 \begin{proof}
 Since $f$ and $g$ are negligible, for any $c+1\in \N$, there exists $n_{c+1,f}$ s.t. for any $n\geq n_{c+1,f}$, $f(n) \leq n^{-(c+1)}$, and there exists $n_{c+1,g}$ s.t. for any $n\geq n_{c+1,g}$, $g(n) \leq n^{-(c+1)}$. Thus, for any $n\geq \max\{n_{c+1,f}, n_{c+1,g}\}$, we have $f(n) \leq n^{-(c+1)}$ and $g(n) \leq n^{-(c+1)}$. Now given any $c\in\N$, let $n_c = \max\{3, n_{c+1,f}, n_{c+1,g}\}$. Then for any $n\geq n_c$, we have $f(n)+g(n) \leq 2n^{-(c+1)} = \frac{2}{n}n^{-c} < n^{-c}$, which satisfies the definition of a negligible function.
 \end{proof}
 
-\item For a \emph{non-negative} polynomial $p(n)$ with no constant term, $p(f(n))$ is negligible.
+\item For any \emph{non-negative} polynomial $p(n)$ with no constant term, $n \mapsto p(f(n))$ is negligible.
 \begin{proof}
 Suppose the degree of $p(n)$ is $d$, and $p(n) = \sum_{k=1}^d a_kn^k$, where each $a_k\in\R$. 
 %Then $a_d\geq 0$; otherwise, $p(n)$ cannot be non-negative. 
@@ -137,12 +137,12 @@ $$p(f(n)) \leq S_p \cdot f(n) \leq S_p \cdot n^{-(c+1)} = \frac{S_p}{n}n^{-c} < 
 which satisfies the definition of a negligible function.
 \end{proof}
 
-\item $f(n)\cdot g(n)$ is negligible.
+\item $n \mapsto f(n)\cdot g(n)$ is negligible.
 \begin{proof}
 Since $f$ and $g$ are negligible, for any $c\in \N$, there exists $n_{c,f}$ s.t. for any $n\geq n_{c,f}$, $f(n) \leq n^{-c}$, and there exists $n_{c,g}$ s.t. for any $n\geq n_{c,g}$, $g(n) \leq n^{-c}$. Let $n_c = \max\{n_{c,f}, n_{c,g}\}$. Then for any $n\geq n_c$, we have $f(n) \leq n^{-c}$ and $g(n) \leq n^{-c}$. Hence $f(n)\cdot g(n) \leq n^{-2c} \leq n^{-c}$, which satisfies the definition of a negligible function.
 \end{proof}
 
-\item For a \emph{non-negative} polynomial $p(n)$, $p(n)\cdot f(n)$ is negligible.
+\item For any \emph{non-negative} polynomial $p(n)$, $n \mapsto p(n)\cdot f(n)$ is negligible.
 \begin{proof}
 Suppose the degree of $p(n)$ is $d$, and $p(n) = \sum_{k=0}^d a_kn^k$, where each $a_k\in\R$.
 Since $p(n)$ is non-negative, we have $a_d \geq 0$. Otherwise, a sufficiently large $n$ can give negative $p(n)$, which is dominated by the term $a_dn^d$.
