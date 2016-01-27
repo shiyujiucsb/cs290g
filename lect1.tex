@@ -93,7 +93,7 @@ One-way functions are easy to compute but hard to invert. Recall the discrete lo
 $$G = \angles{g} = \{e, g, g^2, g^3, \cdots \},$$
 where $e$ is the neutral element, and $g$ is the generator, and all the multiplications are modulo $p$. We assume $p$ is a large prime.
 The exponential function is defined as
-$$exp_g : \Z_{|G|} \mapsto G,$$
+$$exp_g : \Z_{|G|} \to G,$$
 $$exp_g(x) \eqdef g^x \mod p,$$
 in which $\Z_{|G|}$ is the additive group modulo $|G|$: $\{0, 1, \cdots, |G|-1\}$. The discrete logarithm problem says when $p$ is very large, the exponential function is efficient to compute, but intractable to invert.
 
@@ -104,7 +104,7 @@ This example satisfies two properties:
 \end{enumerate}
 
 \section{Adversary Advantage}
-Given a function $f : D \mapsto R$, which is not necessarily injective. How should we define the hardness of inverting $f$? 
+Given a function $f : D \to R$, which is not necessarily injective. How should we define the hardness of inverting $f$? 
 The idea  is to define via a \emph{game}. See Figure \ref{fig:inversion_game}.
 \begin{figure}[!ht]
 \centering
@@ -116,7 +116,7 @@ outputs $x' \in D$ given $f(x)$ & & \\
  & \rightstep{x'} & \\
  & & $A$ \emph{wins} iff $f(x) = f(x')$.
 \end{tabular}
-\caption{The ``inversion game'' used to define the hardness of inverting $f : D \mapsto R$.}
+\caption{The ``inversion game'' used to define the hardness of inverting $f : D \to R$.}
 \label{fig:inversion_game}
 \end{figure}
 
@@ -126,7 +126,7 @@ The adversary $A$ is a (randomized) algorithm that takes an input $y\in R$ and p
 
 We can define the advantage of $A$ as its probability to win this game.
 \begin{definition}
-{\bf Adversary $A$'s Advantage} to invert a function $f : D \mapsto R$:
+{\bf Adversary $A$'s Advantage} to invert a function $f : D \to R$:
 $$\Adv_f^{owf}(A) = \Pr [x\getsr D, x'\getsr A(f(x)) : f(x)=f(x')].$$
 \end{definition}
 
@@ -153,7 +153,7 @@ $$
 &= \Pr [x\getsr D, x'\getsr D : x = x'] = 1/|D|.
 \end{aligned}$$
 
-\item If $f : D \mapsto \bits$, then $\Adv_f^{owf}(A) \geq 1/2$.
+\item If $f : D \to \bits$, then $\Adv_f^{owf}(A) \geq 1/2$.
 \end{itemize}
 \end{example}
 
@@ -175,7 +175,7 @@ Consider the adverary $A'$ in Figure \ref{fig:bf}. We have $\Adv_f^{owf}(A) = 1$
 \end{example}
 
 \section{Definitions}
-Informally, a function $f:D\mapsto R$ is a One-Way Function (OWF) if
+Informally, a function $f:D\to R$ is a One-Way Function (OWF) if
 \begin{enumerate}
 \item $f$ is efficiently computable,
 \item For every ``feasible'' adversary $A$, its advantage $\Adv_f^{owf}(A)$ is ``small''.
@@ -187,7 +187,7 @@ $$f_\lambda : \Z_{p_\lambda-1} \to \Z_{p_\lambda}^*$$
 $$f_\lambda (x) \eqdef g_\lambda^x \mod p_\lambda. $$
 Note that the domain of each $f_\lambda$ does not contain $p_\lambda-1$, since we always have $g_\lambda^{p_\lambda-1} \mod p_\lambda = 1$ by Fermat's little theorem.
 
-Similarly, we can define the advantage of adversary $A$ given a family of functions $F = \{f_\lambda\}_{\lambda\in\N}$, $f_\lambda : D_\lambda \mapsto R_\lambda$.
+Similarly, we can define the advantage of adversary $A$ given a family of functions $F = \{f_\lambda\}_{\lambda\in\N}$, $f_\lambda : D_\lambda \to R_\lambda$.
 \begin{definition}
 {\bf Adversary $A$'s Advantage} to invert a family of functions $F = \{f_\lambda\}_{\lambda\in\N}$:
 $$\Adv_{F,\lambda}^{owf}(A) = \Pr [x\getsr D_\lambda, x'\getsr A(f_\lambda(x), \lambda) : f_\lambda(x)=f_\lambda(x')].$$
@@ -206,7 +206,7 @@ A function family $F = \{f_\lambda\}_{\lambda\in\N}$ is efficiently computable i
 
 We next define ``small'', which needs \emph{negligible functions}.
 \begin{definition}
-A function $f : \N \mapsto [0,1]$ is {\bf negligible} if
+A function $f : \N \to [0,1]$ is {\bf negligible} if
 $$\forall c\in\N, \exists n_c\in\N, \forall n\geq n_c : f(n) \leq \frac{1}{n^c}.$$
 \end{definition}
 
@@ -231,7 +231,7 @@ We can build a OWF given another OWF. This property is reflected in the next lem
 \begin{lemma}
 Assume we are given a function family $F = \{f_\lambda\}$\footnote{Very often $ \{f_\lambda\}$ is short for $ \{f_\lambda\}_{\lambda\in\N}$.}.
 We build another function family $G = \{g_\lambda\}$ s.t.
-$$g_\lambda : D_\lambda \times D_\lambda \mapsto R_\lambda \times D_\lambda,$$
+$$g_\lambda : D_\lambda \times D_\lambda \to R_\lambda \times D_\lambda,$$
 $$g_\lambda(u,v) \eqdef (f(u), v).$$
 If $F$ is one-way, then so is $G$.
 \end{lemma}

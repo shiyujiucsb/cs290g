@@ -94,13 +94,13 @@ $\underleftarrow{\quad #1 \quad}$ }
 \handout{4}{Jan 19, 2016}{Hardcore Predicates}
 \section{Recap}
 Last lecture we defined Pseudorandom Generator (PRG). That is, PRG is a function family 
-$G : \bits^\lambda \mapsto \bits^{n(\lambda)}$, where $n(\lambda) > \lambda$, such that for all PPT distinguisher $D$, the advantage
+$G : \bits^\lambda \to \bits^{n(\lambda)}$, where $n(\lambda) > \lambda$, such that for all PPT distinguisher $D$, the advantage
 $$\Adv_{G, \lambda}^{prg} (D) \eqdef \bigg| \Pr[s \getsr \bits^\lambda : D(G(s)) = 1] - \Pr[y \getsr \bits^{n(\lambda)} : D(y) = 1] \bigg|$$
 is negligible in $\lambda$.
 
 \section{Hardcore Predicates}
 To build PRG from one-way permutation (OWP), we need hardcore predicates. 
-Informally, given a family of one-way functions $f : \bits^\lambda \mapsto \bits^{\lambda'}$ and a family of predicates $P : \bits^\lambda \mapsto \bits$, we say $P$ is a hardcore predicate for $f$ if given $f(x)$ for $x \getsr \bits^\lambda$, it is hard to predict $P(x)$.
+Informally, given a family of one-way functions $f : \bits^\lambda \to \bits^{\lambda'}$ and a family of predicates $P : \bits^\lambda \to \bits$, we say $P$ is a hardcore predicate for $f$ if given $f(x)$ for $x \getsr \bits^\lambda$, it is hard to predict $P(x)$.
 
 We can formalize the intuition as following.
 \begin{definition}
@@ -109,7 +109,7 @@ $$\Adv_{f,P,\lambda}^{pred} (A) \eqdef 2 \bigg| \Pr[x \getsr \bits^\lambda : A(f
 is negligible in $\lambda$.
 \end{definition}
 Let us see how to construct a hardcore predicate.
-Assume the functions $f$ as above. We build another function family $g^f : \bits^{2\lambda} \mapsto \bits^{\lambda + \lambda'}$ defined by
+Assume the functions $f$ as above. We build another function family $g^f : \bits^{2\lambda} \to \bits^{\lambda + \lambda'}$ defined by
 $$g^f (x, r) \eqdef (f(x), r).$$
 In Lecture 2, we have shown that if $f$ is OWF, then so is $g^f$.
 
@@ -142,10 +142,10 @@ If $P$ is a hardcore predicate, can any efficient adversary distinguish these tw
 If $P$ is a hardcore predicate for $f$, then the advantage $\Adv_{P_0,P_1,\lambda}^{dist}(D)$ is negligible for all PPT $D$.
 \end{lemma}
 
-Now we consider the case $f : \bits^\lambda \mapsto \bits^{\lambda'}$ is one-way permutation, i.e., $\lambda = \lambda'$ and $f$ is one-to-one.
+Now we consider the case $f : \bits^\lambda \to \bits^{\lambda'}$ is one-way permutation, i.e., $\lambda = \lambda'$ and $f$ is one-to-one.
 The following theorem constructs a PRG given a OWP and its hardcore predicate.
 \begin{theorem}
-Given a function $f$ and a hardcore predicate $P$ for $f$, define $G^f : \bits^\lambda \mapsto \bits^{\lambda+1}$ as
+Given a function $f$ and a hardcore predicate $P$ for $f$, define $G^f : \bits^\lambda \to \bits^{\lambda+1}$ as
 $$G^f(x) \eqdef (f(x), P(x)).$$
 If $f$ is OWP, then $G^f$ is a PRG.
 \end{theorem}
@@ -198,13 +198,13 @@ The theorem above requires $F$ to be OWP. In fact, we can transform every OWF $f
 \draw [decorate,decoration={brace, amplitude=7pt}] (2,2) -- (2,3);
 \node [left] at (1.8,2.5) {$k$};
 \end{tikzpicture}
-\caption{Extended PRG $G_t : \bits^\lambda \mapsto \bits^{\lambda+tk}$ based on $G : \bits^\lambda \mapsto \bits^{\lambda+k}$.}
+\caption{Extended PRG $G_t : \bits^\lambda \to \bits^{\lambda+tk}$ based on $G : \bits^\lambda \to \bits^{\lambda+k}$.}
 \label{fig:extended_prg}
 \end{figure}
 
-Given a PRG $G : \bits^\lambda \mapsto \bits^{\lambda+k}$, $k\geq 1$, our goal is to build a PRG $G' : \bits^\lambda \mapsto \bits^{\lambda+k'}$, where $k'$ is much larger than $k$.
+Given a PRG $G : \bits^\lambda \to \bits^{\lambda+k}$, $k\geq 1$, our goal is to build a PRG $G' : \bits^\lambda \to \bits^{\lambda+k'}$, where $k'$ is much larger than $k$.
 
-Given a parameter $t$ in $\N^+$, we give a construction $G_t : \bits^\lambda \mapsto \bits^{\lambda+tk}$ as following:
+Given a parameter $t$ in $\N^+$, we give a construction $G_t : \bits^\lambda \to \bits^{\lambda+tk}$ as following:
 \begin{quote}
 Algorithm $G_t (s)$, $s\in\bits^\lambda$
 \begin{enumerate}
@@ -314,7 +314,7 @@ Thus if $G$ is PRG, then $H_i$ and $H_{i+1}$ are computationally indistinguishab
 
 Based on the motivation above, we build $D^*$ as following:
 \begin{quote}
-Distinguisher $D^* (y)$: ($y \in \bits^{\lambda+k}$, $G : \bits^\lambda \mapsto \bits^{\lambda+k}$)
+Distinguisher $D^* (y)$: ($y \in \bits^{\lambda+k}$, $G : \bits^\lambda \to \bits^{\lambda+k}$)
 \begin{enumerate}
 \item $i \getsr \{1, 2, \cdots, t\}$.
 \item {\bf for} $j=1$ to $i-1$ {\bf do}

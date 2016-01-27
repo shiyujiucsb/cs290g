@@ -84,7 +84,7 @@ $\underleftarrow{\quad #1 \quad}$ }
 \newtheorem{assumption}[theorem]{Assumption}
 \newtheorem{fact}[theorem]{Fact}
 
-\bibliographystyle{plain}
+%\bibliographystyle{plain}
 
 \begin{document}
 \handout{3}{Jan 14, 2016}{Pseudorandom Generator}
@@ -169,9 +169,9 @@ We can use the advantage defined above to describe how close two distributions $
 
 \section{Pseudorandom Generators}
 Informally speaking, a pseudorandom generator is an efficiently computable function $G$ that stretches a \emph{random} seed string $s$ into a pseudorandom string $G(s)$, which ``looks like'' a uniformly random string. 
-Let $G: \bits^\lambda \mapsto \bits^{\lambda'}$, where $\lambda$ is the length of input seed, and $\lambda'$ is the output length. We require $\lambda' > \lambda$, e.g. $\lambda' = \lambda+1$, $2\lambda$, $\lambda^2$, etc. Our goal is that if the seed $s\getsr \bits^\lambda$, then the output string $G(s)$ should ``look like'' a uniformly random string $y\getsr\bits^{\lambda'}$. The formal definition of PRG is based on this intuition.
+Let $G: \bits^\lambda \to \bits^{\lambda'}$, where $\lambda$ is the length of input seed, and $\lambda'$ is the output length. We require $\lambda' > \lambda$, e.g. $\lambda' = \lambda+1$, $2\lambda$, $\lambda^2$, etc. Our goal is that if the seed $s\getsr \bits^\lambda$, then the output string $G(s)$ should ``look like'' a uniformly random string $y\getsr\bits^{\lambda'}$. The formal definition of PRG is based on this intuition.
 \begin{definition}
-A function family $G = \{G_\lambda\}_{\lambda\in\N}$ (where $G_\lambda : \bits^\lambda \mapsto \bits^{n(\lambda)}$, $n(\lambda)>\lambda$) is a {\bf Pseudorandom Generator} ({\bf PRG}) if:
+A function family $G = \{G_\lambda\}_{\lambda\in\N}$ (where $G_\lambda : \bits^\lambda \to \bits^{n(\lambda)}$, $n(\lambda)>\lambda$) is a {\bf Pseudorandom Generator} ({\bf PRG}) if:
 \begin{enumerate}
 \item $G$ is efficiently computable and deterministic.
 \item For any PPT $D$, $\Adv_{G,\lambda}^{prg}(D) \eqdef \Adv_{G_\lambda(U_\lambda),U_{n(\lambda)}}^{dist}(D)$ is negligible in $\lambda$.
@@ -181,7 +181,7 @@ Here $U_\lambda$ denotes the uniform distribution over $\bits^\lambda$. $G_\lamb
 
 \begin{example}
 \label{eg:2}
-Assume we are given a PRG $G_\lambda : \bits^\lambda \mapsto \bits^{\lambda+1}$. Consider the following distinguisher $D^*$: 
+Assume we are given a PRG $G_\lambda : \bits^\lambda \to \bits^{\lambda+1}$. Consider the following distinguisher $D^*$: 
 \begin{enumerate}
 \item On input $y\in \bits^{\lambda+1}$, $D^*$ checks whether $y\in\mathrm{range}(G_\lambda)$, i.e., $\exists s$ s.t. $G_\lambda(s) = y$.
 \item If $y\in\mathrm{range}(G_\lambda)$, then $D^*$ outputs 1. Otherwise, she outputs 0.
@@ -195,7 +195,7 @@ The example above implies that we \emph{cannot} require PRG to resist \emph{any}
 
 PRG is closely related to one-way functions (OWFs). The following lemma indicates that a PRG can be a OWF.
 \begin{lemma}
-If $G:\bits^\lambda \mapsto \bits^{2\lambda}$ is a PRG, then $G$ is also a OWF.
+If $G:\bits^\lambda \to \bits^{2\lambda}$ is a PRG, then $G$ is also a OWF.
 \end{lemma}
 \begin{proof}
 Assume by contradiction that $G$ is not one-way, then there exists a PPT adversary $A$ and a non-negligible function $\epsilon$ s.t.
@@ -225,7 +225,7 @@ which is negligible. Now $\Adv_{G,\lambda}^{prg}(D)$ is the distance between a n
 
 A much stronger result is that there exists a construction transforming \emph{any} OWF into a PRG. This construction was found by H\aa stad, Impagliazzo, Levin and Luby \cite{HILL99}.
 
-Another important fact is that we can construct PRG from one-way permutation (OWP), which is a one-to-one one-way function family $\pi: \bits^\lambda \mapsto \bits^\lambda$. The Goldreich-Levin construction \cite{GL89} $G^\pi : \bits^{2\lambda} \mapsto \bits^{2\lambda+1}$ is given by
+Another important fact is that we can construct PRG from one-way permutation (OWP), which is a one-to-one one-way function family $\pi: \bits^\lambda \to \bits^\lambda$. The Goldreich-Levin construction \cite{GL89} $G^\pi : \bits^{2\lambda} \to \bits^{2\lambda+1}$ is given by
 $$G^\pi(x; r) \eqdef (\pi(x), r, \angles{x,r}),$$
 where $x, r\in\bits^\lambda$, and $\angles{x,r}$ is the inner product of $x$ and $r$ defined as
 $$\angles{x,r} \eqdef \sum_{i=1}^\lambda x_ir_i \mod 2.$$

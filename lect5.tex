@@ -93,7 +93,7 @@ $\underleftarrow{\quad #1 \quad}$ }
 \begin{document}
 \handout{5}{Jan 21, 2016}{Pseudorandom Functions}
 \section{Recap}
-Last lecture we constructed a PRG with extended outputs. That is, given a PRG $G : \bits^\lambda \mapsto \bits^{\lambda+k}$, we built another generator $G_t : \bits^\lambda \mapsto \bits^{\lambda+tk}$, and we also proved that if $G$ is a PRG and $t$ is polynomial in $\lambda$, then $G_t$ is also a PRG. The proof idea is to show that for all PPT distinguisher $D$, there exists a PPT distinguisher $D^*$ s.t.
+Last lecture we constructed a PRG with extended outputs. That is, given a PRG $G : \bits^\lambda \to \bits^{\lambda+k}$, we built another generator $G_t : \bits^\lambda \to \bits^{\lambda+tk}$, and we also proved that if $G$ is a PRG and $t$ is polynomial in $\lambda$, then $G_t$ is also a PRG. The proof idea is to show that for all PPT distinguisher $D$, there exists a PPT distinguisher $D^*$ s.t.
 $$\Adv_{G_t,\lambda}^{prg}(D) = t\cdot \Adv_{G,\lambda}^{prg}(D^*).$$
 We ``fix'' some $D$, which expects input of $\lambda+tk$ bits, and construct $D^*$ based on the fixed $D$. $D^*$ expects $\lambda+k$ bits of input.
 \begin{quote}
@@ -210,7 +210,7 @@ $$
 Note that our observations can cancel out $t-2$ terms.
 
 Last lecture we also saw a concrete construction of PRG given by Blum and Micali \cite{BM84}.
-Given a large prime modulus $p$, and a generator $g$ of $\Z_p^*$, the seed is $s \in \Z_p^* = \{1,2,\cdots,p-1\}$, and we build a generator $BM_t : \Z_p^* \mapsto \bits^t$ as following.
+Given a large prime modulus $p$, and a generator $g$ of $\Z_p^*$, the seed is $s \in \Z_p^* = \{1,2,\cdots,p-1\}$, and we build a generator $BM_t : \Z_p^* \to \bits^t$ as following.
 \begin{quote}
 Procedure $BM_t(s)$: ($t$ is roughly larger than $\log p$)
 \begin{enumerate}
@@ -238,7 +238,7 @@ The question is: is it possible to build an efficient generator that can output 
 The answer is no, because it requires at least $2^\lambda$ time and thus is not efficient. This motivates our second-best goal: given $s\in\bits^\lambda$ and an index $i\in\{1,2,3,\cdots,2^\lambda\}$, can we efficiently compute the individual bits of $G(s)$?
 It turns out this goal can be achieved, and it gives rise to pseudorandom functions (PRFs).
 
-We start from a simple example. Assume we have a doubling PRG $G : \bits^\lambda \mapsto \bits^{2\lambda}$. The goal is to build a PRG $G' : \bits^\lambda \mapsto \bits^{4\lambda}$. Rather than calculating the bits sequentially as before, we can do it in a more parallel mode (Figure \ref{fig:2tree}). 
+We start from a simple example. Assume we have a doubling PRG $G : \bits^\lambda \to \bits^{2\lambda}$. The goal is to build a PRG $G' : \bits^\lambda \to \bits^{4\lambda}$. Rather than calculating the bits sequentially as before, we can do it in a more parallel mode (Figure \ref{fig:2tree}). 
 
 \begin{figure}[!t]
 \centering{}
@@ -254,11 +254,11 @@ We start from a simple example. Assume we have a doubling PRG $G : \bits^\lambda
 \draw (5.5,0) rectangle (7.5,1); \node at (6.5,0.5) {$s_{10}$};
 \draw (7.5,0) rectangle (9.5,1); \node at (8.5,0.5) {$s_{11}$};
 \end{tikzpicture}
-\caption{A PRG $G' : \bits^\lambda \mapsto \bits^{4\lambda}$ based on PRG $G : \bits^\lambda \mapsto \bits^{2\lambda}$.}
+\caption{A PRG $G' : \bits^\lambda \to \bits^{4\lambda}$ based on PRG $G : \bits^\lambda \to \bits^{2\lambda}$.}
 \label{fig:2tree}
 \end{figure}
 
-We can easily extend this tree-like construction to the case of $\bits^\lambda \mapsto \bits^{2^n\cdot\lambda}$ (Figure \ref{fig:ntree}).
+We can easily extend this tree-like construction to the case of $\bits^\lambda \to \bits^{2^n\cdot\lambda}$ (Figure \ref{fig:ntree}).
 If we want to get any bits at the $2^n$ $\lambda$-bit blocks, we can make $n$ calls to $G$ along the path given by index.
 
 \begin{figure}[!t]
@@ -289,11 +289,11 @@ If we want to get any bits at the $2^n$ $\lambda$-bit blocks, we can make $n$ ca
 \node at (12, -1) {$\vdots$};
 \node at (12, -2.5) {$2^n$};
 \end{tikzpicture}
-\caption{A PRG $G' : \bits^\lambda \mapsto \bits^{2^n\cdot\lambda}$ based on PRG $G : \bits^\lambda \mapsto \bits^{2\lambda}$.}
+\caption{A PRG $G' : \bits^\lambda \to \bits^{2^n\cdot\lambda}$ based on PRG $G : \bits^\lambda \to \bits^{2\lambda}$.}
 \label{fig:ntree}
 \end{figure}
 
-Based on this idea, Goldreich, Goldwasser and Micali \cite{GGM86} gave the construction $GGM : \bits^\lambda \times \bits^n \mapsto \bits^\lambda$ as following:
+Based on this idea, Goldreich, Goldwasser and Micali \cite{GGM86} gave the construction $GGM : \bits^\lambda \times \bits^n \to \bits^\lambda$ as following:
 \begin{quote}
 Procedure $GGM(s,x)$: ($x=x_1x_2\cdots x_n$, $x_i\in\bits$)
 \begin{enumerate}
@@ -322,7 +322,7 @@ Informally, random function $RF_{n,m}$ is a box answering queries $x_1,x_2,\cdot
 
 Now we can give the formal definition of PRF.
 \begin{definition}
-A function $F : \bits^\lambda \times \bits^{n(\lambda)} \mapsto \bits^{m(\lambda)}$ is a PRF if
+A function $F : \bits^\lambda \times \bits^{n(\lambda)} \to \bits^{m(\lambda)}$ is a PRF if
 \begin{enumerate}
 \item It is efficiently computable.
 \item For any PPT distinguisher $D$,
@@ -354,7 +354,7 @@ The definition of PRF can be illustrated by a random experiment (Figure \ref{fig
 
 We give an example which is \emph{not} a PRF.
 \begin{example}
-A function $F : \bits^\lambda \times \bits^\lambda \mapsto \bits^{\lambda}$ s.t. $F(s,x) = s \oplus x$.
+A function $F : \bits^\lambda \times \bits^\lambda \to \bits^{\lambda}$ s.t. $F(s,x) = s \oplus x$.
 
 To show $F$ is not a PRF, we need to find a distinguisher $D$ s.t. $\Adv_{F,\lambda}^{prf}(D)$ is non-negligible.
 \begin{quote}

@@ -90,7 +90,7 @@ $\underleftarrow{\quad #1 \quad}$ }
 \begin{document}
 \handout{1}{Due: Jan 29, 2016}{Homework 1}
 \section{Task 1 - Negligible Functions}
-Recall that a function $f : \N \mapsto \R_{\geq 0}$ is \emph{negligible} if for all $c\in\N$, there exists $n_c$ such that $f(n)\leq n^{-c}$ for all $n\geq n_c$.
+Recall that a function $f : \N \to \R_{\geq 0}$ is \emph{negligible} if for all $c\in\N$, there exists $n_c$ such that $f(n)\leq n^{-c}$ for all $n\geq n_c$.
 
 {\bf a) [Points: 6]} Which ones of the following functions are negligible, and which ones are not? Prove your claim!
 $$f_1(n) = 2^{-n}, \quad f_3(n) = 2^{-\log n}, \quad f_5(n) = n^{-\log n},$$
@@ -115,8 +115,8 @@ $$f_4(n) = n^{-\log n} \leq n^{-\log n_c} = n^{-\log 2^c} = n^{-c}.$$
 \end{itemize}
 
 {\bf b) [Points: 6]} Show that for any two negligible functions $f, g$, and any polynomial $p$ which is non-negative (i.e., $p(n)\geq 0$ on all $n\in\N$) the following functions are negligible:
-$$n \mapsto f(n)+g(n), \quad n \mapsto p(f(n)) \textrm{ where $p$ has no constant term},$$
-$$n \mapsto f(n)\cdot g(n), \quad n \mapsto p(n)\cdot f(n) \textrm{ for a polynomial $p(n)$}.$$
+$$n \to f(n)+g(n), \quad n \to p(f(n)) \textrm{ where $p$ has no constant term},$$
+$$n \to f(n)\cdot g(n), \quad n \to p(n)\cdot f(n) \textrm{ for a polynomial $p(n)$}.$$
 
 {\bf Solution}:
 \begin{itemize}
@@ -158,7 +158,7 @@ which satisfies the definition of a negligible function.
 \end{itemize}
 
 \section{Task 2 - One-Way Functions}
-Let $f, g : \bits^\lambda \mapsto \bits^\lambda$ be both one-way functions. Which of the following statements
+Let $f, g : \bits^\lambda \to \bits^\lambda$ be both one-way functions. Which of the following statements
 are true and which ones are false? Formally justify your claims – i.e., either with a proof
 of one-wayness or a counterexample.
 
@@ -200,9 +200,9 @@ Hence $A'$ has a non-negligible advantage.
 
 {\bf c) [Points: 2]} $x \mapsto f(g(x))$.
 
-{\bf Claim}: $x \mapsto f(g(x))$ is \emph{not} one-way. A simple counterexample can be: given one-way function $h : \bits^\lambda \mapsto \bits^\lambda$, suppose for any $x,y \in \bits^\lambda$, $f(x||y) \eqdef h(x)||1^\lambda$ and $g(x||y) \eqdef 1^\lambda || h(y)$. Following a similar proof from Lecture 2, it is easy to see both $f$ and $g$ are one-way. However, $f \circ g (x||y) = f(1^\lambda||h(y)) = h(1^\lambda)||1^\lambda$, which holds for any $x||y$, and thus is not one-way. We also found another slightly more complex counterexample.
+{\bf Claim}: $x \mapsto f(g(x))$ is \emph{not} always one-way. A simple counterexample can be: given one-way function $h : \bits^\lambda \to \bits^\lambda$, suppose for any $x,y \in \bits^\lambda$, $f(x||y) \eqdef h(x)||1^\lambda$ and $g(x||y) \eqdef 1^\lambda || h(y)$. Following a similar proof from Lecture 2, it is easy to see both $f$ and $g$ are one-way. However, $f \circ g (x||y) = f(1^\lambda||h(y)) = h(1^\lambda)||1^\lambda$, which holds for any $x||y$, and thus is not one-way. We also found another slightly more complex counterexample.
 
-{\bf Another Counterexample}: Suppose $h, j : \bits^\lambda \mapsto \bits^\lambda$ are one-way functions (not permutations) and w.l.o.g $0^\lambda$ is not in the range of $j$. We construct two functions $f,g : \bits^{2\lambda} \mapsto \bits^{2\lambda}$ as following, given any inputs $x, y \in \bits^\lambda$:
+{\bf Another Counterexample}: Suppose $h, j : \bits^\lambda \to \bits^\lambda$ are one-way functions (not permutations) and w.l.o.g $0^\lambda$ is not in the range of $j$. We construct two functions $f,g : \bits^{2\lambda} \to \bits^{2\lambda}$ as following, given any inputs $x, y \in \bits^\lambda$:
 $$g(x,y) \eqdef h(x) || h(x).$$
 $$f(x,y) \eqdef
 \begin{cases}
@@ -212,7 +212,7 @@ $$f(x,y) \eqdef
 Apparently $f(g(z)) = 0^{2\lambda}$ for all $z\in\bits^{2\lambda}$. Thus $h\eqdef f\circ g$ is \emph{not} one-way over $\bits^{2\lambda}$.
 We claim that both $f$ and $g$ are one-way.
 \begin{lemma}
-Given one way function $h : \bits^\lambda \mapsto \bits^\lambda$, $g(x,y) \eqdef h(x) || h(x)$ is also one-way.
+Given one way function $h : \bits^\lambda \to \bits^\lambda$, $g(x,y) \eqdef h(x) || h(x)$ is also one-way.
 \end{lemma}
 \begin{proof}
 Assume by contradiction $g$ is not one-way. Then there exists a PPT adversary $A$ s.t. the advantage $\epsilon(\lambda) \eqdef \Adv_{g,\lambda}^{owf}(A)$ is non-negligible. It suffices to build an algorithm $A'$ s.t. the advantage $\Adv_{h,\lambda}^{owf}(A')$ is also non-negligible. Given any input $y=h(x)$, we give the construction of $A'$ as following:
@@ -238,7 +238,7 @@ which is also non-negligible.
 \end{proof}
 
 \begin{lemma}
-Given one way function $j : \bits^\lambda \mapsto \bits^\lambda$ s.t. $0^\lambda \not\in \mathrm{range}(j)$, the function $f : \bits^{2\lambda} \mapsto \bits^{2\lambda}$ given by
+Given one way function $j : \bits^\lambda \to \bits^\lambda$ s.t. $0^\lambda \not\in \mathrm{range}(j)$, the function $f : \bits^{2\lambda} \to \bits^{2\lambda}$ given by
 $$f(x,y) \eqdef
 \begin{cases}
 0^{2\lambda} & \textrm{if $x=y$,} \\
@@ -308,11 +308,11 @@ $$
 \end{proof}
 
 \section{Task 3 - Hard-Core Predicates}
-Let $f : \bits^\lambda \mapsto \bits^{\lambda'}$ be a permutation family, and let $P : \bits^\lambda \mapsto \bits$ be a family of predicates. Then, recall that $P$ is a hardcore predicate for $f$ if for all PPT $A$, we have that
+Let $f : \bits^\lambda \to \bits^{\lambda'}$ be a permutation family, and let $P : \bits^\lambda \to \bits$ be a family of predicates. Then, recall that $P$ is a hardcore predicate for $f$ if for all PPT $A$, we have that
 $$\Adv_{f,P,\lambda}^{pred}(A) = 2 \left| \Pr[x\getsr\bits^\lambda : A(f(x)) = P(x)] -\frac{1}{2}\right|$$
 is negligible.
 
-{\bf a) [Points: 8]} Prove, giving an explicit reduction, that if $f : \bits^\lambda \mapsto \bits^{\lambda'}$ is a \emph{permutation}, and there exists some hardcore predicate $P$ for $f$, then $f$ must be one way.
+{\bf a) [Points: 8]} Prove, giving an explicit reduction, that if $f : \bits^\lambda \to \bits^{\lambda'}$ is a \emph{permutation}, and there exists some hardcore predicate $P$ for $f$, then $f$ must be one way.
 \begin{proof}
 Assume by contradiction $f$ is not one-way. Then there exists a PPT adversary $A$ s.t. the advantage $\Adv_{f,\lambda}^{owf}(A)$ is non-negligible. It suffices to build a distinguisher $D$ s.t. the advantage $\Adv_{f,P,\lambda}^{pred}(D)$ is also non-negligible. Given any input $y=f(x)$, we give the construction of $D$ as following:
 \begin{quote}
@@ -362,7 +362,7 @@ general $f$? Justify your answer!
 
 {\bf Claim}: The statement is not true for general $f$.
 
-{\bf Counterexample}: Suppose $f : \bits^\lambda \mapsto \bits$ is defined by $f(x) = 0$ for any $x\in\bits^\lambda$. Apparently $f$ is not one-way, but we claim the bitwise xor $\oplus_i x_i$ is a hardcore predicate of $f$. Note that the predicate $\oplus_i x_i$ is uniformly distributed over $\bits$ if $x\getsr\bits^\lambda$. For the base case of 2 terms, 
+{\bf Counterexample}: Suppose $f : \bits^\lambda \to \bits$ is defined by $f(x) = 0$ for any $x\in\bits^\lambda$. Apparently $f$ is not one-way, but we claim the bitwise xor $\oplus_i x_i$ is a hardcore predicate of $f$. Note that the predicate $\oplus_i x_i$ is uniformly distributed over $\bits$ if $x\getsr\bits^\lambda$. For the base case of 2 terms, 
 $$\begin{aligned}
 &\Pr[x_1,x_2\getsr\bits: x_1\oplus x_2 = 0] \\
 = &\Pr[x_1,x_2\getsr\bits: x_1 = 0, x_2=0] + \Pr[x_1,x_2\getsr\bits: x_1 = 1, x_2=1] = \frac{1}{4} + \frac{1}{4} = \frac{1}{2}.
@@ -377,9 +377,9 @@ Since given any input $f(x)$ which is always 0, any adversary has no knowledge a
 
 
 \section{Task 4 - Pseudorandom Generators}
-Throughout this task let $G : \bits^\lambda \mapsto \bits^{n(\lambda)}$ for $\lambda<n=n(\lambda)$ be a PRG.
+Throughout this task let $G : \bits^\lambda \to \bits^{n(\lambda)}$ for $\lambda<n=n(\lambda)$ be a PRG.
 
-{\bf a) [Points: 4]} Prove that $G' : \bits^{\lambda + n(\lambda)} \mapsto \bits^{2n(\lambda)}$ such that
+{\bf a) [Points: 4]} Prove that $G' : \bits^{\lambda + n(\lambda)} \to \bits^{2n(\lambda)}$ such that
 $$G'(x||y) = (G(x)\oplus y)||y$$
 for all $x\in\bits^\lambda$ and $y\in \bits^{n(\lambda)}$ is a pseudorandom generator.
 \begin{proof}
@@ -407,7 +407,7 @@ $$\Pr[(y\oplus z)||z = x_1||x_2] = \Pr[y\oplus z = x_1 | z=x_2]\Pr[z=x_2]$$
 $$=\Pr[y = x_1\oplus x_2]\Pr[z=x_2] = 2^{-2n(\lambda)}.$$
 \end{proof}
 
-{\bf b) [Points: 6]} Prove that the function $G'' : \bits^{2\lambda} \mapsto \bits^{2n(\lambda)}$ such that
+{\bf b) [Points: 6]} Prove that the function $G'' : \bits^{2\lambda} \to \bits^{2n(\lambda)}$ such that
 $$G''(x||y) = G(x)||G(y)$$
 for all $x,y\in\bits^\lambda$ is a pseudorandom generator.
 \begin{proof}
@@ -493,15 +493,15 @@ $$\begin{aligned}
 \end{aligned}$$
 \end{proof}
 
-{\bf c) [Points: 6]} Prove that the function $G''' : \bits^{\lambda} \mapsto \bits^{2n(\lambda)}$ such that
+{\bf c) [Points: 6]} Prove that the function $G''' : \bits^{\lambda} \to \bits^{2n(\lambda)}$ such that
 $$G'''(x) = G(x)||G(\overline{x})$$
 for all $x\in\bits^\lambda$ is \emph{not} a pseudorandom generator, where $\overline{x}$ is the bit-wise complement of $x$ (i.e., each bit is flipped).
 \begin{proof}
-Consider the Goldreich-Levin PRG construction $G^\pi : \bits^{2\lambda} \mapsto \bits^{2\lambda+1}$ given by
+Consider the Goldreich-Levin PRG construction $G^\pi : \bits^{2\lambda} \to \bits^{2\lambda+1}$ given by
 $$G^\pi(x||r) \eqdef \pi(x)||r||\angles{x,r}$$
 where $\pi$ is a OWP over $\bits^\lambda$, $x,r \in \bits^\lambda$ and $\angles{x,r}$ denotes the mod 2 inner product of $x$ and $r$:
 $$\angles{x,r} \eqdef \sum_{k=1}^\lambda x_ir_i\mod 2.$$
-Now the function $G''' : \bits^{2\lambda} \mapsto \bits^{4\lambda+2}$ is
+Now the function $G''' : \bits^{2\lambda} \to \bits^{4\lambda+2}$ is
 $$G'''(x||r) = G^\pi(x||r)||G^\pi(\overline{x||r}) = \pi(x)||r||\angles{x,r}||\pi(\overline{x})||\overline{r}||\angles{\overline{x},\overline{r}}.$$
 Note that $r$ gives two complementary segments in the output of $G'''$. This gives us chance to build an efficient distinguisher as following:
 \begin{quote}
@@ -523,7 +523,7 @@ which is a overwhelming advantage on $\lambda$. Hence the construction $D$ is an
 
 
 \section{Task 5 - Distinguishing Advantages}
-Let $P_0, P_1 : \mathcal{X} \mapsto [0,1]$ be probability distributions on a finite set $\mathcal{X}$, i.e., we have $\sum_{x\in\mathcal{X}}P_b(x) = 1$ for $b\in\bits$. As in class, denote by $x\getsr P_b$ the process of sampling a value $x$ according to the probability distribution $P_b$, i.e., every value $x$ is taken with probability $P_b(x)$.
+Let $P_0, P_1 : \mathcal{X} \to [0,1]$ be probability distributions on a finite set $\mathcal{X}$, i.e., we have $\sum_{x\in\mathcal{X}}P_b(x) = 1$ for $b\in\bits$. As in class, denote by $x\getsr P_b$ the process of sampling a value $x$ according to the probability distribution $P_b$, i.e., every value $x$ is taken with probability $P_b(x)$.
 
 We consider the following two definitions of distinguishing advantage:
 \begin{enumerate}
@@ -603,7 +603,7 @@ which is exactly $SD(P_1, P_0)$ by the lemma above. by the definition of statist
 
 Our distinguisher itself is PPT. However, if the statistical distance between $P_0$ and $P_1$ is negligible on $\lambda$, then repeating $D$ by feeding independent inputs $x$ by only polynomial times cannot give a non-negligible advantage. Thus if $SD(P_0,P_1)$ is negligible on $\lambda$, our construction of $D$ may not be efficient (i.e., giving non-negligible $\Adv_{P_0,P_1}^{dist}(D)$ in polynomial time).
 
-{\bf c) [Points: 8]} Consider a function $f : \bits^\lambda \mapsto \bits^{\lambda'}$ and a predicate $P : \bits^\lambda \mapsto \bits$.
+{\bf c) [Points: 8]} Consider a function $f : \bits^\lambda \to \bits^{\lambda'}$ and a predicate $P : \bits^\lambda \to \bits$.
 Also let:
 \begin{itemize}
 \item $P_0$ be the distribution over pairs $(y, u)$ obtained by sampling $x\getsr\bits^\lambda$, $y\gets f(x)$, $u\gets P(x)$.
@@ -624,7 +624,7 @@ Adversary $A(y)$: (here $y=f(x)\in\bits^{\lambda'}$)
 \end{quote}
 Before the formal treatment of $\Adv_{f,P,\lambda}^{pred}(A)$. We first claim that for all hardcore predicate $P(x)$, its output is a uniformly random bit if the input $x$ is chosen at uniformly random.
 \begin{lemma}
-For any hardcore predicate $P : \bits^\lambda \mapsto \bits$ of OWF $f$,
+For any hardcore predicate $P : \bits^\lambda \to \bits$ of OWF $f$,
 $$\Pr[x\getsr\bits^\lambda, u\getsr\bits : u = P(x)] = \frac{1}{2}.$$
 \end{lemma}
 \begin{proof}
