@@ -1,0 +1,281 @@
+\documentclass[12pt]{article}
+\usepackage{url,amsmath,setspace,amssymb,amsthm,amsfonts}
+
+
+\setlength{\oddsidemargin}{.25in}
+\setlength{\evensidemargin}{.25in}
+\setlength{\textwidth}{6.25in}
+\setlength{\topmargin}{-0.4in}
+\setlength{\textheight}{8.5in}
+
+\newcommand{\heading}[5]{
+   \renewcommand{\thepage}{#1-\arabic{page}}
+   \noindent
+   \begin{center}
+   \framebox[\textwidth]{
+     \begin{minipage}{0.9\textwidth} \onehalfspacing
+       {\bf CS 290G -- Introduction to Modern Cryptography} \hfill #2
+
+       {\centering \Large #5
+       
+       }\medskip
+
+       {\it #3 \hfill #4}
+     \end{minipage}
+   }
+   \end{center}
+}
+
+\newcommand{\handout}[3]{\heading{#1}{#2}{Instructor:
+Stefano Tessaro}{Scribe: Shiyu Ji}{Lecture #1: #3}}
+
+\setlength{\parindent}{0in}
+
+\newcommand{\eqdef}{\stackrel{def}{=}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\bits}{\{0,1\}}
+\newcommand{\inr}{\in_{\mbox{\tiny R}}}
+%\newcommand{\getsr}{\gets_{\mbox{\tiny R}}}
+\newcommand{\getsr}{\stackrel{\$}{\gets}}
+\newcommand{\st}{\mbox{ s.t. }}
+\newcommand{\etal}{{\it et al }}
+\newcommand{\into}{\rightarrow}
+
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\e}{\epsilon}
+\newcommand{\ee}{\varepsilon}
+\newcommand{\ceil}[1]{{\lceil{#1}\rceil}}
+\newcommand{\floor}[1]{{\lfloor{#1}\rfloor}}
+\newcommand{\angles}[1]{\langle #1 \rangle}
+\newcommand{\Com}{{\sf Com}}
+\newcommand{\desc}{{\sf desc}}
+
+\newcommand{\rightstep}[1]{%
+$\underrightarrow{\quad #1 \quad}$ }
+
+\newcommand{\leftstep}[1]{%
+$\underleftarrow{\quad #1 \quad}$ }
+
+\newcommand{\Adv}{\mathsf{Adv}}
+
+\newcommand{\tab}{\hspace{0.3in}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Theorems & Definitions
+
+
+\newtheorem{theorem}{Theorem}[section]
+
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{subclaim}{Claim}[theorem]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{construction}[theorem]{Construction}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{algorithm1}[theorem]{Algorithm}
+\newtheorem{protocol}[theorem]{Protocol}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{fact}[theorem]{Fact}
+
+%\bibliographystyle{plain}
+\usepackage{tikz}
+\usetikzlibrary{calc,decorations.pathreplacing}
+
+\begin{document}
+\handout{6}{Jan 26, 2016}{Pseudorandom Permutations}
+\section{Recap}
+A function $F : \bits^\lambda \times \bits^n \mapsto \bits^m$ is a PRF if
+\begin{enumerate}
+\item It is efficiently computable.
+\item For any PPT distinguisher $D$, the advantage $\Adv_{F,\lambda}^{prf}(D)$ is negligible. $\Adv_{F,\lambda}^{prf}(D)$ is defined by
+\[\Adv_{F,\lambda}^{prf}(D) \eqdef \bigg| \Pr[s \getsr \bits^\lambda : D^{F(s,\cdot)}=1] - \Pr[D^{RF_{n,m}}=1] \bigg|. \]
+Here $D^{RF_{n,m}}$ denotes that $D$ can make queries to the black box $RF_{n,m}$ s.t.
+\begin{itemize}
+\item For every \emph{new} $x_i$, the box answers $y_i \getsr \bits^m$.
+\item When $D$ asks two identical queries $x_i = x_j$, the box gives the same answer.
+\end{itemize}
+$D^{F(s,\cdot)}$ is similar except that the box answers $y_i \gets F(s,x_i)$ upon query $x_i$.
+\end{enumerate}
+
+\section{Block Cipher}
+\begin{definition}
+A function $E : \bits^\lambda \times \bits^n \mapsto \bits^n$ is a \emph{block cipher} if
+\begin{enumerate}
+\item $E$ is efficiently computable.
+\item For all $s \getsr \bits^\lambda$, the function $E_s : \bits^n \mapsto \bits^n$ mapping $m \in \bits^n$ to $E(s,m)$ is a \emph{permutation}, i.e., one-to-one.
+\item The inverse function $E^{-1}_s$ that maps $(s, y)$ to $E^{-1}_s(y)$ is also efficiently computable.
+\end{enumerate}
+\end{definition}
+
+\begin{example}
+There are several practical constructions of block cipher, e.g., Data Encryption Standard (DES), Advanced Encryption Standard (AES), etc. Both DES and AES are standardized block ciphers.
+
+Most practical constructions of block cipher have fixed parameters, e.g., for AES, we have $\lambda = 128$ or $256$, $n=128$; for DES, we have $\lambda = 56$, $n=64$.
+\end{example}
+
+\section{Pseudorandom Permutation}
+The next question is: what does it mean for a block cipher $E$ to be secure?
+
+\emph{First try}: Is $E$ a PRF? Is ``random function'' the best abstraction for what a secure block cipher should achieve?
+
+Unfortunately, when $n$ is relatively small, this goal cannot be achieved. For example, if $n=4$, then $E$ cannot be a PRF, since we have a distinguisher to tell it apart from random function. Concretely, the distinguisher $D$ may query all the 16 possible inputs and check whether all the outputs are distinct. If so, output 1. Otherwise, output 0. The advantage of this distinguisher $D$ is
+$$
+\Adv_{E}^{prf}(D) = \bigg|\Pr[s\getsr\bits^\lambda : D^{E(s,\cdot)}=1]-\Pr[D^{RF_{4,4}}=1] \bigg| = 1 - 16!/16^{16},
+$$
+which is very close to 1.
+
+\emph{Second try}: Can we replace ``random function'' by ``random permutation''? Firstly we need to define random permutation.
+\begin{definition}
+Random permutation $RP_n$ is a system that uses a table $T$ to keep the states of each query. 
+\begin{itemize}
+\item Initially, set $T[x] \gets \bot$ for all $x \in \bits^n$.
+\item For any query $x$, $RP_n(x)$ is defined as
+\begin{quote}
+Procedure $RP_n(x)$:
+\begin{enumerate}
+\item {\bf if} $T[x]=\bot$ {\bf then}
+\item \tab $T[x] \getsr \{y \in \bits^n | \forall x' \in \bits^n, T[x'] \not= y\}.$
+\item {\bf return} $T[x]$.
+\end{enumerate}
+\end{quote}
+\end{itemize}
+\end{definition}
+
+A block cipher is a \emph{pseudorandom permutation} if we cannot tell it apart from a random permutation.
+
+\begin{definition}
+A block cipher $E$ is a \emph{pseudorandom permutation} (PRP) if for any PPT distinguisher $D$, the advantage $\Adv_{E,\lambda}^{prp}(D)$ is negligible. $\Adv_{E,\lambda}^{prp}(D)$ is defined as
+$$\Adv_{E,\lambda}^{prp}(D) \eqdef \bigg| \Pr[s \getsr \bits^\lambda : D^{E(s,\cdot)} = 1] - \Pr[D^{RP_n}=1] \bigg|.$$
+\end{definition}
+
+We need to compare the notions of PRP and PRF, i.e., to give an upper bound of the distance between $\Adv_{E,\lambda}^{prp}(D)$ and $\Adv_{E,\lambda}^{prf}(D)$. Before that, we need some preliminaries about birthday attack.
+
+\section{Birthday Attack}
+Let $S$ be a set of $N$ elements. We independently sample $q$ values $x_1, x_2, \cdots, x_q \getsr S$ at uniformly random. We will show that the collision probability $\Pr[\exists i\not= j : x_i = x_j]$ is roughly $\frac{q^2}{2N}$, i.e., about $1/2$ when $q$ is around $\sqrt{N}$.
+
+In fact $\frac{q^2}{2N}$ is the upper bound of the collision probability. To give this bound, we need the union bound of probabilities.
+
+\begin{fact}
+{\bf Union Bound}. For any two events $E_1$, $E_2$, the probability of their union has an upper bound:
+$$\Pr[E_1 \vee E_2] \leq \Pr[E_1] + \Pr[E_2].$$
+\end{fact}
+
+By this fact, we can show the upper bound.
+
+\begin{lemma}
+$\Pr[\exists i\not= j : x_i = x_j] \leq \frac{q^2}{2N}$.
+\end{lemma}
+\begin{proof}
+We can rewrite the event as:
+$$\Pr[\exists i\not= j : x_i = x_j] = \Pr[\bigvee_{1 \leq i < j \leq q} : x_i = x_j].$$
+By using union bound of probabilities, we have
+$$\Pr[\bigvee_{1 \leq i < j \leq q} : x_i = x_j] \leq \sum_{1\leq i < j \leq q}\Pr[x_i=x_j] = \sum_{1\leq i < j \leq q} \frac{1}{N} = \binom{q}{2} \frac{1}{N} \leq \frac{q^2}{2N}.$$
+\end{proof}
+
+\section{PRP v.s. PRF}
+By birthday attack, we can build a more efficient distinguisher to tell a block cipher apart from random function. 
+
+Given any block cipher $E : \bits^\lambda \times \bits^n \mapsto \bits^n$, we build a distinguisher $D$ that queries around $\sqrt{2^n} = 2^{n/2}$ distinct inputs $x_1, x_2, \cdots, x_{2^{n/2}}$. The corresponding outputs are $y_1, y_2, \cdots, y_{2^{n/2}}$. $D$ outputs 1 if there is no collision among $y_1, y_2, \cdots, y_{2^{n/2}}$, and outputs 0 otherwise.
+
+Clearly, $\Pr[s \getsr \bits^\lambda : D^{E(s, \cdot)} = 1] = 1$, and by the upper bound of birthday attack
+$$\Pr[D^{RF_{n,n}}=1] \geq 1-\frac{(\sqrt{2^n})^2}{2\cdot 2^n} = \frac{1}{2}.$$
+It turns out the advantage $\Adv_{E,\lambda}^{prf}(D)$ is roughly around some non-zero constant. This means if $n$ is relatively small, we can efficiently distinguish the block cipher from a random function. For example, in DES we have $n=64$. Then $2^{n/2} = 2^{32}$ is very small for modern computers. In this sense PRF may not be a good notion for secure block ciphers.
+
+The following theorem puts the above discussion in a clear way, i.e., given sufficiently large $n$, the distinguisher advantages up to PRP and PRF respectively will be very close.
+\begin{theorem}
+Given a block cipher $E : \bits^\lambda \times \bits^n \mapsto \bits^n$, for all distinguisher $D$ making at most $q$ queries, 
+$$\bigg| \Adv_{E,\lambda}^{prf}(D) - \Adv_{E,\lambda}^{prp}(D) \bigg| \leq \frac{q^2}{2 \cdot 2^n}.$$
+\end{theorem}
+\begin{proof}
+Define
+$$
+\Delta \eqdef \bigg| \Adv_{E,\lambda}^{prf}(D) - \Adv_{E,\lambda}^{prp}(D) \bigg| 
+= \bigg| \Pr[D^{RF_{n,n}}=1] - \Pr[D^{RP_n}=1] \bigg|.
+$$
+It suffices to show $\Delta \leq \frac{q^2}{2 \cdot 2^n}$. 
+
+Note that for any $D$, $D$ makes at most $q$ queries. We define a new system $G$ s.t.
+\begin{itemize}
+\item Initially, $T(x) \gets \bot$ for all $x \in \bits^n$. $cnt \gets 0$.
+\item For a given list of $q$ results: $X = (x_1, x_2, \cdots, x_q)$, upon query $x$, we define $G(X)$ as
+\begin{quote}
+$G(X)(x)$:
+\begin{enumerate}
+\item {\bf if} $T[x] = \bot$ {\bf then}
+\item \tab $cnt \gets cnt + 1$.
+\item \tab $T[x] \gets X[cnt]$.
+\item {\bf return} $T[x]$.
+\end{enumerate}
+\end{quote}
+\end{itemize}
+
+Define
+$$A \eqdef \{(x_1,x_2,\cdots,x_q) | x_1,x_2,\cdots,x_q \in \bits^n \},$$
+$$S \eqdef \{(x_1,x_2,\cdots,x_q) \in A | \forall i \not= j, x_i \not= x_j \}. $$
+Clearly $S\subseteq A$. \footnote{For example, let $n=2$, $q=4$. $(00, 10, 11, 00)$ is in $A$ but not in $S$. $(00, 10, 11, 01)$ is in $S$, which is a subset of $A$.}
+
+By the definition of $G$ above, we have
+$$\Pr[X \getsr A : D^{G(X)}=1] = \Pr[D^{RF_{n,n}}=1],$$
+$$\Pr[X \getsr S : D^{G(X)}=1] = \Pr[D^{RP_n}=1].$$
+Thus
+$$\begin{aligned}
+\Delta = & \bigg| \Pr[X \getsr A : D^{G(X)}=1] - \Pr[X \getsr S : D^{G(X)}=1] \bigg| \\
+=& \bigg| \Pr[X \getsr A : D^{G(X)}=1 \wedge X \in S] + \Pr[X \getsr A : D^{G(X)}=1 \wedge X \not\in S] \\
+& - \Pr[X \getsr S : D^{G(X)}=1] \bigg|.
+\end{aligned}$$
+We have two facts about the probabilities.
+\begin{fact}
+$\Pr [X \getsr A : D^{G(X)}=1 \wedge X \not\in S] \leq \Pr [X \getsr A : X \not\in S] \leq \frac{q^2}{2 \cdot 2^n}$. The last inequality is given by birthday attack.
+\end{fact}
+
+\begin{fact}
+$$\begin{aligned}
+& \Pr[X \getsr A : D^{G(X)}=1 \wedge X \in S] \\
+= & \Pr[X \getsr A : X \in S] \Pr[X \getsr S : D^{G(X)}=1] \\
+\leq &\Pr[X \getsr S : D^{G(X)}=1].
+\end{aligned}$$
+This is by the law of conditional probability.
+\end{fact}
+Both facts give $\Delta \leq \frac{q^2}{2 \cdot 2^n}$.
+\end{proof}
+
+\section{PRP Constructions}
+Given a PRF $F : \bits^\lambda \times \bits^n \mapsto \bits^n$, how to build a block cipher $E : \bits^\lambda \times \bits^{n'} \mapsto \bits^{n'}$ which is a secure PRP?
+
+Feistel construction can achieve this goal. In fact, it is an idea behind DES.
+
+\begin{quote}
+Feistel construction: build a block cipher $E : \bits^{r\lambda} \times \bits^{2n} \mapsto \bits^{2n}$, where $r$ is the number of rounds.
+
+Procedure $E((s_1, s_2, \cdots, s_r), (x_0, x_1))$ ($s_i\in\bits^\lambda$, $x_i\in\bits^n$)
+\begin{enumerate}
+\item {\bf for} $i=1$ to $r$ {\bf do}
+\item \tab $x_{i+1} \gets F(s_i, x_i) \oplus x_{i-1}$.
+\item {\bf return} $(x_r, x_{r+1})$.
+\end{enumerate}
+\end{quote}
+
+Luby and Rackoff \cite{LR88} showed that if the number of rounds is no less than 3, then the Feistel construction gives a PRP block cipher.
+\begin{theorem}
+For any block cipher $E$ built by $r$-round Feistel construction, if $r\geq 3$ and $F$ is a PRF, then $E$ is a PRP.
+\end{theorem}
+
+\begin{thebibliography}{10}
+
+\bibitem{LR88}
+M. Luby and C. Rackoff, 1988. 
+How to construct pseudorandom permutations from pseudorandom functions. 
+SIAM Journal on Computing, 17(2), pp.373-386.
+
+\end{thebibliography}
+
+\end{document}
