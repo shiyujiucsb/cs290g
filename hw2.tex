@@ -1,0 +1,217 @@
+\documentclass[12pt]{article}
+\usepackage{url,amsmath,setspace,amssymb,amsthm,amsfonts}
+%\usepackage{hyperref}
+
+\setlength{\oddsidemargin}{.25in}
+\setlength{\evensidemargin}{.25in}
+\setlength{\textwidth}{6.25in}
+\setlength{\topmargin}{-0.4in}
+\setlength{\textheight}{8.5in}
+
+\newcommand{\heading}[5]{
+   \renewcommand{\thepage}{#1-\arabic{page}}
+   \noindent
+   \begin{center}
+   \framebox[\textwidth]{
+     \begin{minipage}{0.9\textwidth} \onehalfspacing
+       {\bf CS 290G -- Introduction to Modern Cryptography} \hfill #2
+
+       {\centering \Large #5
+       
+       }\medskip
+
+       {\it #3 \hfill #4}
+     \end{minipage}
+   }
+   \end{center}
+}
+
+\newcommand{\handout}[3]{\heading{#1}{#2}{Instructor:
+Stefano Tessaro}{Student: Shiyu Ji, Yi Yang}{#3}}
+
+\setlength{\parindent}{0in}
+
+\newcommand{\eqdef}{\stackrel{def}{=}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\bits}{\{0,1\}}
+\newcommand{\inr}{\in_{\mbox{\tiny R}}}
+%\newcommand{\getsr}{\gets_{\mbox{\tiny R}}}
+\newcommand{\getsr}{\stackrel{\$}{\gets}}
+\newcommand{\st}{\mbox{ s.t. }}
+\newcommand{\etal}{{\it et al }}
+\newcommand{\into}{\rightarrow}
+
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\e}{\epsilon}
+\newcommand{\ee}{\varepsilon}
+\newcommand{\ceil}[1]{{\lceil{#1}\rceil}}
+\newcommand{\floor}[1]{{\lfloor{#1}\rfloor}}
+\newcommand{\angles}[1]{\langle #1 \rangle}
+\newcommand{\Com}{{\sf Com}}
+\newcommand{\desc}{{\sf desc}}
+
+\newcommand{\rightstep}[1]{%
+$\underrightarrow{\quad #1 \quad}$ }
+
+\newcommand{\leftstep}[1]{%
+$\underleftarrow{\quad #1 \quad}$ }
+\newcommand{\Adv}{\textsf{Adv}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Theorems & Definitions
+
+
+\newtheorem{theorem}{Theorem}[section]
+
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{subclaim}{Claim}[theorem]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{observation}[theorem]{Observation}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{construction}[theorem]{Construction}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{counterexample}[theorem]{Counterexample}
+\newtheorem{algorithm1}[theorem]{Algorithm}
+\newtheorem{protocol}[theorem]{Protocol}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{fact}[theorem]{Fact}
+
+%\bibliographystyle{plain}
+
+\begin{document}
+\handout{2}{Due: Feb 12, 2016}{Homework 2}
+\section{Task 1 - Pseudorandom Functions}
+Let $F : \bits^\lambda \times \bits^n \to \bits^n$ be a PRF. As in class, we use the notation $F_s(x) = F(s, x)$.
+
+{\bf a) [Points: 4]} Consider $F' : \bits^\lambda \times \bits^{2n} \to \bits^n$ such that
+$$F'_s(x_1 || x_2) = F_s(x_1) \oplus F_s(x_2)$$
+for all $x_1, x_2 \in \bits^n$ and $s\in\bits^\lambda$. Is $F'$ a PRF?
+
+{\bf Claim}: $F'$ is \emph{not} a PRF.
+\begin{proof}
+It suffices to give a distinguisher $D$ s.t. $\Adv_{F'}^{prf}(D)$ is non-negligible.
+\begin{quote}
+Distinguisher $D^O$: // $O$ can be either $F'_s$ or $RF_{2n,n}$.
+\begin{enumerate}
+\item $c \gets O(0^n || 0^n)$.
+\item {\bf if} $c=0^n$ {\bf then return} 1.
+\item {\bf else return} 0.
+\end{enumerate}
+\end{quote}
+Note that the oracle $F'_s$ always return $0^n$ on the query $(0^n || 0^n)$, whereas $RF_{2n,n}$ gives uniformly random answer. 
+We can finish the proof by estimating the advantage:
+$$
+\Adv_{F'}^{prf}(D) 
+= \bigg| \Pr[s \getsr \bits^\lambda : D^{F'_s}=1] - \Pr[D^{RF_{2n,n}}=1] \bigg| \\
+= 1 - 2^{-n},
+$$
+which is overwhelming.
+\end{proof}
+
+{\bf b) [Points: 6]} Consider $F'' : \bits^{2\lambda} \times \bits^{2n} \to \bits^n$ such that
+$$F''_{s_1||s_2}(x_1||x_2) = F_{s_1}(x_1) \oplus F_{s_2}(x_2)$$
+for all $x_1, x_2 \in \bits^n$ and $s_1,s_2 \in \bits^\lambda$. Is $F''$ a PRF?
+
+{\bf Claim}: $F''$ is \emph{not} a PRF.
+\begin{proof}
+It suffices to give a distinguisher $D$ s.t. $\Adv_{F''}^{prf}(D)$ is non-negligible.
+\begin{quote}
+Distinguisher $D^O$: // $O$ can be either $F''_{s_1||s_2}$ or $RF_{2n,n}$.
+\begin{enumerate}
+\item $c_1 \gets O(0^n||0^n)$.
+\item $c_2 \gets O(0^n||1^n)$.
+\item $c_3 \gets O(1^n||0^n)$.
+\item $c_4 \gets O(1^n||1^n)$.
+\item {\bf if} $c_1 \oplus c_2 = c_3 \oplus c_4$ {\bf then output} 1.
+\item {\bf else output} 0.
+\end{enumerate}
+\end{quote}
+Note that if $O$ is $F''_{s_1||s_2}$, we have
+$$c_1 \oplus c_2 = F_{s_2}(0^n) \oplus F_{s_2}(1^n) = c_3 \oplus c_4.$$
+If $O$ is $RF_{2n,n}$, then each $c_i$ is independently uniformly random.
+We estimate the advantage
+$$
+\Adv_{F''}^{prf}(D) 
+= \bigg| \Pr[s \getsr \bits^\lambda : D^{F''_s}=1] - \Pr[D^{RF_{2n,n}}=1] \bigg| \\
+= 1 - 2^{-n},
+$$
+which is overwhelming.
+\end{proof}
+
+{\bf c) [Points: 6]} Consider the keyed function $F''' : \bits^\lambda \times \bits^n \to \bits^n$ such that
+$$F'''_s(x) = F_s(x) \oplus x$$
+for all $s \in \bits^\lambda$ and $s_1, s_2 \in \bits^\lambda$. Is $F'''$ a PRF?
+
+{\bf Claim}: $F'''$ is a PRF.
+\begin{proof}
+Assume by contradiction $F'''$ is not a PRF. Then there exists a distinguisher $D$ s.t. $\Adv_{F'''}^{prf}(D)$ is non-negligible. It suffices to build a distinguisher $D'$ s.t. $\Adv_{F}^{prf}(D')$ is also non-negligible. We give such a construction as following:
+\begin{quote}
+Distinguisher $D'^O$: // $O$ can be either $F_s$ or $RF_{n,n}$.
+\begin{enumerate}
+\item $b \getsr D^{\widetilde{O}}$.
+\item {\bf return} $b$.
+\end{enumerate}
+\end{quote}
+Here the oracle $\widetilde{O}$ is defined as the following procedure:
+\begin{quote}
+Procedure $\widetilde{O} (x)$: // query $x\in\bits^n$.
+\begin{enumerate}
+\item $r \gets O(x)$.
+\item {\bf return} $r \oplus x$.
+\end{enumerate}
+\end{quote}
+Note that if the oracle $O$ is $F_s$, then $\widetilde{O}$ simulates $F'''_s$. If $O$ is $RF_{n,n}$, the output of $\widetilde{O}$ is $RF_{n,n}(x) \oplus x$ on the query $x$. Since $RF_{n,n}$ always samples at uniformly random upon each new query, the distribution of $RF_{n,n}(x) \oplus x$ is also independently uniformly distributed for each distinct $x$, like OTP. Hence $\widetilde{O}$ simulates $RF_{n,n}$.
+Formally, define a hybrid oracle $H(x) \eqdef RF_{n,n}(x) \oplus x$, and hence the output distribution of $H$ is identical to that of $RF_{n,n}$. Thus the advantage of $D'$ is
+$$\begin{aligned}
+&\Adv_{F}^{prf}(D') = \bigg| \Pr[s \getsr \bits^\lambda : D'^{F_s}=1] - \Pr[D'^{RF_{n,n}}=1] \bigg| \\
+=& \bigg| \Pr[s \getsr \bits^\lambda : D^{F'''_s}=1] - \Pr[D^{H}=1] \bigg| \\
+=& \bigg| \Pr[s \getsr \bits^\lambda : D^{F'''_s}=1] - \Pr[D^{RF_{n,n}}=1] \bigg| = \Adv_{F'''}^{prf}(D),
+\end{aligned}$$
+which is non-negligible as desired.
+\end{proof}
+
+\section{Task 2 - Feistel Construction}
+Let $F : \bits^\lambda \times \bits^n \to \bits^n$ be a PRF. Recall that the $r$-round \emph{Feistel construction} uses $F$ to implement a block cipher $\Psi^r : \bits^{r\lambda} \times \bits^{2n} \to \bits^{2n}$. In particular, for key/seed $s = s_1 || s_2 || \cdots || s_r$ (where $s_1, \cdots, s_r \in \bits^\lambda$) and input $x = x_0 || x_1$ (where $x_0, x_1 \in \bits^n$), the Feistel construction outputs $\Psi_s^r(x) = x_r || x_{r+1}$, where for all $i=1, \cdots, r$, we have
+$$x_{i+1} \gets F_{s_i}(x_i) \oplus x_{i-1}.$$
+
+{\bf a) [Points: 4]} Show that $\Psi^r$ is indeed a block cipher, i.e., show that given $s = s_1 || s_2 || \cdots || s_r$, the map $\Psi_s^r(\cdot)$ is a permutation, and that its inverse is efficiently computable.
+
+\begin{proof}
+Since $\Psi_s^r$ preserves the length, to show it is a permutation, it suffices to show that it is one-to-one, i.e., $\Psi_s^r(x) = \Psi_s^r(y)$ implies $x = y$. If $\Psi_s^r(x) = \Psi_s^r(y)$, then $x_r = y_r$ and $x_{r+1} = y_{r+1}$. If $r=1$, then $\Psi_s^1$ is defined as $(x_0, x_1) \mapsto (x_1, F_{s_1}(x_1) \oplus x_{0})$, which is clearly injective since $(y_1,y_2) \mapsto (F_{s_1}(y_1)\oplus y_2, y_1)$ is its inverse. If $r \geq 2$, then from $x_{r+1} = y_{r+1}$ we have
+$$F_{r}(x_{r}) \oplus x_{r-1} = F_{r}(y_{r}) \oplus y_{r-1}.$$ 
+Then since $x_r = y_r$, $F_r(x_r) = F_r(y_r)$ and thus $x_{r-1} = y_{r-1}$. If $r-1=0$, then we have shown that $(x_0,x_1) = (y_0, y_1)$. Otherwise, use the same reasoning we can show that $x_{r} = y_{r}$ and $x_{r-1} = y_{r-1}$ imply $x_{r-2} = y_{r-2}$. After at most $r$ rounds we reach $x_0 = y_0$.
+
+The inverse of $\Psi_s^r(\cdot)$ can be computed efficiently as following: given input $(y_r, y_{r+1})$, we output $(y_0, y_1)$ s.t. for $i$ from $r$ to $1$, we compute
+$$y_{i-1} \gets F_{s_i}(y_i) \oplus y_{i+1}.$$
+It is easy to see the value given by the PRF $F$ is canceled out by XORing.
+\end{proof}
+
+{\bf b) [Points: 6]} Prove that $\Psi^2$ is \emph{not} a pseudorandom permutation (PRP).
+\begin{proof}
+$\Psi^2$ is given by 
+$$\Psi_s^2 : (x_0,x_1) \mapsto (F_{s_1}(x_1) \oplus x_{0}, F_{s_2}(F_{s_1}(x_1) \oplus x_{0}) \oplus x_1).$$
+To show that $\Psi^2$ is not PRP, it suffices to build a distinguisher $D$ s.t. $\Adv_{\Psi^2}^{prp}(D)$ is non-negligible. We give such a construction as following:
+\begin{quote}
+Distinguisher $D^O$: // $O$ can be either $\Psi_s^2$ or $RP_{2n}$.
+\begin{enumerate}
+\item $(c_1,c_2) \gets O(1^n0^n)$.
+\item $(c_3,c_4) \gets O(0^n0^n)$.
+\item {\bf if} $c_1 \oplus c_3 = 1^n$ {\bf then output} 1.
+\item {\bf else output} 0.
+\end{enumerate}
+\end{quote}
+Note that if $O$ is $\Psi_s^2$, then $c_1 = F_{s_1}(0^n) \oplus 1^n$ and $c_2 = F_{s_1}(0^n) \oplus 0^n$ and thus $c_1 \oplus c_3 = 1^n$. If $O$ is $RP_{2n}$, then $c_1$ and $c_3$ are independently uniformly sampled. Hence the advantage of $D$ is
+$$\Adv_{\Psi^2}^{prp}(D) = \bigg| \Pr[s \getsr \bits^\lambda : D^{\Psi_s^2} = 1] - \Pr[D^{RP_{2n}}=1] \bigg| = 1 - 2^{-n},$$
+which is overwhelming.
+\end{proof}
+
+\end{document}
