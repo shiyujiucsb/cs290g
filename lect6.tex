@@ -239,14 +239,18 @@ $\Pr [X \getsr A : D^{G(X)}=1 \wedge X \not\in S] \leq \Pr [X \getsr A : X \not\
 \end{fact}
 
 \begin{fact}
+By using conditional probability, we have
 $$\begin{aligned}
 & \Pr[X \getsr A : D^{G(X)}=1 \wedge X \in S] \\
 = & \Pr[X \getsr A : X \in S] \Pr[X \getsr S : D^{G(X)}=1] \\
 \leq &\Pr[X \getsr S : D^{G(X)}=1].
 \end{aligned}$$
-This is by the law of conditional probability.
+This upper bound is given by $\Pr[X \getsr A : X \in S] \leq 1$.
+
+Since $\Pr[X \getsr A : X \in S] \geq 1-\frac{q^2}{2 \cdot 2^n}$, we also have a lower bound:
+$$\Pr[X \getsr A : D^{G(X)}=1 \wedge X \in S] \geq (1-\frac{q^2}{2 \cdot 2^n})\Pr[X \getsr S : D^{G(X)}=1].$$
 \end{fact}
-Both facts give $\Delta \leq \frac{q^2}{2 \cdot 2^n}$.
+These facts give that $\Delta \leq \frac{q^2}{2 \cdot 2^n}$.
 \end{proof}
 
 \section{PRP Constructions}

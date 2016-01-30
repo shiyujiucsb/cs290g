@@ -105,7 +105,7 @@ We can formally define the model above.
 \begin{definition}
 A {\bf Symmetric Encryption} scheme is a triple of efficient algorithms $SE = (KG, Enc, Dec)$ with the message space $M = \{M_\lambda\}_{\lambda \in \N}$:
 \begin{itemize}
-\item $KG$: the key generation algorithm (randomized in general). $KG$ samples the shared key $k$: $k \getsr KG(1^\lambda)$, where $\lambda$ is the security parameter (roughly related to the length of the key $k$)
+\item $KG$: the key generation algorithm (randomized in general). $KG$ samples the shared key $k$: $k \getsr KG(1^\lambda)$, where $\lambda$ is the security parameter (roughly related to the length of the key $k$).
 \item $Enc$: the encryption algorithm (randomized in general). $Enc$ outputs the ciphertext $c$: $c \getsr Enc(k, m)$, where $k$ is a valid output of $KG$, and $m$ is an element of the message space $M_\lambda$.
 \item $Dec$: the decryption algorithm ({\it deterministic}). $Dec$ restores the message $m$: $m \gets Dec(k, c)$, where $c$ is an output of $Enc$.
 \end{itemize}

@@ -214,4 +214,52 @@ $$\Adv_{\Psi^2}^{prp}(D) = \bigg| \Pr[s \getsr \bits^\lambda : D^{\Psi_s^2} = 1]
 which is overwhelming.
 \end{proof}
 
+\section{Task 3 - Collision Probabilities}
+Let $X_1, \cdots, X_q$ be uniformly and independently sampled from a set $S$ with $N$ elements. We are interested in the probability $p_c(q, N)$ that there exist indices $i \not = j$ such that $X_i = X_j$. In class, we have proved that $p_c(q, N) \leq \frac{q^2}{2N}$.
+
+{\bf a) [Points: 10]} Prove that
+$$p_c(q, N) \geq 1-e^{-\frac{q(q-1)}{2N}}.$$
+\begin{proof}
+Define the event $E$: there exist indices $i \not = j$ such that $X_i = X_j$. 
+Consider its complementary event $\overline{E}$: for any distinct indices $i \not= j$, we have $X_i \not= X_j$. In other words, there is no collision among the $X$ values. We rewrite its probability as
+$$\Pr[\overline{E}] = \Pr[\bigwedge_{1\leq i < j \leq q} : X_i \not = X_j].$$
+Note that the events $X_i \not = X_j$ and $X_{i'} \not = X_{j'}$ are independent if $\{i,j\} \not= \{i',j'\}$. To see this, we can compute
+$$\Pr[X_i \not = X_j \wedge X_{i'} \not = X_{j'}] = \Pr[X_i \not = X_j]\Pr[X_{i'} \not = X_{j'} | X_i \not = X_j].$$
+If $i, j, i', j'$ are all distinct, it is clear that
+$$\Pr[X_{i'} \not = X_{j'} | X_i \not = X_j] = \Pr[X_{i'} \not = X_{j'} ].$$
+Otherwise, w.l.o.g. we assume $i=i'$, then we have
+$$\Pr[X_{i'} \not = X_{j'} | X_i \not = X_j] = \Pr[X_{i'} \not = X_{j'} ] = \Pr[X_{i} \not = X_{j'} ].$$
+For either case we have
+$$\Pr[X_i \not = X_j \wedge X_{i'} \not = X_{j'}] = \Pr[X_i \not = X_j]\Pr[X_{i'} \not = X_{j'}].$$
+Hence for $\overline{E}$, we have
+$$\Pr[\overline{E}] = \prod_{1\leq i < j \leq q}\Pr[X_i \not = X_j] = \left( 1 - \frac{1}{N} \right)^{\binom{q}{2}}.$$
+Here we need to use a bound:
+\begin{lemma}
+\label{lem:1}
+$1-\frac{1}{N} \leq e^{-\frac{1}{N}}$ for all $N\geq 1$.
+\end{lemma}
+\begin{proof}
+The function $f(x) \eqdef e^x-1-x$ achieves its minimum value 0 at $x=0$, since the derivative $f'(x) = e^x-1$ s.t. $f'(0)=0$ and $f(x)$ is convex. Let $x=-\frac{1}{N}$ and the lemma follows.
+\end{proof}
+By using Lemma \ref{lem:1}, we have
+$$\Pr[\overline{E}] \leq e^{-\frac{1}{N}\binom{q}{2}} = e^{-\frac{q(q-1)}{2N}},$$
+and $\Pr[E] = 1-\Pr[\overline{E}]$ finishes the proof.
+\end{proof}
+
+{\bf b) [Points: 2]} Show that if $q \leq \sqrt{2N}$, then 
+$$p_c(q,N) \geq c \cdot \frac{q(q-1)}{N}$$
+for some constant $c$.
+\begin{proof}
+We first need a lemma.
+\begin{lemma}
+$\left( 1-\frac{1}{e} \right)x \leq 1-e^{-x}$ for all $x \in [0,1]$.
+\end{lemma}
+\begin{proof}
+Consider the function $f(x) \eqdef e^{-x} + \left( 1-\frac{1}{e} \right)x-1$. Note that $f(0) = f(1) = 0$ and $f$ is convex. Hence $f(x) \leq 0$ for all $x \in [0,1]$ and the lemma follows.
+\end{proof}
+Based on the above lemma and a), we have
+$$p_c(q, N) \geq 1-e^{-\frac{q(q-1)}{2N}} \geq \left( 1-\frac{1}{e} \right)\frac{q(q-1)}{2N}.$$
+Let $c = \frac{1}{2} - \frac{1}{2e}$ and b) follows.
+\end{proof}
+
 \end{document}
