@@ -59,6 +59,7 @@ $\underrightarrow{\quad #1 \quad}$ }
 \newcommand{\leftstep}[1]{%
 $\underleftarrow{\quad #1 \quad}$ }
 \newcommand{\Adv}{\textsf{Adv}}
+\newcommand{\tab}{\hspace{0.3in}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Theorems & Definitions
@@ -262,4 +263,151 @@ $$p_c(q, N) \geq 1-e^{-\frac{q(q-1)}{2N}} \geq \left( 1-\frac{1}{e} \right)\frac
 Let $c = \frac{1}{2} - \frac{1}{2e}$ and b) follows.
 \end{proof}
 
+
+\section{Task 4 - Key Recovery}
+{\bf [10 Points]} A basic property one would expect from a good symmetric encryption scheme is that \emph{key
+recovery} is hard, i.e., it is hard to recover the secret key, even when the adversary is able to
+encrypt messages of her choice.
+
+Formalize key recovery security with an appropriate advantage metric, and sketch a proof
+that ind-cpa security implies your security notion.
+
+\begin{definition}
+A symmetric encryption $SE = (KG, Enc, Dec)$ with message space $M = \{M_\lambda\}_{\lambda \in \N}$ is {\bf key recovery secure} if for all PPT adversary $A$, for all $\lambda$, the advantage defined by
+$$\Adv_{SE}^{key-rec}(A) \eqdef \Pr[k \getsr KG(1^\lambda), k' \getsr A^{Enc(k,\cdot)} : k' = k]$$
+is negligible. 
+\end{definition}
+
+\begin{lemma}
+Ind-cpa security implies key recovery security.
+\end{lemma}
+We first give a proof with strong correctness notion, and then fix that for the relaxed version.
+\begin{proof}
+Given a symmetric encryption scheme $SE$, assume by contradiction $SE$ is not key recovery secure, then there exists an adversary $A$ s.t. $\Adv_{SE}^{key-rec}(A)$ is non-negligible. Choose two distinct messages $m, m' \in M_\lambda$ s.t. $m \not= m'$. It suffices to build a PPT distinguisher $D$ s.t. $\Adv_{SE}^{ind-cpa}(D)$ is also non-negligible. We give the construction as following:
+\begin{quote}
+Distinguisher $D^O$: // $O$ can be either $LR_0^k$ or $LR_1^k$.
+\begin{enumerate}
+\item $k' \getsr A^{Enc(k,\cdot)}$.
+\item $c_1 \gets O(m, m)$.
+\item $c_2 \gets O(m, m')$.
+\item {\bf if} $Dec(k', c_1) = m$ {\bf then } 
+\item \tab {\bf if} $Dec(k', c_2) = m$ {\bf then return} 1.
+\item \tab {\bf else return} 0.
+\item {\bf else return} 0.
+\end{enumerate}
+\end{quote}
+Now we estimate the advantage
+$$\begin{aligned}
+&\Adv_{SE}^{ind-cpa}(D) \\
+=& \bigg| \Pr[k \getsr KG(1^\lambda) : D^{LR_0^k}=1] - \Pr[k \getsr KG(1^\lambda) : D^{LR_1^k}=1] \bigg| \\
+=& \bigg| \Pr[k \getsr KG(1^\lambda), k' \getsr A^{Enc(k,\cdot)}: Dec(k', Enc(k, m))=m] \\
+&-\Pr[k \getsr KG(1^\lambda), k' \getsr A^{Enc(k,\cdot)}: Dec(k', Enc(k, m))=m \wedge Dec(k', Enc(k, m'))=m] \bigg|.
+\end{aligned}$$
+Hence by the strong correctness assumption of symmetric encryption 
+$$\Pr[Dec(k, Enc(k, m))=m]=1,$$ 
+we have
+$$\begin{aligned}
+&\Adv_{SE}^{ind-cpa}(D) \\
+=& \Pr[k \getsr KG(1^\lambda), k' \getsr A^{Enc(k,\cdot)}: Dec(k', Enc(k, m))=m \wedge Dec(k', Enc(k, m'))\not=m] \\
+\geq & \Pr[k \getsr KG(1^\lambda), k' \getsr A^{Enc(k,\cdot)}: k' = k \wedge Dec(k', Enc(k, m'))\not=m].
+\end{aligned}$$
+By conditional probability,
+$$\begin{aligned}
+&\Pr[k \getsr KG(1^\lambda), k' \getsr A^{Enc(k,\cdot)}: k' = k \wedge Dec(k', Enc(k, m'))\not=m] \\
+=&\Pr[k \getsr KG(1^\lambda), k' \getsr A^{Enc(k,\cdot)}: k' = k] \cdot \Pr[k' = k: Dec(k', Enc(k, m'))\not=m].
+\end{aligned}$$
+By correctness of SE, we know $Dec(k', Enc(k, m')) = m' \not= m$ for sure. Thus
+$$\begin{aligned}
+&\Adv_{SE}^{ind-cpa}(D) 
+\geq  \Pr[k \getsr KG(1^\lambda), k' \getsr A^{Enc(k,\cdot)}: k' = k] 
+= \Adv_{SE}^{key-rec}(A),
+\end{aligned}$$
+which is non-negligible.
+\end{proof}
+Note that the proof above assumes the notion of SE correctness as $k=k'$ implies $Dec(k', Enc(k, m)) = m$ for any $m$. If negligible errors are allowed, we can fix the proof as following: define $K$ as the set of all the keys $k$ s.t. $Dec(k, Enc(k, m)) = m$ for any $m$. 
+Then
+$$\begin{aligned}
+&\Adv_{SE}^{ind-cpa}(D) \\
+=& \bigg| \Pr[k \getsr KG(1^\lambda) : k \in K]\cdot(\Pr[k\getsr K : D^{LR_0^k}=1] - \Pr[k\getsr K : D^{LR_1^k}=1]) \\
+& + \Pr[k \getsr KG(1^\lambda) : k \not\in K]\cdot(\Pr[k\not\in K : D^{LR_0^k}=1] - \Pr[k\not\in K : D^{LR_1^k}=1]) \bigg|.
+\end{aligned}$$
+Since $\Pr[k \getsr KG(1^\lambda) : k \not\in K]$ is negligible by the correctness notion, it suffices to show
+$$P \eqdef \bigg| \Pr[k\getsr K : D^{LR_0^k}=1] - \Pr[k\getsr K : D^{LR_1^k}=1] \bigg|$$
+is non-negligible.
+A similar reasoning shows that
+$$P
+\geq \Pr[k \getsr K, k' \getsr A^{Enc(k,\cdot)}: k' = k] 
+\geq \Adv_{SE}^{key-rec}(A).$$
+
+\section{Task 5 - Concrete Security for Symmetric Encryption}
+We want to have a closer look at the quantitative impact of concrete attacks on the security
+of symmetric encryption schemes. In particular, consider the randomized counter-mode
+encryption scheme CTR with message space $M = \bits^\lambda$ as presented in class, using a
+PRF $F : \bits^\lambda \times \bits^\lambda \to \bits^\lambda$, it chooses a random $r \getsr \bits^\lambda$
+and produces the ciphertext $c = (r, F(k, r) \oplus m)$.
+
+{\bf a) [Points: 5]} For every $q$, give a concrete distinguisher $D$, making $q$ queries to its oracle, achieving advantage
+$\Adv_{CTR}^{ind-cpa}(D) = \Omega(q^2/2^\lambda)$.
+\begin{proof}
+The idea of such a $D$ is from birthday attack:
+\begin{quote}
+Distinguisher $D^O$: // $O$ can be either $LR_0^k$ or $LR_1^k$.
+\begin{enumerate}
+\item {\bf for} $i=1$ to $q$ {\bf do}
+\item \tab choose messages $m_i, n_i$ s.t. $m_i \not= m_j$ and $n_i \not= n_j$ for any $j<i$.
+\item \tab $(r_i, c_i) \gets O(m_i, n_i)$.
+\item {\bf if} there exist $i\not= j$ s.t. $r_i = r_j$ {\bf then}
+\item \tab {\bf if} $m_i \oplus m_j = c_i \oplus c_j$ {\bf then return} 1.
+\item \tab {\bf else} {\bf return} 0.
+\item {\bf else} $b\gets\bits$ and {\bf return} b.
+\end{enumerate}
+\end{quote}
+It is easy to compute the advantage 
+$$\begin{aligned}
+& \Adv_{CTR}^{ind-cpa}(D) \\
+=& \bigg| \Pr[k \getsr KG(1^\lambda) : D^{LK_0^k}=1] - \Pr[k \getsr KG(1^\lambda) : D^{LK_1^k}=1] \bigg| \\
+=& \bigg| \Pr[k \getsr KG(1^\lambda) : D^{LK_0^k}=1 \wedge \textrm{$r$ collides}] - \Pr[k \getsr KG(1^\lambda) : D^{LK_1^k}=1 \wedge \textrm{$r$ collides}] \\
+&+\Pr[k \getsr KG(1^\lambda) : D^{LK_0^k}=1 \wedge \textrm{no collision}] - \Pr[k \getsr KG(1^\lambda) : D^{LK_1^k}=1 \wedge \textrm{no collision}] \bigg| \\
+\end{aligned}$$
+Since if no collision, $D$ with always output 1 with probability 1/2,
+$$\begin{aligned}
+& \Adv_{CTR}^{ind-cpa}(D) \\
+=& \bigg| \Pr[k \getsr KG(1^\lambda) : D^{LK_0^k}=1 \wedge \textrm{$r$ collides}] - \Pr[k \getsr KG(1^\lambda) : D^{LK_1^k}=1 \wedge \textrm{$r$ collides}] \bigg| \\
+\end{aligned}$$
+For the first probability term,
+$$\begin{aligned}
+& \Pr[k \getsr KG(1^\lambda) : D^{LK_0^k}=1 \wedge \textrm{$r$ collides}] \\
+=& \Pr[k \getsr KG(1^\lambda): \textrm{$r$ collides}]\Pr[\textrm{$r_i, r_j$ collide} : m_i \oplus m_j = c_i \oplus c_j] \\
+=& \Pr[k \getsr KG(1^\lambda): \textrm{$r$ collides}].
+\end{aligned}$$
+For the second probability term,
+$$\begin{aligned}
+& \Pr[k \getsr KG(1^\lambda) : D^{LK_1^k}=1 \wedge \textrm{$r$ collides}] \\
+=& \Pr[k \getsr KG(1^\lambda): \textrm{$r$ collides}]\Pr[\textrm{$r_i, r_j$ collide} : m_i \oplus m_j = c_i \oplus c_j]. \\
+\end{aligned}$$
+However, this time 
+$$m_i \oplus m_j = c_i \oplus c_j = F(k, r_i) \oplus n_i \oplus F(k, r_j) \oplus n_j = n_i \oplus n_j.$$
+Thus
+$$\begin{aligned}
+& \Pr[k \getsr KG(1^\lambda) : D^{LK_1^k}=1 \wedge \textrm{$r$ collides}] \\
+=& \Pr[k \getsr KG(1^\lambda): \textrm{$r$ collides}]\cdot 2^{-\lambda}. 
+\end{aligned}$$
+Hence 
+$$\Adv_{CTR}^{ind-cpa}(D) = (1-2^{-\lambda}) \Pr[k \getsr KG(1^\lambda): \textrm{$r$ collides}] \approx q^2/2\cdot 2^\lambda.$$
+\end{proof}
+
+{\bf b) [Points: 2]} Assume we instantiate $F$ in counter-mode with a short $\lambda$ (e.g., using DES, where $\lambda = 64$). Would this be a good idea?
+
+\emph{Solution}: It is not a good idea since by doing this only $q = 2^{32}$ queries will break the scheme with significant advantage around
+$$\frac{q^2}{2\cdot 2^{64}} = \frac{2^{64}}{2\cdot 2^{64}} = \frac{1}{2}.$$
+Note that $2^{32}$ is not big enough for modern computers.
+
+{\bf c) [Points: 5]} Consider the following (less efficient) variant of counter-mode encryption.
+To encrypt a message $m \in \bits^\lambda$ with secret key $k \in \bits^\lambda$, it chooses random strings $r_1, \cdots, r_{10} \getsr \bits^\lambda$ and produces the ciphertext $c = (r_1, \cdots, r_{10}, F(k, r_1) \oplus \cdots \oplus F(k, r_{10}) \oplus m$. (Note that the ciphertext has now length $11\lambda$ bits.)
+
+Try to give the best possible $q$-query distinguisher you can find against this construction, and analyze its ind-cpa advantage.
+
+\begin{proof}
+
+\end{proof}
 \end{document}
