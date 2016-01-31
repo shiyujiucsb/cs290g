@@ -408,6 +408,42 @@ To encrypt a message $m \in \bits^\lambda$ with secret key $k \in \bits^\lambda$
 Try to give the best possible $q$-query distinguisher you can find against this construction, and analyze its ind-cpa advantage.
 
 \begin{proof}
+Denote by $Q$ the set of the $q$ queries. Each query $i \in Q$ can be represented as a vector $(r_{i,1}, \cdots, r_{i,10}, c_i)$. 
+Suppose there is a multigraph $G = (Q, E)$ allowing self loops. Each edge between two nodes $i_1, i_2$ (can be the same) is associated with two $r$ values $r_{i_1,j_1}$ and $r_{i_2,j_2}$ s.t. $r_{i_1,j_1} = r_{i_2,j_2}$ and $(i_1,j_1) \not= (i_2, j_2)$. Each $r$ value $r_{i,j}$ can only be associated with at most one edge. 
+The key observation is that if there is a subset $I \subseteq Q$ s.t. $I$ is a 10-regular subgraph, then 
+$$\bigoplus_{i \in I, 1\leq j \leq 10}F(k, r_{i,j}) = 0.$$
+Since the degree of each vertex in $Q$ is at most 10, such a subset $I$ must be a component of the graph $G$. 
+Hence by traversing the graph $G$ we can find such a 10-regular component if any. 
+Based on the idea above, we construct the distinguisher as following:
 
+\begin{quote}
+Distinguisher $D^O$: // $O$ can be either $LR_0^k$ or $LR_1^k$.
+\begin{enumerate}
+\item set up a $q\times 10$ table $T$, and a multigraph $G$ with $q$ vertices and no edges initially.
+\item set $T[i,j]=\bot$ for any $1\leq i\leq q$, $1\leq j \leq 10$.
+\item {\bf for} $i=1$ to $q$ {\bf do}
+\item \tab choose messages $m_i, n_i$ s.t. $m_i \not= m_j$ and $n_i \not= n_j$ for any $j<i$.
+\item \tab $(r_{i,1}, \cdots, r_{i,10}, c_i) \gets O(m_i, n_i)$.
+\item \tab {\bf if} there exists $r_{i,j} = r_{i',j'}$ s.t. $(i,j)\not=(i',j')$, $i\geq i'$, $T[i,j]=T[i',j']=\bot$ {\bf then}
+\item \tab \tab $T[i,j] \gets set, T[i',j'] \gets set$.
+\item \tab \tab add an edge between the vertices $i$ and $i'$ in $G$.
+\item traverse the graph to find if any 10-regular component $I$ exists.
+\item {\bf if} there exist such a component $I$ {\bf then}
+\item \tab {\bf if} $\bigoplus_{i \in I, 1\leq j \leq 10} m_i = \bigoplus_{i \in I, 1\leq j \leq 10} c_i$ {\bf then return} 1.
+\item \tab {\bf else} {\bf return} 0.
+\item {\bf else} $b\gets\bits$ and {\bf return} b.
+\end{enumerate}
+\end{quote}
+Note that $D$ is efficient, since both the number of queries and graph traversal are bounded by $q$.
+The challenging question is to calculate the advantage $\Adv_{CTR}^{ind-cpa}(D)$.
+By a similar reasoning in a), we can show that
+$$\Adv_{CTR}^{ind-cpa}(D) = (1-2^\lambda)\Pr[\textrm{$G$ has a 10-regular component.}].$$
+We give a lower bound on $P \eqdef \Pr[\textrm{$G$ has a 10-regular component.}]$.
+Clearly $P \geq \Pr[\textrm{$G$ has a 10-regular component of size 1.}]$.
+For any query $i \in Q$, the probability $q$ that $\{i\}$ is already a 10-regular component is
+$$q = \frac{\binom{10}{5}(2^\lambda)^5}{(2^\lambda)^{10}} = \frac{252}{2^{5\lambda}}.$$
+Thus $P = 1-(1-q)^{10} \geq 1-e^{-10q}=1-e^{-\frac{2520}{2^{5\lambda}}}.$
+We can also find a rough upper bound based on the idea that there must be at least 5 collisions. That is, we need to find the probability that there are at least 5 pairs of collisions among the $r_{i,j}$'s of size $10q$. Clearly by birthday attack, $P$ is bounded by
+$$P \leq \frac{(10q)^2}{2\cdot 2^\lambda} = \frac{50q^2}{2^\lambda}.$$
 \end{proof}
 \end{document}
