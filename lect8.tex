@@ -1,0 +1,291 @@
+\documentclass[12pt]{article}
+\usepackage{url,amsmath,setspace,amssymb,amsthm,amsfonts}
+%\usepackage{hyperref}
+
+
+\setlength{\oddsidemargin}{.25in}
+\setlength{\evensidemargin}{.25in}
+\setlength{\textwidth}{6.25in}
+\setlength{\topmargin}{-0.4in}
+\setlength{\textheight}{8.5in}
+
+\newcommand{\heading}[5]{
+   \renewcommand{\thepage}{#1-\arabic{page}}
+   \noindent
+   \begin{center}
+   \framebox[\textwidth]{
+     \begin{minipage}{0.9\textwidth} \onehalfspacing
+       {\bf CS 290G -- Introduction to Modern Cryptography} \hfill #2
+
+       {\centering \Large #5
+       
+       }\medskip
+
+       {\it #3 \hfill #4}
+     \end{minipage}
+   }
+   \end{center}
+}
+
+\newcommand{\handout}[3]{\heading{#1}{#2}{Instructor:
+Stefano Tessaro}{Scribe: Shiyu Ji}{Lecture #1: #3}}
+
+\setlength{\parindent}{0in}
+
+\newcommand{\eqdef}{\stackrel{def}{=}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\bits}{\{0,1\}}
+\newcommand{\inr}{\in_{\mbox{\tiny R}}}
+%\newcommand{\getsr}{\gets_{\mbox{\tiny R}}}
+\newcommand{\getsr}{\stackrel{\$}{\gets}}
+\newcommand{\st}{\mbox{ s.t. }}
+\newcommand{\etal}{{\it et al }}
+\newcommand{\into}{\rightarrow}
+
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\e}{\epsilon}
+\newcommand{\ee}{\varepsilon}
+\newcommand{\ceil}[1]{{\lceil{#1}\rceil}}
+\newcommand{\floor}[1]{{\lfloor{#1}\rfloor}}
+\newcommand{\angles}[1]{\langle #1 \rangle}
+\newcommand{\Com}{{\sf Com}}
+\newcommand{\desc}{{\sf desc}}
+
+\newcommand{\rightstep}[1]{%
+$\underrightarrow{\quad #1 \quad}$ }
+
+\newcommand{\leftstep}[1]{%
+$\underleftarrow{\quad #1 \quad}$ }
+
+\newcommand{\Adv}{\mathsf{Adv}}
+\newcommand{\poly}{\mathsf{poly}}
+\newcommand{\MAC}{\mathsf{MAC}}
+\newcommand{\Ver}{\mathsf{Ver}}
+
+\newcommand{\tab}{\hspace{0.3in}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Theorems & Definitions
+
+
+\newtheorem{theorem}{Theorem}[section]
+
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{subclaim}{Claim}[theorem]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{construction}[theorem]{Construction}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{algorithm1}[theorem]{Algorithm}
+\newtheorem{protocol}[theorem]{Protocol}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{fact}[theorem]{Fact}
+
+%\bibliographystyle{plain}
+\usepackage{tikz}
+\usetikzlibrary{calc,decorations.pathreplacing}
+
+\begin{document}
+\handout{8}{Feb 2, 2016}{Message Authentication}
+\section{Message Authentication Code}
+Last lecture we saw symmetric encryption, in which the adversary Eve can wiretap the channel between Alice and Bob. In this lecture we consider a more powerful adversary Eve, who can tamper with or even forge the messages sent from Alice to Bob. We can use \emph{message authentication code} (MAC) to defend against such an adversary Eve.
+Message authentication code (MAC) is an efficient algorithm $\MAC : \bits^\lambda \times \bits^* \to \bits^n$ (typically $n \approx \lambda$). 
+Alice uses $\MAC$ to generate a tag $\tau \in \bits^n$ for the message $m\in\bits^*$ by using the key $k\in\bits^\lambda$: $\tau \gets \MAC(k, m)$. Then Alice sends the pair $(m, \tau)$ to Bob. By wiretapping the channel, Eve obtains $(m, \tau)$ and may change it to $(m', \tau')$ and then sends $(m', \tau')$ to Bob. After receiving $(m', \tau')$, Bob verifies the tag $\tau'$ by using $\MAC$ and the shared key $k$ as following:
+\begin{quote}
+Bob's verification $\Ver(k, m', \tau')$:
+\begin{enumerate}
+\item $\tilde{\tau} \gets \MAC(k, m')$.
+\item {\bf if} $\tilde{\tau} = \tau'$ {\bf then}
+\item \tab {\bf output} $m'$.
+\item {\bf else output} $\bot$.
+\end{enumerate}
+\end{quote}
+The following graph shows the model here:
+\begin{quote}
+\begin{tikzpicture}
+\draw (0,0) rectangle (2,1); \node at (1,0.5) {Alice};
+\node at (1,-0.5) {$\tau \gets \MAC(k, m)$};
+\draw [->] (2,0.5) -- (4,0.5);
+\node [above] at (3,0.5) {$(m, \tau)$};
+\draw (4,0) rectangle (6,1); \node at (5,0.5) {Eve}; 
+\draw [->] (6,0.5) -- (8,0.5);
+\node [above] at (7,0.5) {$(m', \tau')$};
+\draw (8,0) rectangle (10,1); \node at (9,0.5) {Bob};
+\node at (9,-0.5) {$\Ver(k, m', \tau')$};
+\draw [->] (10,0.5) -- (11,0.5);
+\node at (12,0.5) {$m$ or $\bot$};
+\end{tikzpicture}
+\end{quote}
+
+We now discuss what a secure MAC should be. Informally, any adversary Eve cannot tamper with or forge any message or tag, even with chosen-message attack. 
+That is, a secure MAC should have unforgeability under chosen-message attack (UF-CMA).
+
+\begin{definition}
+A MAC is secure if for all PPT adversary $A$, the advantage
+$$\begin{aligned}
+\Adv_{\MAC}^{uf-cma}(A) \eqdef & \Pr[s \getsr \bits^\lambda, (m, \tau) \gets A^{\MAC(s,\cdot)} : \\
+& \MAC(s,m)=\tau \wedge \textrm{$m$ was not queried to $\MAC(s,\cdot)$ by $A$}]
+\end{aligned}$$
+is negligible.
+\end{definition}
+
+How to build a secure MAC? In fact, there are already many MACs in practice, e.g., HMAC, CBC-MAC, etc.
+
+We will show that if there exists a PRF that can be extended to work with inputs of any length (i.e. inputs from $\bits^*$), then we can construct a MAC. We first extend the definition of PRF. Recall that in the definition of PRF, the advantage is defined as
+$$\Adv_{F,\lambda}^{prf}(D) \eqdef \bigg| \Pr[s \getsr \bits^\lambda: D^{F(s,\cdot)}=1] - \Pr[D^{RF_{m,n}}=1] \bigg|.$$
+To extend the definition to work with $\bits^*$, we can replace $RF_{m,n}$ with $RF_{*,n}$, which can take inputs from $\bits^*$.
+
+We next give the construction of MAC as the following theorem.
+
+\begin{theorem}
+If $F : \bits^\lambda \times \bits^* \to \bits^n$ is a PRF, and $n = \omega(\log \lambda)$,\footnote{Equivalently, $2^{-n}$ is negligible.} then $F$ is a secure MAC.
+\end{theorem}
+\begin{proof}
+It suffices to show that for all adversary $A$, there exists a distinguisher $D$ s.t.
+$$\Adv_{\MAC}^{uf-cma}(A) \leq \Adv_{F}^{prf}(D) + \frac{1}{2^n}.$$
+Moreover, if $A$ is PPT, then $D$ is also PPT. The construction of $D$ is given as following:
+\begin{quote}
+Distinguisher $D^O$: // $O$ can be either $F(s,\cdot)$ or $RF_{*,n}$.
+\begin{enumerate}
+\item $(m,\tau) \getsr A^O$.
+\item {\bf if} $O(m) = \tau \wedge$ $m$ is not queried to $O$ by $A$ {\bf then}
+\item \tab {\bf return} 1.
+\item {\bf else return} 0.
+\end{enumerate}
+\end{quote}
+Clearly
+$$\begin{aligned}
+\Pr[s\getsr\bits^\lambda: D^{F(s,\cdot)}=1] =& \Pr[s\getsr\bits^\lambda, (m,\tau) \getsr A^{F(s,\cdot)}: F(s,m) = \tau \\
+&\wedge \textrm{$m$ was not queired to $F(s,\cdot)$ by $A$}] = \Adv_{F}^{uf-cma}(A).
+\end{aligned}$$
+Hence we can rewrite $\Adv_{F}^{uf-cma}(A)$ as
+$$\begin{aligned}
+&\Adv_{F}^{uf-cma}(A) 
+= \Pr[s\getsr\bits^\lambda: D^{F(s,\cdot)}=1] - \Pr[D^{RF_{*,n}}=1] + \Pr[D^{RF_{*,n}}=1].
+\end{aligned}$$
+By 
+$$\Adv_{F}^{prf}(D) \eqdef \bigg| \Pr[s\getsr\bits^\lambda: D^{F(s,\cdot)}=1] - \Pr[D^{RF_{*,n}}=1] \bigg|,$$
+we have
+$$\Pr[s\getsr\bits^\lambda: D^{F(s,\cdot)}=1] - \Pr[D^{RF_{*,n}}=1] \leq \Adv_{F}^{prf}(D).$$
+The remaining is to bound $\Pr[D^{RF_{*,n}}=1]$.
+\begin{claim}
+$\Pr[D^{RF_{*,n}}=1] \leq 2^{-n}$.
+\end{claim}
+{\bf Proof of the claim}: If $D$ outputs 1, then in the if-statement, $m$ must be queried to $RF_{*,n}$ for the first time, after $\tau$ has been fixed. This implies $\Pr[RF_{*,n}(m) = \tau] = 2^{-n}$.
+\end{proof}
+The theorem above shows that we can construct MAC from PRF. Does the theorem hold conversely? That is, is every MAC a PRF? 
+The answer is no. Consider $\MAC(s,m) = F(s,m)||0$, where $F$ is a PRF. It turns out this MAC is valid, but not a PRF.
+
+\section{Almost-Universal Hash Function}
+Almost-Universal Hash Function (AUHF) is important in the sense that together with PRF (with fixed input length), we can construct PRF with inputs in $\bits^*$.
+
+\begin{definition}
+A function $H : \bits^\lambda \times \bits^* \to \bits^n$ is {\bf $\delta$-almost-universal hash function} ($\delta$-AUHF) for some function $\delta : \N \to [0,1]$, \footnote{For example, $\delta(\ell) = \ell/2^n$.} if for all $m \not= m'$,
+$$\Pr[s \getsr \bits^\lambda : H(s,m) = H(s, m')] \leq \delta(\max\{|m|, |m'|\}).$$ 
+\end{definition}
+
+We can concretely construct an AUHF. Before that we need some preliminaries about fields. Very informally, a field $\F$ is a set equipped with addition and multiplication, and we always have inverses for both of them. For example, for any prime $p$, $\Z_p$ is a field taking addition and multiplication modulo $p$. $\Z_2^n = \bits^n$ is another field with modular component-wise addition (aka $\oplus$) and multiplication. 
+
+Now given a field $\F$, we can define $H : \F \times \F^* \to \F$ as
+$$H(s, m=(m_1, m_2, \cdots, m_\ell)) \eqdef \sum_{i=1}^{\ell} m_i \cdot s^{i-1}.$$
+We assume $m = (m_1, m_2, \cdots, m_\ell)$ and $m' = (m'_1, m'_2, \cdots, m'_\ell)$ have the same length. We now argue that $H$ is an AUHF.
+
+\begin{lemma}
+The above $H$ is $\frac{\ell}{|\F|}$-AUHF.
+\end{lemma}
+\begin{proof}
+We may directly compute the probability:
+$$\begin{aligned}
+& \Pr[s \getsr \F : H(s,m) = H(s,m')] \\ 
+=& \Pr[s \getsr \F : \sum_{i=1}^{\ell} m_i \cdot s^{i-1} = \sum_{i=1}^{\ell} m'_i \cdot s^{i-1}] \\
+=& \Pr[s \getsr \F : \sum_{i=1}^{\ell} (m_i-m'_i) \cdot s^{i-1} = 0].
+\end{aligned}$$
+Since $m \not= m'$, there exists some $j \leq \ell$ s.t. $m_j \not= m'_j$. That is, $s$ must be a root of a polynomial with degree at most $\ell-1$. By the fundamental theorem of algebra, the number of the roots is at most $\ell-1$. Thus
+$$\Pr[s \getsr \F : H(s,m) = H(s,m')] \leq \frac{\ell-1}{|\F|}.$$
+One can take $\delta = \frac{\ell}{|\F|}$.
+\end{proof}
+
+\section{Construction of MAC}
+Now we will show how to construct MAC by using PRF and AUHF. Given a PRF $F : \bits^\lambda \times \bits^n \to \bits^n$ and an AUHF $H : \bits^\lambda \times \bits^* \to \bits^n$, we can construct a $\MAC : \bits^{2\lambda} \times \bits^* \to \bits^n$ as following:
+$$\MAC (s = (s_1,s_2), m) \eqdef F(s_2, H(s_1, m)).$$
+The following theorem shows that the above $\MAC$ is valid.
+
+\begin{theorem}
+If $F$ is a PRF, and $H$ is $\delta$-AUHF ($\delta$ is negligible), then the above $\MAC$ is a PRF.
+\end{theorem}
+\begin{proof}
+It suffices to show that for any distinguisher $D$, there exists another distinguisher $D'$ s.t. 
+$$\Adv_{\MAC}^{prf}(D) \leq \Adv_{\MAC}^{prf}(D') + q^2 \delta(\ell),$$
+if $D$ makes at most $q$ queries at length at most $\ell$. 
+Moreover, PPT $D$ implies PPT $D'$.
+Note that if $D$ is PPT, then $\ell$ and $q$ are polynomial, and thus $q^2 \delta(\ell)$ is negligible.
+
+To show this, we may replace $F(s_2,\cdot)$ with $RF_{n,n}$. That is
+$$\begin{aligned}
+&\Adv_{\MAC}^{prf}(D) = \bigg| \Pr[s_1,s_2 \getsr \bits^\lambda : D^{\MAC((s_1,s_2),\cdot)}=1] - \Pr[D^{RF_{*,n}}=1] \bigg| \\
+\leq & \bigg| \Pr[s_1,s_2 \getsr \bits^\lambda : D^{\MAC((s_1,s_2),\cdot)}=1] - \Pr[s_1 \getsr \bits^\lambda : D^{RF_{n,n}(H(s_1,\cdot))}=1] \bigg| \\
+&+ \bigg| \Pr[s_1 \getsr \bits^\lambda : D^{RF_{n,n}(H(s_1,\cdot))}=1] - \Pr[D^{RF_{*,n}}=1] \bigg|. \\
+\end{aligned}$$
+Define
+$$\Delta_1 \eqdef \bigg| \Pr[s_1,s_2 \getsr \bits^\lambda : D^{\MAC((s_1,s_2),\cdot)}=1] - \Pr[s_1 \getsr \bits^\lambda : D^{RF_{n,n}(H(s_1,\cdot))}=1] \bigg|.$$
+$$\Delta_2 \eqdef \bigg| \Pr[s_1 \getsr \bits^\lambda : D^{RF_{n,n}(H(s_1,\cdot))}=1] - \Pr[D^{RF_{*,n}}=1] \bigg|.$$
+Note that by the construction of $\MAC$,
+$$\Delta_1 = \bigg| \Pr[s_1,s_2 \getsr \bits^\lambda : D^{F(s_2,H(s_1,\cdot))}=1] - \Pr[s_1 \getsr \bits^\lambda : D^{RF_{n,n}(H(s_1,\cdot))}=1] \bigg|.$$
+We first bound $\Delta_1$. This can be done by constructing the following distinguisher $D'$.
+\begin{quote}
+Distinguisher $D'^O$: // $O$ can be either $F(s_2, \cdot)$ or $RF_{n,n}$.
+\begin{enumerate}
+\item $s_1 \getsr \bits^\lambda$.
+\item $b \getsr D^{O(H(s_1,\cdot))}$.
+\item {\bf return} $b$.
+\end{enumerate}
+\end{quote}
+Clearly $\Delta_1 = \Adv_{F}^{prf}(D')$.
+
+We next bound $\Delta_2$. First define two oracles:
+\begin{quote}
+\begin{minipage}{.3\textwidth}
+$O_{s_1}(m)$:
+\begin{enumerate}
+\item $y \gets H(s_1, m)$.
+\item $z \gets RF_{n,n}(y)$.
+\item {\bf return} $z$.
+\end{enumerate}
+\end{minipage}
+\begin{minipage}{.3\textwidth}
+$O'_{s_1}(m)$:
+\begin{enumerate}
+\item $y \gets H(s_1, m)$.
+\item $z \gets RF_{*,n}(m)$.
+\item {\bf return} $z$.
+\end{enumerate}
+\end{minipage}
+\end{quote}
+Then 
+$$\Delta_2 = \bigg| \Pr[s_1 \getsr \bits^\lambda : D^{O_{s_1}(\cdot)}=1] - \Pr[s_1 \getsr \bits^\lambda : D^{O'_{s_1}(\cdot)}=1] \bigg|.$$
+For both $O_{s_1}(m)$ and $O'_{s_1}(m)$, define event $COLL$: there exists a collision among the $y$ values.
+Since up to the first collision, the two oracles are identical. That is,
+$$\Pr[s_1 \getsr \bits^\lambda : D^{O_{s_1}(\cdot)}=1 \wedge \neg COLL] = \Pr[s_1 \getsr \bits^\lambda : D^{O'_{s_1}(\cdot)}=1 \wedge \neg COLL].$$
+Then we have 
+$$\begin{aligned}
+& \Delta_2 \\
+ =& \bigg| \Pr[s_1 \getsr \bits^\lambda : D^{O_{s_1}(\cdot)}=1 \wedge COLL] - \Pr[s_1 \getsr \bits^\lambda : D^{O'_{s_1}(\cdot)}=1 \wedge COLL] \bigg| \\
+\leq& \max\{\Pr[s_1 \getsr \bits^\lambda : D^{O_{s_1}(\cdot)}=1 \wedge COLL], \Pr[s_1 \getsr \bits^\lambda : D^{O'_{s_1}(\cdot)}=1 \wedge COLL]\} \\
+\leq& \Pr[COLL \textrm{ when $D$ interacts with $O_{s_1}(\cdot)$ or $O'_{s_1}(\cdot)$}].
+\end{aligned}$$
+We claim that for any fixed $m_1,m_2,\cdots,m_q$, if $H$ is $\delta$-AUHF, then 
+$$\Pr[s_1 \getsr \bits^\lambda : \exists i \not= j, H(s_1,m_i) = H(s_1,m_j)] \leq q^2\delta(\ell).$$
+The argument is birthday attack. 
+The details will be given next lecture.
+\end{proof}
+
+\end{document}

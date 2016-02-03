@@ -428,7 +428,7 @@ Distinguisher $D^O$: // $O$ can be either $LR_0^k$ or $LR_1^k$.
 \item \tab \tab $T[i,j] \gets set, T[i',j'] \gets set$.
 \item \tab \tab add an edge between the vertices $i$ and $i'$ in $G$.
 \item traverse the graph to find if any 10-regular component $I$ exists.
-\item {\bf if} there exist such a component $I$ {\bf then}
+\item {\bf if} there exists such a component $I$ {\bf then}
 \item \tab {\bf if} $\bigoplus_{i \in I, 1\leq j \leq 10} m_i = \bigoplus_{i \in I, 1\leq j \leq 10} c_i$ {\bf then return} 1.
 \item \tab {\bf else} {\bf return} 0.
 \item {\bf else} $b\gets\bits$ and {\bf return} b.
