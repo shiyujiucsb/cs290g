@@ -209,7 +209,7 @@ $$\begin{aligned}
 =& \Pr[s \getsr \F : \sum_{i=1}^{\ell} m_i \cdot s^{i-1} = \sum_{i=1}^{\ell} m'_i \cdot s^{i-1}] \\
 =& \Pr[s \getsr \F : \sum_{i=1}^{\ell} (m_i-m'_i) \cdot s^{i-1} = 0].
 \end{aligned}$$
-Since $m \not= m'$, there exists some $j \leq \ell$ s.t. $m_j \not= m'_j$. That is, $s$ must be a root of a polynomial with degree at most $\ell-1$. By the fundamental theorem of algebra, the number of the roots is at most $\ell-1$. Thus
+Since $m \not= m'$, there exists some $j \leq \ell$ s.t. $m_j \not= m'_j$. That is, $s$ must be a root of a polynomial with degree at most $\ell-1$. By Schwartz–Zippel lemma, the number of the roots is at most $\ell-1$. Thus
 $$\Pr[s \getsr \F : H(s,m) = H(s,m')] \leq \frac{\ell-1}{|\F|}.$$
 One can take $\delta = \frac{\ell}{|\F|}$.
 \end{proof}
