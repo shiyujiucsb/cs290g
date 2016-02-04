@@ -224,7 +224,7 @@ If $F$ is a PRF, and $H$ is $\delta$-AUHF ($\delta$ is negligible), then the abo
 \end{theorem}
 \begin{proof}
 It suffices to show that for any distinguisher $D$, there exists another distinguisher $D'$ s.t. 
-$$\Adv_{\MAC}^{prf}(D) \leq \Adv_{\MAC}^{prf}(D') + q^2 \delta(\ell),$$
+$$\Adv_{\MAC}^{prf}(D) \leq \Adv_{\MAC}^{prf}(D') + q^2 \delta(\ell)/2,$$
 if $D$ makes at most $q$ queries at length at most $\ell$. 
 Moreover, PPT $D$ implies PPT $D'$.
 Note that if $D$ is PPT, then $\ell$ and $q$ are polynomial, and thus $q^2 \delta(\ell)$ is negligible.
@@ -283,7 +283,7 @@ $$\begin{aligned}
 \leq& \Pr[COLL \textrm{ when $D$ interacts with $O_{s_1}(\cdot)$ or $O'_{s_1}(\cdot)$}].
 \end{aligned}$$
 We claim that for any fixed $m_1,m_2,\cdots,m_q$, if $H$ is $\delta$-AUHF, then 
-$$\Pr[s_1 \getsr \bits^\lambda : \exists i \not= j, H(s_1,m_i) = H(s_1,m_j)] \leq q^2\delta(\ell).$$
+$$\Pr[s_1 \getsr \bits^\lambda : \exists i \not= j, H(s_1,m_i) = H(s_1,m_j)] \leq q^2\delta(\ell)/2.$$
 The argument is birthday attack. 
 The details will be given next lecture.
 \end{proof}
