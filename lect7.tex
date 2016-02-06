@@ -185,7 +185,7 @@ Our next question is how to formalize the security notion of symmetric encryptio
 \item The adversary can launch chosen plaintext attack (CPA), i.e., is the key $k$ leaked when the adversary knows $(c, m)$ s.t. $c \getsr Enc(k, m)$?
 \end{itemize}
 Up to the notions above, neither OTP nor block cipher is secure. 
-Apparently OTP is not secure when encrypting multiple messages with the same key, and for CPA the key $k$ can be easily found: $k = c \oplus m$. 
+Clearly OTP is not secure when encrypting multiple messages with the same key, and for CPA the key $k$ can be easily found: $k = c \oplus m$. 
 Even though block cipher can be a PRP, it is \emph{deterministic}, i.e., encrypting the same plaintext always leads to the same ciphertext. We want to hide such information by using randomization.
 
 IND-CPA security is a standard definition about secure symmetric encryption. It can address all the security problems discussed above.

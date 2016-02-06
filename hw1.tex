@@ -209,7 +209,7 @@ $$f(x,y) \eqdef
 0^{2\lambda} & \textrm{if $x=y$,} \\
 (j(x),j(y)) & \textrm{otherwise.}
 \end{cases}$$
-Apparently $f(g(z)) = 0^{2\lambda}$ for all $z\in\bits^{2\lambda}$. Thus $h\eqdef f\circ g$ is \emph{not} one-way over $\bits^{2\lambda}$.
+Clearly $f(g(z)) = 0^{2\lambda}$ for all $z\in\bits^{2\lambda}$. Thus $h\eqdef f\circ g$ is \emph{not} one-way over $\bits^{2\lambda}$.
 We claim that both $f$ and $g$ are one-way.
 \begin{lemma}
 Given one way function $h : \bits^\lambda \to \bits^\lambda$, $g(x,y) \eqdef h(x) || h(x)$ is also one-way.
@@ -362,7 +362,7 @@ general $f$? Justify your answer!
 
 {\bf Claim}: The statement is not true for general $f$.
 
-{\bf Counterexample}: Suppose $f : \bits^\lambda \to \bits$ is defined by $f(x) = 0$ for any $x\in\bits^\lambda$. Apparently $f$ is not one-way, but we claim the bitwise xor $\oplus_i x_i$ is a hardcore predicate of $f$. Note that the predicate $\oplus_i x_i$ is uniformly distributed over $\bits$ if $x\getsr\bits^\lambda$. For the base case of 2 terms, 
+{\bf Counterexample}: Suppose $f : \bits^\lambda \to \bits$ is defined by $f(x) = 0$ for any $x\in\bits^\lambda$. Clearly $f$ is not one-way, but we claim the bitwise xor $\oplus_i x_i$ is a hardcore predicate of $f$. Note that the predicate $\oplus_i x_i$ is uniformly distributed over $\bits$ if $x\getsr\bits^\lambda$. For the base case of 2 terms, 
 $$\begin{aligned}
 &\Pr[x_1,x_2\getsr\bits: x_1\oplus x_2 = 0] \\
 = &\Pr[x_1,x_2\getsr\bits: x_1 = 0, x_2=0] + \Pr[x_1,x_2\getsr\bits: x_1 = 1, x_2=1] = \frac{1}{4} + \frac{1}{4} = \frac{1}{2}.
@@ -601,7 +601,7 @@ $$
 $$
 which is exactly $SD(P_1, P_0)$ by the lemma above. by the definition of statistical distance, it is easy to see $SD(P_1, P_0) = SD(P_0, P_1)$.
 
-Our distinguisher itself is PPT. However, if the statistical distance between $P_0$ and $P_1$ is negligible on $\lambda$, then repeating $D$ by feeding independent inputs $x$ by only polynomial times cannot give a non-negligible advantage. Thus if $SD(P_0,P_1)$ is negligible on $\lambda$, our construction of $D$ may not be efficient (i.e., giving non-negligible $\Adv_{P_0,P_1}^{dist}(D)$ in polynomial time).
+If the statistical distance between $P_0$ and $P_1$ is non-negligible, then our distinguisher is efficient. However, if the statistical distance between $P_0$ and $P_1$ is negligible on $\lambda$, then repeating $D$ by feeding independent inputs $x$ by only polynomial times cannot give a non-negligible advantage. Thus if $SD(P_0,P_1)$ is negligible on $\lambda$, our construction of $D$ may not be efficient (i.e., giving non-negligible $\Adv_{P_0,P_1}^{dist}(D)$ in polynomial time).
 
 {\bf c) [Points: 8]} Consider a function $f : \bits^\lambda \to \bits^{\lambda'}$ and a predicate $P : \bits^\lambda \to \bits$.
 Also let:
