@@ -407,8 +407,13 @@ Note that $2^{32}$ is not big enough for modern computers.
 To encrypt a message $m \in \bits^\lambda$ with secret key $k \in \bits^\lambda$, it chooses random strings $r_1, \cdots, r_{10} \getsr \bits^\lambda$ and produces the ciphertext $c = (r_1, \cdots, r_{10}, F(k, r_1) \oplus \cdots \oplus F(k, r_{10}) \oplus m$. (Note that the ciphertext has now length $11\lambda$ bits.)
 
 Try to give the best possible $q$-query distinguisher you can find against this construction, and analyze its ind-cpa advantage.
+
+\begin{claim}
+The less-efficient variant above cannot improve the ind-cpa security of CTR.
+\end{claim}
 \begin{proof}
-The idea of such a distinguisher $D$ is similar to a):
+We can construct a distinguisher that can achieve almost identical ind-cpa advantage, i.e., $\Omega(q^2/2^\lambda)$.
+The idea of such a distinguisher $D$ is similar to a), but in addition we compute a value $R_i$ from $m_i$ and $c_i$:
 \begin{quote}
 Distinguisher $D^O$: // $O$ can be either $LR_0^k$ or $LR_1^k$.
 \begin{enumerate}
