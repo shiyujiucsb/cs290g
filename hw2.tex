@@ -103,7 +103,7 @@ It suffices to give a distinguisher $D$ s.t. $\Adv_{F'}^{prf}(D)$ is non-negligi
 \begin{quote}
 Distinguisher $D^O$: // $O$ can be either $F'_s$ or $RF_{2n,n}$.
 \begin{enumerate}
-\item $c \gets O(0^n || 0^n)$.
+\item $c \gets O(0^n0^n)$.
 \item {\bf if} $c=0^n$ {\bf then return} 1.
 \item {\bf else return} 0.
 \end{enumerate}
@@ -128,10 +128,10 @@ It suffices to give a distinguisher $D$ s.t. $\Adv_{F''}^{prf}(D)$ is non-neglig
 \begin{quote}
 Distinguisher $D^O$: // $O$ can be either $F''_{s_1||s_2}$ or $RF_{2n,n}$.
 \begin{enumerate}
-\item $c_1 \gets O(0^n||0^n)$.
-\item $c_2 \gets O(0^n||1^n)$.
-\item $c_3 \gets O(1^n||0^n)$.
-\item $c_4 \gets O(1^n||1^n)$.
+\item $c_1 \gets O(0^n0^n)$.
+\item $c_2 \gets O(0^n1^n)$.
+\item $c_3 \gets O(1^n0^n)$.
+\item $c_4 \gets O(1^n1^n)$.
 \item {\bf if} $c_1 \oplus c_2 = c_3 \oplus c_4$ {\bf then output} 1.
 \item {\bf else output} 0.
 \end{enumerate}
@@ -198,7 +198,7 @@ It is easy to see the value given by the PRF $F$ is canceled out by XORing.
 
 {\bf b) [Points: 6]} Prove that $\Psi^2$ is \emph{not} a pseudorandom permutation (PRP).
 \begin{proof}
-$\Psi^2$ is given by 
+Given $s = (s_1, s_2)$, $\Psi^2$ is given by 
 $$\Psi_s^2 : (x_0,x_1) \mapsto (F_{s_1}(x_1) \oplus x_{0}, F_{s_2}(F_{s_1}(x_1) \oplus x_{0}) \oplus x_1).$$
 To show that $\Psi^2$ is not PRP, it suffices to build a distinguisher $D$ s.t. $\Adv_{\Psi^2}^{prp}(D)$ is non-negligible. We give such a construction as following:
 \begin{quote}
@@ -210,7 +210,7 @@ Distinguisher $D^O$: // $O$ can be either $\Psi_s^2$ or $RP_{2n}$.
 \item {\bf else output} 0.
 \end{enumerate}
 \end{quote}
-Note that if $O$ is $\Psi_s^2$, then $c_1 = F_{s_1}(0^n) \oplus 1^n$ and $c_2 = F_{s_1}(0^n) \oplus 0^n$ and thus $c_1 \oplus c_3 = 1^n$. If $O$ is $RP_{2n}$, then $c_1$ and $c_3$ are independently uniformly sampled. Hence the advantage of $D$ is
+Note that if $O$ is $\Psi_s^2$, then $c_1 = F_{s_1}(0^n) \oplus 1^n$ and $c_3 = F_{s_1}(0^n) \oplus 0^n$ and thus $c_1 \oplus c_3 = 1^n$. If $O$ is $RP_{2n}$, then $c_1$ and $c_3$ are independently uniformly sampled. Hence the advantage of $D$ is
 $$\Adv_{\Psi^2}^{prp}(D) = \bigg| \Pr[s \getsr \bits^\lambda : D^{\Psi_s^2} = 1] - \Pr[D^{RP_{2n}}=1] \bigg| = 1 - 2^{-n},$$
 which is overwhelming.
 \end{proof}
@@ -226,10 +226,10 @@ Consider its complementary event $\overline{E}$: for any distinct indices $i \no
 $$\Pr[\overline{E}] = \Pr[\bigwedge_{1\leq i < j \leq q} : X_i \not = X_j].$$
 Note that the events $X_i \not = X_j$ and $X_{i'} \not = X_{j'}$ are independent if $\{i,j\} \not= \{i',j'\}$. To see this, we can compute
 $$\Pr[X_i \not = X_j \wedge X_{i'} \not = X_{j'}] = \Pr[X_i \not = X_j]\Pr[X_{i'} \not = X_{j'} | X_i \not = X_j].$$
-If $i, j, i', j'$ are all distinct, it is clear that
-$$\Pr[X_{i'} \not = X_{j'} | X_i \not = X_j] = \Pr[X_{i'} \not = X_{j'} ].$$
-Otherwise, w.l.o.g. we assume $i=i'$, then we have
-$$\Pr[X_{i'} \not = X_{j'} | X_i \not = X_j] = \Pr[X_{i'} \not = X_{j'} ] = \Pr[X_{i} \not = X_{j'} ].$$
+Note that each $X_i$ is sampled uniformly and independently. If $i, j, i', j'$ are all distinct, it is clear that
+$$\Pr[X_{i'} \not = X_{j'} | X_i \not = X_j] = 1-\frac{1}{N} = \Pr[X_{i'} \not = X_{j'} ].$$
+Otherwise, w.l.o.g. we assume $i=i'$ and $j \not= j'$, then we have
+$$\Pr[X_{i'} \not = X_{j'} | X_i \not = X_j] = \Pr[X_{i'} \not = X_{j'} | X_{i'} \not = X_j] = 1-\frac{1}{N} = \Pr[X_{i'} \not = X_{j'} ].$$
 For either case we have
 $$\Pr[X_i \not = X_j \wedge X_{i'} \not = X_{j'}] = \Pr[X_i \not = X_j]\Pr[X_{i'} \not = X_{j'}].$$
 Hence for $\overline{E}$, we have
@@ -240,7 +240,7 @@ Here we need to use a bound:
 $1-\frac{1}{N} \leq e^{-\frac{1}{N}}$ for all $N\geq 1$.
 \end{lemma}
 \begin{proof}
-The function $f(x) \eqdef e^x-1-x$ achieves its minimum value 0 at $x=0$, since the derivative $f'(x) = e^x-1$ s.t. $f'(0)=0$ and $f(x)$ is convex. Let $x=-\frac{1}{N}$ and the lemma follows.
+The function $f(x) \eqdef e^x-1-x$ achieves its minimum value 0 at $x=0$, since its derivative $f'(x) = e^x-1$ has $f'(0)=0$ and $f(x)$ is convex. Let $x=-\frac{1}{N}$ and the lemma follows.
 \end{proof}
 By using Lemma \ref{lem:1}, we have
 $$\Pr[\overline{E}] \leq e^{-\frac{1}{N}\binom{q}{2}} = e^{-\frac{q(q-1)}{2N}},$$
@@ -260,7 +260,7 @@ Consider the function $f(x) \eqdef e^{-x} + \left( 1-\frac{1}{e} \right)x-1$. No
 \end{proof}
 Based on the above lemma and a), we have
 $$p_c(q, N) \geq 1-e^{-\frac{q(q-1)}{2N}} \geq \left( 1-\frac{1}{e} \right)\frac{q(q-1)}{2N}.$$
-Let $c = \frac{1}{2} - \frac{1}{2e}$ and b) follows.
+Set $c = \frac{1}{2} - \frac{1}{2e}$ and b) follows.
 \end{proof}
 
 
@@ -314,9 +314,9 @@ $$\begin{aligned}
 By conditional probability,
 $$\begin{aligned}
 &\Pr[k \getsr KG(1^\lambda), k' \getsr A^{Enc(k,\cdot)}: k' = k \wedge Dec(k', Enc(k, m'))\not=m] \\
-=&\Pr[k \getsr KG(1^\lambda), k' \getsr A^{Enc(k,\cdot)}: k' = k] \cdot \Pr[k' = k: Dec(k', Enc(k, m'))\not=m].
+=&\Pr[k \getsr KG(1^\lambda), k' \getsr A^{Enc(k,\cdot)}: k' = k] \cdot \Pr[Dec(k', Enc(k, m'))\not=m | k' = k].
 \end{aligned}$$
-By correctness of SE, we know $Dec(k', Enc(k, m')) = m' \not= m$ for sure. Thus
+By correctness of SE, we know $Dec(k', Enc(k, m')) = m' \not= m$ for sure if $k'=k$. Thus
 $$\begin{aligned}
 &\Adv_{SE}^{ind-cpa}(D) 
 \geq  \Pr[k \getsr KG(1^\lambda), k' \getsr A^{Enc(k,\cdot)}: k' = k] 
@@ -331,7 +331,7 @@ $$\begin{aligned}
 =& \bigg| \Pr[k \getsr KG(1^\lambda) : k \in K]\cdot(\Pr[k\getsr K : D^{LR_0^k}=1] - \Pr[k\getsr K : D^{LR_1^k}=1]) \\
 & + \Pr[k \getsr KG(1^\lambda) : k \not\in K]\cdot(\Pr[k\not\in K : D^{LR_0^k}=1] - \Pr[k\not\in K : D^{LR_1^k}=1]) \bigg|.
 \end{aligned}$$
-Since $\Pr[k \getsr KG(1^\lambda) : k \not\in K]$ is negligible by the correctness notion, it suffices to show
+Since $\Pr[k \getsr KG(1^\lambda) : k \not\in K]$ is negligible by the relaxed correctness notion, it suffices to show
 $$P \eqdef \bigg| \Pr[k\getsr K : D^{LR_0^k}=1] - \Pr[k\getsr K : D^{LR_1^k}=1] \bigg|$$
 is non-negligible.
 A similar reasoning shows that
@@ -354,12 +354,12 @@ The idea of such a $D$ is from birthday attack:
 Distinguisher $D^O$: // $O$ can be either $LR_0^k$ or $LR_1^k$.
 \begin{enumerate}
 \item {\bf for} $i=1$ to $q$ {\bf do}
-\item \tab choose messages $m_i, n_i$ s.t. $m_i \not= m_j$ and $n_i \not= n_j$ for any $j<i$.
+\item \tab uniformly and independently choose two messages $m_i, n_i$.% s.t. $m_i \not= m_j$ and $n_i \not= n_j$ for any $j<i$.
 \item \tab $(r_i, c_i) \gets O(m_i, n_i)$.
 \item {\bf if} there exist $i\not= j$ s.t. $r_i = r_j$ {\bf then}
 \item \tab {\bf if} $m_i \oplus m_j = c_i \oplus c_j$ {\bf then return} 1.
 \item \tab {\bf else} {\bf return} 0.
-\item {\bf else} $b\gets\bits$ and {\bf return} b.
+\item {\bf else} $b\getsr\bits$ and {\bf return} b.
 \end{enumerate}
 \end{quote}
 It is easy to compute the advantage 
@@ -372,7 +372,7 @@ $$\begin{aligned}
 Since if no collision, $D$ with always output 1 with probability 1/2,
 $$\begin{aligned}
 & \Adv_{CTR}^{ind-cpa}(D) \\
-=& \bigg| \Pr[k \getsr KG(1^\lambda) : D^{LK_0^k}=1 \wedge \textrm{$r$ collides}] - \Pr[k \getsr KG(1^\lambda) : D^{LK_1^k}=1 \wedge \textrm{$r$ collides}] \bigg| \\
+=& \bigg| \Pr[k \getsr KG(1^\lambda) : D^{LK_0^k}=1 \wedge \textrm{$r$ collides}] - \Pr[k \getsr KG(1^\lambda) : D^{LK_1^k}=1 \wedge \textrm{$r$ collides}] \bigg|. \\
 \end{aligned}$$
 For the first probability term,
 $$\begin{aligned}
@@ -386,14 +386,15 @@ $$\begin{aligned}
 =& \Pr[k \getsr KG(1^\lambda): \textrm{$r$ collides}]\Pr[\textrm{$r_i, r_j$ collide} : m_i \oplus m_j = c_i \oplus c_j]. \\
 \end{aligned}$$
 However, this time 
-$$m_i \oplus m_j = c_i \oplus c_j = F(k, r_i) \oplus n_i \oplus F(k, r_j) \oplus n_j = n_i \oplus n_j.$$
+$$m_i \oplus m_j = c_i \oplus c_j = F(k, r_i) \oplus n_i \oplus F(k, r_j) \oplus n_j = n_i \oplus n_j,$$
+which happens with probability $2^{-\lambda}$, since the samplings of $m$ and $n$ are uniformly independent. \footnote{See Task 5 c) for more general discussion.}
 Thus
 $$\begin{aligned}
 & \Pr[k \getsr KG(1^\lambda) : D^{LK_1^k}=1 \wedge \textrm{$r$ collides}] \\
 =& \Pr[k \getsr KG(1^\lambda): \textrm{$r$ collides}]\cdot 2^{-\lambda}. 
 \end{aligned}$$
 Hence 
-$$\Adv_{CTR}^{ind-cpa}(D) = (1-2^{-\lambda}) \Pr[k \getsr KG(1^\lambda): \textrm{$r$ collides}] \approx q^2/2\cdot 2^\lambda.$$
+$$\Adv_{CTR}^{ind-cpa}(D) = (1-2^{-\lambda}) \Pr[k \getsr KG(1^\lambda): \textrm{$r$ collides}] \approx q^2/(2\cdot 2^\lambda).$$
 \end{proof}
 
 {\bf b) [Points: 2]} Assume we instantiate $F$ in counter-mode with a short $\lambda$ (e.g., using DES, where $\lambda = 64$). Would this be a good idea?
@@ -406,44 +407,105 @@ Note that $2^{32}$ is not big enough for modern computers.
 To encrypt a message $m \in \bits^\lambda$ with secret key $k \in \bits^\lambda$, it chooses random strings $r_1, \cdots, r_{10} \getsr \bits^\lambda$ and produces the ciphertext $c = (r_1, \cdots, r_{10}, F(k, r_1) \oplus \cdots \oplus F(k, r_{10}) \oplus m$. (Note that the ciphertext has now length $11\lambda$ bits.)
 
 Try to give the best possible $q$-query distinguisher you can find against this construction, and analyze its ind-cpa advantage.
-
 \begin{proof}
-Denote by $Q$ the set of the $q$ queries. Each query $i \in Q$ can be represented as a vector $(r_{i,1}, \cdots, r_{i,10}, c_i)$. 
-Suppose there is a multigraph $G = (Q, E)$ allowing self loops. Each edge between two nodes $i_1, i_2$ (can be the same) is associated with two $r$ values $r_{i_1,j_1}$ and $r_{i_2,j_2}$ s.t. $r_{i_1,j_1} = r_{i_2,j_2}$ and $(i_1,j_1) \not= (i_2, j_2)$. Each $r$ value $r_{i,j}$ can only be associated with at most one edge. 
-The key observation is that if there is a subset $I \subseteq Q$ s.t. $I$ is a 10-regular subgraph, then 
-$$\bigoplus_{i \in I, 1\leq j \leq 10}F(k, r_{i,j}) = 0.$$
-Since the degree of each vertex in $Q$ is at most 10, such a subset $I$ must be a component of the graph $G$. 
-Hence by traversing the graph $G$ we can find such a 10-regular component if any. 
-Based on the idea above, we construct the distinguisher as following:
-
+The idea of such a distinguisher $D$ is similar to a):
 \begin{quote}
 Distinguisher $D^O$: // $O$ can be either $LR_0^k$ or $LR_1^k$.
 \begin{enumerate}
-\item set up a $q\times 10$ table $T$, and a multigraph $G$ with $q$ vertices and no edges initially.
-\item set $T[i,j]=\bot$ for any $1\leq i\leq q$, $1\leq j \leq 10$.
 \item {\bf for} $i=1$ to $q$ {\bf do}
-\item \tab choose messages $m_i, n_i$ s.t. $m_i \not= m_j$ and $n_i \not= n_j$ for any $j<i$.
+\item \tab uniformly and independently choose two messages $m_i, n_i$.% s.t. $m_i \not= m_j$ and $n_i \not= n_j$ for any $j<i$.
 \item \tab $(r_{i,1}, \cdots, r_{i,10}, c_i) \gets O(m_i, n_i)$.
-\item \tab {\bf if} there exists $r_{i,j} = r_{i',j'}$ s.t. $(i,j)\not=(i',j')$, $i\geq i'$, $T[i,j]=T[i',j']=\bot$ {\bf then}
-\item \tab \tab $T[i,j] \gets set, T[i',j'] \gets set$.
-\item \tab \tab add an edge between the vertices $i$ and $i'$ in $G$.
-\item traverse the graph to find if any 10-regular component $I$ exists.
-\item {\bf if} there exists such a component $I$ {\bf then}
-\item \tab {\bf if} $\bigoplus_{i \in I, 1\leq j \leq 10} m_i = \bigoplus_{i \in I, 1\leq j \leq 10} c_i$ {\bf then return} 1.
+\item {\bf for} $i=1$ to $q$ {\bf do}
+\item \tab $R_i \gets c_i \oplus m_i$.
+\item {\bf if} there exist $i\not= j$ s.t. $R_i = R_j$ {\bf then}
+\item \tab {\bf if} $m_i \oplus m_j = c_i \oplus c_j$ {\bf then return} 1.
 \item \tab {\bf else} {\bf return} 0.
-\item {\bf else} $b\gets\bits$ and {\bf return} b.
+\item {\bf else} $b\getsr\bits$ and {\bf return} b.
 \end{enumerate}
 \end{quote}
-Note that $D$ is efficient, since both the number of queries and graph traversal are bounded by $q$.
-The challenging question is to calculate the advantage $\Adv_{CTR}^{ind-cpa}(D)$.
-By a similar reasoning in a), we can show that
-$$\Adv_{CTR}^{ind-cpa}(D) = (1-2^\lambda)\Pr[\textrm{$G$ has a 10-regular component.}].$$
-We give a lower bound on $P \eqdef \Pr[\textrm{$G$ has a 10-regular component.}]$.
-Clearly $P \geq \Pr[\textrm{$G$ has a 10-regular component of size 1.}]$.
-For any query $i \in Q$, the probability $q$ that $\{i\}$ is already a 10-regular component is
-$$q = \frac{\binom{10}{5}(2^\lambda)^5}{(2^\lambda)^{10}} = \frac{252}{2^{5\lambda}}.$$
-Thus $P = 1-(1-q)^{10} \geq 1-e^{-10q}=1-e^{-\frac{2520}{2^{5\lambda}}}.$
-We can also find a rough upper bound based on the idea that there must be at least 5 collisions. That is, we need to find the probability that there are at least 5 pairs of collisions among the $r_{i,j}$'s of size $10q$. Clearly by birthday attack, $P$ is bounded by
-$$P \leq \frac{(10q)^2}{2\cdot 2^\lambda} = \frac{50q^2}{2^\lambda}.$$
+Note that if $O$ is $LR_0^k$, then each $R_i = F(k, r_{i,1}) \oplus \cdots \oplus F(k, r_{i,10})$. Hence if there is a collision $R_i = R_j$ for $i \not= j$, then we have $m_i \oplus m_j = c_i \oplus c_j$ if $O$ is $LR_0^k$.
+
+We can compute the advantage 
+$$\begin{aligned}
+& \Adv_{CTR}^{ind-cpa}(D) \\
+=& \bigg| \Pr[k \getsr KG(1^\lambda) : D^{LK_0^k}=1] - \Pr[k \getsr KG(1^\lambda) : D^{LK_1^k}=1] \bigg| \\
+=& \bigg| \Pr[k \getsr KG(1^\lambda) : D^{LK_0^k}=1 \wedge \textrm{$R$ collides}] - \Pr[k \getsr KG(1^\lambda) : D^{LK_1^k}=1 \wedge \textrm{$R$ collides}] \\
+&+\Pr[k \getsr KG(1^\lambda) : D^{LK_0^k}=1 \wedge \textrm{no collision}] - \Pr[k \getsr KG(1^\lambda) : D^{LK_1^k}=1 \wedge \textrm{no collision}] \bigg| \\
+\end{aligned}$$
+Since if no collision, $D$ with always output 1 with probability 1/2,
+$$\begin{aligned}
+& \Adv_{CTR}^{ind-cpa}(D) \\
+=& \bigg| \Pr[k \getsr KG(1^\lambda) : D^{LK_0^k}=1 \wedge \textrm{$R$ collides}] - \Pr[k \getsr KG(1^\lambda) : D^{LK_1^k}=1 \wedge \textrm{$R$ collides}] \bigg|. \\
+\end{aligned}$$
+For the first probability term,
+$$\begin{aligned}
+& \Pr[k \getsr KG(1^\lambda) : D^{LK_0^k}=1 \wedge \textrm{$R$ collides}] \\
+=& \Pr[k \getsr KG(1^\lambda): \textrm{$R$ collides}]\Pr[\textrm{$R_i, R_j$ collide} : m_i \oplus m_j = c_i \oplus c_j] \\
+=& \Pr[k \getsr KG(1^\lambda): \textrm{$R$ collides}].
+\end{aligned}$$
+For the second probability term,
+$$\begin{aligned}
+& \Pr[k \getsr KG(1^\lambda) : D^{LK_1^k}=1 \wedge \textrm{$R$ collides}] \\
+=& \Pr[k \getsr KG(1^\lambda): \textrm{$R$ collides}]\Pr[\textrm{$R_i, R_j$ collide} : m_i \oplus m_j = c_i \oplus c_j]. \\
+\end{aligned}$$
+However, since this time $O$ is $LK_1^k$, for each $i$, $R_i = F(k, r_{i,1}) \oplus \cdots \oplus F(k, r_{i,10}) \oplus n_i \oplus m_i$, and thus 
+$$\begin{aligned}
+&m_i \oplus m_j = c_i \oplus c_j = R_i \oplus m_i \oplus R_j \oplus m_j \\
+=& F(k, r_{i,1}) \oplus \cdots \oplus F(k, r_{i,10}) \oplus n_i \oplus F(k, r_{j,1}) \oplus \cdots \oplus F(k, r_{j,10}) \oplus n_j,
+\end{aligned}$$
+which happens with probability $2^{-\lambda}$, since the samplings of $m$, $n$, $r_{i,\cdot}$ and $r_{j,\cdot}$ are uniformly independent. To see this, one may fix all the random variables except $m_i$ firstly, and see that the probability that
+$$\begin{aligned}
+& m_i = m_j \oplus c_i \oplus c_j \\
+=& m_j \oplus F(k, r_{i,1}) \oplus \cdots \oplus F(k, r_{i,10}) \oplus n_i \oplus F(k, r_{j,1}) \oplus \cdots \oplus F(k, r_{j,10}) \oplus n_j
+\end{aligned}$$
+is $2^{-\lambda}$. This conditional probability holds for each combination of the random variables except $m_i$. Thus the total probability is also $2^{-\lambda}$. 
+Hence
+$$\begin{aligned}
+& \Pr[k \getsr KG(1^\lambda) : D^{LK_1^k}=1 \wedge \textrm{$R$ collides}] \\
+=& \Pr[k \getsr KG(1^\lambda): \textrm{$R$ collides}]\cdot 2^{-\lambda}. 
+\end{aligned}$$
+Since each $m_i$, $r_{i,\cdot}$ is independently and uniformly distributed, each $R_i = m_i \oplus c_i$ is also independently and uniformly distributed. Hence we can still apply birthday attack:
+$$\Adv_{CTR}^{ind-cpa}(D) = (1-2^{-\lambda}) \Pr[k \getsr KG(1^\lambda): \textrm{$R$ collides}] \approx q^2/(2\cdot 2^\lambda).$$
+Compared to a), the advantage of our new distinguisher does not decrease.
 \end{proof}
+
+%\begin{proof}
+%Denote by $Q$ the set of the $q$ queries. The answer to each query $i \in Q$ can be represented as a vector $(r_{i,1}, \cdots, r_{i,10}, c_i)$. 
+%Suppose there is a multigraph $G = (Q, E)$ allowing self loops. Each edge between two nodes $i_1, i_2$ (can be the same) is associated with two $r$ values $r_{i_1,j_1}$ and $r_{i_2,j_2}$ s.t. $r_{i_1,j_1} = r_{i_2,j_2}$ and $(i_1,j_1) \not= (i_2, j_2)$. Each $r$ value $r_{i,j}$ can only be associated with at most one edge. 
+%The key observation is that if there is a subset $I \subseteq Q$ s.t. $I$ is a 10-regular subgraph, then 
+%$$\bigoplus_{i \in I, 1\leq j \leq 10}F(k, r_{i,j}) = 0.$$
+%Since the degree of each vertex in $Q$ is at most 10, such a subset $I$ must be a component of the graph $G$. 
+%Hence by traversing the graph $G$ we can find such a 10-regular component if any. 
+%Based on the idea above, we construct the distinguisher as following:
+%
+%\begin{quote}
+%Distinguisher $D^O$: // $O$ can be either $LR_0^k$ or $LR_1^k$.
+%\begin{enumerate}
+%\item set up a $q\times 10$ table $T$, and a multigraph $G$ with $q$ vertices and no edges initially.
+%\item set $T[i,j]=\bot$ for any $1\leq i\leq q$, $1\leq j \leq 10$.
+%\item {\bf for} $i=1$ to $q$ {\bf do}
+%\item \tab choose messages $m_i, n_i$ s.t. $m_i \not= m_j$ and $n_i \not= n_j$ for any $j<i$.
+%\item \tab $(r_{i,1}, \cdots, r_{i,10}, c_i) \gets O(m_i, n_i)$.
+%\item \tab {\bf if} there exists $r_{i,j} = r_{i',j'}$ s.t. $(i,j)\not=(i',j')$, $i\geq i'$, $T[i,j]=T[i',j']=\bot$ {\bf then}
+%\item \tab \tab $T[i,j] \gets set, T[i',j'] \gets set$.
+%\item \tab \tab add an edge between the vertices $i$ and $i'$ in $G$.
+%\item traverse the graph to find if any 10-regular component $I$ exists.
+%\item {\bf if} there exists such a component $I$ {\bf then}
+%\item \tab {\bf if} $\bigoplus_{i \in I, 1\leq j \leq 10} m_i = \bigoplus_{i \in I, 1\leq j \leq 10} c_i$ {\bf then return} 1.
+%\item \tab {\bf else} {\bf return} 0.
+%\item {\bf else} $b\gets\bits$ and {\bf return} b.
+%\end{enumerate}
+%\end{quote}
+%Note that $D$ is efficient, since both the number of queries and graph traversal are bounded by $q$.
+%The challenging question is to calculate the advantage $\Adv_{CTR}^{ind-cpa}(D)$.
+%By a similar reasoning in a), we can show that
+%$$\Adv_{CTR}^{ind-cpa}(D) = (1-2^\lambda)\Pr[\textrm{$G$ has a 10-regular component.}].$$
+%We give a lower bound on $P \eqdef \Pr[\textrm{$G$ has a 10-regular component.}]$.
+%Clearly $P \geq \Pr[\textrm{$G$ has a 10-regular component of size 1.}]$.
+%For any query $i \in Q$, the probability $q$ that $\{i\}$ is already a 10-regular component is
+%$$q = \frac{\binom{10}{5}(2^\lambda)^5}{(2^\lambda)^{10}} = \frac{252}{2^{5\lambda}}.$$
+%Thus $P = 1-(1-q)^{10} \geq 1-e^{-10q}=1-e^{-\frac{2520}{2^{5\lambda}}}.$
+%We can also find a rough upper bound based on the idea that there must be at least 5 collisions. That is, we need to find the probability that there are at least 5 pairs of collisions among the $r_{i,j}$'s of size $10q$. Clearly by birthday attack, $P$ is bounded by
+%$$P \leq \frac{(10q)^2}{2\cdot 2^\lambda} = \frac{50q^2}{2^\lambda}.$$
+%\end{proof}
 \end{document}
