@@ -109,7 +109,7 @@ Distinguisher $D^O$: // $O$ can be either $F'_s$ or $RF_{2n,n}$.
 \end{enumerate}
 \end{quote}
 Note that the oracle $F'_s$ always return $0^n$ on the query $(0^n || 0^n)$, whereas $RF_{2n,n}$ gives uniformly random answer. 
-We can finish the proof by estimating the advantage:
+We can finish the proof by computing the advantage:
 $$
 \Adv_{F'}^{prf}(D) 
 = \bigg| \Pr[s \getsr \bits^\lambda : D^{F'_s}=1] - \Pr[D^{RF_{2n,n}}=1] \bigg| \\
@@ -394,13 +394,17 @@ $$\begin{aligned}
 =& \Pr[k \getsr KG(1^\lambda): \textrm{$r$ collides}]\cdot 2^{-\lambda}. 
 \end{aligned}$$
 Hence 
-$$\Adv_{CTR}^{ind-cpa}(D) = (1-2^{-\lambda}) \Pr[k \getsr KG(1^\lambda): \textrm{$r$ collides}] \approx q^2/(2\cdot 2^\lambda).$$
+$$\begin{aligned}
+&\Adv_{CTR}^{ind-cpa}(D) = (1-2^{-\lambda}) \Pr[k \getsr KG(1^\lambda): \textrm{$r$ collides}] \\
+\geq & (1-2^{-\lambda})(1-e^{-\frac{q(q-1)}{2\cdot 2^\lambda}}) \geq (1-2^{-\lambda})(1-\frac{1}{e})\frac{q(q-1)}{2\cdot 2^\lambda}
+= \Omega(q^2/2^\lambda).
+\end{aligned}$$
 \end{proof}
 
 {\bf b) [Points: 2]} Assume we instantiate $F$ in counter-mode with a short $\lambda$ (e.g., using DES, where $\lambda = 64$). Would this be a good idea?
 
-\emph{Solution}: It is not a good idea since by doing this only $q = 2^{32}$ queries will break the scheme with significant advantage around
-$$\frac{q^2}{2\cdot 2^{64}} = \frac{2^{64}}{2\cdot 2^{64}} = \frac{1}{2}.$$
+\emph{Solution}: It is not a good idea since by doing this only $q = 2^{32}$ queries will break the scheme with significant advantage no less than
+$$(1-2^{-\lambda})(1-\frac{1}{e})\frac{q(q-1)}{2\cdot 2^\lambda} \bigg|_{\lambda = 64, q = 2^{32}} \approx 0.316.$$
 Note that $2^{32}$ is not big enough for modern computers.
 
 {\bf c) [Points: 5]} Consider the following (less efficient) variant of counter-mode encryption.
@@ -470,7 +474,11 @@ $$\begin{aligned}
 =& \Pr[k \getsr KG(1^\lambda): \textrm{$R$ collides}]\cdot 2^{-\lambda}. 
 \end{aligned}$$
 Since each $m_i$, $r_{i,\cdot}$ is independently and uniformly distributed, each $R_i = m_i \oplus c_i$ is also independently and uniformly distributed. Hence we can still apply birthday attack:
-$$\Adv_{CTR}^{ind-cpa}(D) = (1-2^{-\lambda}) \Pr[k \getsr KG(1^\lambda): \textrm{$R$ collides}] \approx q^2/(2\cdot 2^\lambda).$$
+$$\begin{aligned}
+& \Adv_{CTR}^{ind-cpa}(D) = (1-2^{-\lambda}) \Pr[k \getsr KG(1^\lambda): \textrm{$R$ collides}] \\
+\geq & (1-2^{-\lambda})(1-e^{-\frac{q(q-1)}{2\cdot 2^\lambda}}) \geq (1-2^{-\lambda})(1-\frac{1}{e})\frac{q(q-1)}{2\cdot 2^\lambda}
+= \Omega(q^2/2^\lambda).
+\end{aligned}$$
 Compared to a), the advantage of our new distinguisher does not decrease.
 \end{proof}
 
