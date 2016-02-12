@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
 \usepackage{url,amsmath,setspace,amssymb,amsthm,amsfonts}
-%\usepackage{hyperref}
+\usepackage{hyperref}
 
 \setlength{\oddsidemargin}{.25in}
 \setlength{\evensidemargin}{.25in}
@@ -191,7 +191,7 @@ Since $\Psi_s^r$ preserves the length, to show it is a permutation, it suffices 
 $$F_{r}(x_{r}) \oplus x_{r-1} = F_{r}(y_{r}) \oplus y_{r-1}.$$ 
 Then since $x_r = y_r$, $F_r(x_r) = F_r(y_r)$ and thus $x_{r-1} = y_{r-1}$. If $r-1=0$, then we have shown that $(x_0,x_1) = (y_0, y_1)$. Otherwise, use the same reasoning we can show that $x_{r} = y_{r}$ and $x_{r-1} = y_{r-1}$ imply $x_{r-2} = y_{r-2}$. After at most $r$ rounds we reach $x_0 = y_0$.
 
-The inverse of $\Psi_s^r(\cdot)$ can be computed efficiently as following: given input $(y_r, y_{r+1})$, we output $(y_0, y_1)$ s.t. for $i$ from $r$ to $1$, we compute
+An alternative way to show the bijection is by giving its inverse function. The inverse of $\Psi_s^r(\cdot)$ can be computed efficiently as following: given input $(y_r, y_{r+1})$, we output $(y_0, y_1)$ s.t. for $i$ from $r$ to $1$, we compute
 $$y_{i-1} \gets F_{s_i}(y_i) \oplus y_{i+1}.$$
 It is easy to see the value given by the PRF $F$ is canceled out by XORing.
 \end{proof}
