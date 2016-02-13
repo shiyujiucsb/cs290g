@@ -1,0 +1,165 @@
+\documentclass[12pt]{article}
+\usepackage{url,amsmath,setspace,amssymb,amsthm,amsfonts}
+%\usepackage{hyperref}
+
+\setlength{\oddsidemargin}{.25in}
+\setlength{\evensidemargin}{.25in}
+\setlength{\textwidth}{6.25in}
+\setlength{\topmargin}{-0.4in}
+\setlength{\textheight}{8.5in}
+
+\newcommand{\heading}[5]{
+   \renewcommand{\thepage}{#1-\arabic{page}}
+   \noindent
+   \begin{center}
+   \framebox[\textwidth]{
+     \begin{minipage}{0.9\textwidth} \onehalfspacing
+       {\bf CS 290G -- Introduction to Modern Cryptography} \hfill #2
+
+       {\centering \Large #5
+       
+       }\medskip
+
+       {\it #3 \hfill #4}
+     \end{minipage}
+   }
+   \end{center}
+}
+
+\newcommand{\handout}[3]{\heading{#1}{#2}{Instructor:
+Stefano Tessaro}{Student: Shiyu Ji, Yi Yang}{#3}}
+
+\setlength{\parindent}{0in}
+
+\newcommand{\eqdef}{\stackrel{def}{=}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\bits}{\{0,1\}}
+\newcommand{\inr}{\in_{\mbox{\tiny R}}}
+%\newcommand{\getsr}{\gets_{\mbox{\tiny R}}}
+\newcommand{\getsr}{\stackrel{\$}{\gets}}
+\newcommand{\getsn}{\stackrel{n}{\gets}}
+\newcommand{\st}{\mbox{ s.t. }}
+\newcommand{\etal}{{\it et al }}
+\newcommand{\into}{\rightarrow}
+
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\e}{\epsilon}
+\newcommand{\ee}{\varepsilon}
+\newcommand{\ceil}[1]{{\lceil{#1}\rceil}}
+\newcommand{\floor}[1]{{\lfloor{#1}\rfloor}}
+\newcommand{\angles}[1]{\langle #1 \rangle}
+\newcommand{\Com}{{\sf Com}}
+\newcommand{\desc}{{\sf desc}}
+
+\newcommand{\rightstep}[1]{%
+$\underrightarrow{\quad #1 \quad}$ }
+
+\newcommand{\leftstep}[1]{%
+$\underleftarrow{\quad #1 \quad}$ }
+\newcommand{\Adv}{\textsf{Adv}}
+\newcommand{\tab}{\hspace{0.3in}}
+\newcommand{\CBC}{\textsf{CBC}}
+\newcommand{\Eval}{\textsf{Eval}}
+\newcommand{\Vrfy}{\textsf{Vrfy}}
+\newcommand{\WIN}{\textsf{WIN}}
+\newcommand{\true}{\textsf{true}}
+\newcommand{\false}{\textsf{false}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Theorems & Definitions
+
+
+\newtheorem{theorem}{Theorem}[section]
+
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{subclaim}{Claim}[theorem]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{observation}[theorem]{Observation}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{construction}[theorem]{Construction}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{counterexample}[theorem]{Counterexample}
+\newtheorem{algorithm1}[theorem]{Algorithm}
+\newtheorem{protocol}[theorem]{Protocol}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{fact}[theorem]{Fact}
+
+%\bibliographystyle{plain}
+
+\begin{document}
+\handout{3}{Due: Feb 26, 2016}{Homework 3}
+\section{Task 1 - CBC-MAC}
+We define a variant of CBC-MAC as the following function $\CBC : \bits^\lambda \times \bits^\lambda \to \bits^n$ using a block cipher $E : \bits^\lambda \times \bits^n \to \bits^n$:
+\begin{quote}
+{\bf Procedure} $\CBC_k (M)$: // $M \in bits^*$
+\begin{enumerate}
+\item $M[1], \cdots, M[\ell] \getsn M$
+\item $S_0 \gets 0^n$
+\item {\bf for} $i=1$ to $\ell$ {\bf do} $S_i \gets E_k (S_{i-1} \oplus M[i])$
+\item {\bf return} $S_{\ell}$
+\end{enumerate}
+\end{quote}
+Recall that the $\getsn$ padding operation first appends to $M$ a single 1 bit and then appends as many 0's as necessary to make the length of $M$ a multiple of $n$ (say $\ell \cdot n$). Finally, it outputs the $\ell$ $n$-bit blocks of the extension of $M$.
+
+{\bf a) [Points: 8]} Prove that the $\CBC$ construction given above is \emph{not} UF-CMA secure. In particular, show first that given $Y = \CBC_k (M)$ for some message $M$ and (unknown) key $k$, there exist two other messages $M', M''$ s.t. $M'' \not\in \{M, M'\}$ with the following property:
+\begin{quote}
+Using $Y$ and the result $Y' = \CBC_k (M')$ of the query $M'$ to $\CBC_k$, we can compute $Y'' = \CBC_k (M'')$ without querying $M$.
+\end{quote}
+Use this to describe a concrete attacker $A$ making two queries!
+
+\begin{proof}
+We directly give the adversary, and then observe the $M$, $M'$, $Y$ and $Y'$ that are used.
+\begin{quote}
+{\bf Adversary} $A^{\Eval, \Vrfy}$:
+\begin{enumerate}
+\item $\WIN \gets \false$
+\item $M \gets 0^n$
+\item $Y \gets \Eval(M)$
+\item $M' \gets 1^n$
+\item $Y' \gets \Eval(M')$
+\item Query $\Vrfy(0^n10^{n-1}||(Y \oplus 1^n), Y')$
+\end{enumerate}
+\end{quote}
+Note that 
+$$Y = \CBC_k (0^n) = E_k(E_k(0^n) \oplus 10^{n-1}),$$
+$$Y' = \CBC_k (1^n) = E_k(E_k(1^n) \oplus 10^{n-1}).$$
+Hence
+$$\begin{aligned}
+Y' &= E_k(E_k(Y \oplus Y \oplus 1^n) \oplus 10^{n-1}) \\
+&= E_k(E_k(E_k(E_k(0^n) \oplus 10^{n-1}) \oplus Y \oplus 1^n) \oplus 10^{n-1}) \\
+&= \CBC_k (0^n10^{n-1} || (Y \oplus 1^n) || 10^{n-1}).
+\end{aligned}$$
+Thus $\WIN$ will always be set to $\true$ in the last $\Vrfy$. Hence we have $\Adv_{CBC}^{uf-cma}(A) = 1$.
+\end{proof}
+Note that the adversary $A$ can also query $\Vrfy(0^n10^{n-1}||Y, Y)$. The advantage is still 1. Hence only one query $\Eval(0^n)$ would be enough.
+
+{\bf b) [Points: 4]} How can we modify the encoding of $M$ into blocks
+$M[1], \cdots, M[\ell]$ so that the attack from {\bf a)} is not possible any more?
+
+{\bf Solution}: Note that in {\bf a)} we query two messages: $0^n$ and $0^n10^{n-1}||(Y \oplus 1^n)$. $0^n$ is a proper prefix of the other. If we require any queried message cannot be a prefix of any other, such attack can be defended. As suggested by \cite{BKR94}, this can be done by prepending the block length $\ell$ before $M[1], \cdots, M[\ell]$.
+\begin{quote}
+{\bf Procedure} $\CBC_k (M)$: // $M \in bits^*$
+\begin{enumerate}
+\item $M[1], \cdots, M[\ell] \getsn M$
+\item $M[0] \gets \ell$
+\item $S_{-1} \gets 0^n$
+\item {\bf for} $i=0$ to $\ell$ {\bf do} $S_i \gets E_k (S_{i-1} \oplus M[i])$
+\item {\bf return} $S_{\ell}$
+\end{enumerate}
+\end{quote}
+There may be some other ways to achieve this goal.
+
+\begin{thebibliography}{10}
+\bibitem{BKR94}
+Bellare M, Kilian J, Rogaway P. The security of cipher block chaining. In Advances in Cryptology - CRYPTO’94 1994 Aug 21 (pp. 341-358).
+\end{thebibliography}
+\end{document}
