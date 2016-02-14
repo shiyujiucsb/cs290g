@@ -288,14 +288,17 @@ Given a symmetric encryption scheme $SE$, assume by contradiction $SE$ is not ke
 Distinguisher $D^O$: // $O$ can be either $LR_0^k$ or $LR_1^k$.
 \begin{enumerate}
 \item $k' \getsr A^{Enc(k,\cdot)}$.
-\item $c_1 \gets O(m, m)$.
+\item repeat many times
+\item \tab $c_1 \gets O(m, m)$. 
+\item \tab {\bf if} $Dec(k', c_1) \not= m$ {\bf then return} 0.
 \item $c_2 \gets O(m, m')$.
-\item {\bf if} $Dec(k', c_1) = m$ {\bf then } 
-\item \tab {\bf if} $Dec(k', c_2) = m$ {\bf then return} 1.
-\item \tab {\bf else return} 0.
+\item {\bf if} $Dec(k', c_2) = m$ {\bf then return} 1.
 \item {\bf else return} 0.
 \end{enumerate}
 \end{quote}
+%By the strong correctness assumption of symmetric encryption, we have $\Pr[Dec(k, Enc(k, m))=m]=1$. Then the probability 
+%$$\Pr[k \getsr KG(1^\lambda), k' \getsr A^{Enc(k,\cdot)}, c_1, c_2 \getsr Enc(k, m): Dec(k', c_1)=m]$$
+%is either 1 or 0, depending on whether $k=k'$. 
 Now we estimate the advantage
 $$\begin{aligned}
 &\Adv_{SE}^{ind-cpa}(D) \\
