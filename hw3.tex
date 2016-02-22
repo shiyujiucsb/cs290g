@@ -315,7 +315,7 @@ We give the adversary $A$ that can break IND-CCA security of $SE'$.
 Following the same reasoning in {\bf b)}, we know that the message $M$ ($0^\lambda$ or $1^\lambda$) can always be restored, and $C'||1$ is never in $\C$. Thus $A$ can guess $b$ in $LR_b^k$ correctly with probability 1, i.e., $\Adv_{SE'}^{ind-cca}(A) = 1$.
 \end{proof}
 
-In the following, let additionally $\MAC : \bits^\lambda \times \bits^* \to \bits^n$ a MAC. We consider now the construction Encrypt-and-MAC discussed in class, which gives rise to the following symmetric encryption scheme $SE'' = (Kg'', Enc'', Dec'')$:
+In the following, let additionally $\MAC : \bits^\lambda \times \bits^* \to \bits^n$ be a MAC. We consider now the construction Encrypt-and-MAC discussed in class, which gives rise to the following symmetric encryption scheme $SE'' = (Kg'', Enc'', Dec'')$:
 \begin{quote}
 \begin{minipage}[t]{.3\textwidth}
 {\bf Procedure} $Kg''(1^\lambda)$:
@@ -443,7 +443,7 @@ $$\begin{aligned}
 
 {\bf b) [Points: 2]} Does the above imply that the CDH assumption or the DL assumption also do not hold in $G = G_\lambda$?
 
-{\bf Solution}: No. Currently there is no known efficient way to solve CDH or DL over $G_\lambda$, e.g., $Z_P^*$ where $P$ is a $\lambda$-bit prime. If there is any implication, some efficient algorithms that can solve these long-standing problems immediately follow.
+{\bf Solution}: No. Currently there is no known efficient way to solve CDH or DL over $G_\lambda$, e.g., $\Z_P^*$ where $P$ is a $\lambda$-bit prime. If there is any implication, some efficient algorithms that can solve these long-standing problems immediately follow.
 
 \section{Task 5 - One Query is Enough!}
 Consider the definition of IND-CPA security for public-key encryption schemes. That is,
@@ -525,7 +525,7 @@ It can be constructed as following.
 {\bf d) [Points: 2]} How does this simplify the task of proving ind-cpa security of $PKE$? Is an
 analogous statement true in the secret-key case?
 
-{\bf Solution}: One query is enough! We only need to consider the games that allow at most one query, i.e., if all the advantages for such games are negligible, then we can immediately conclude that $PKE$ is ind-cpa secure.
+{\bf Solution}: One query is enough! We only need to consider the games that allow at most one query, i.e., if all the advantages for such games are negligible, and then we can immediately conclude that the $PKE$ scheme is ind-cpa secure.
 
 It is not true for the secret-key case. Intuitively, for secret-key case, the adversary cannot encrypt any message all by herself, since there is no such analogue of public key $pk$. Thus there is no way to simulate the hybrid oracles in the proof. Any adversary must rely on the encryption oracle to get multiple ciphertexts on chosen messages.
 
