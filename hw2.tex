@@ -224,16 +224,19 @@ $$p_c(q, N) \geq 1-e^{-\frac{q(q-1)}{2N}}.$$
 Define the event $E$: there exist indices $i \not = j$ such that $X_i = X_j$. 
 Consider its complementary event $\overline{E}$: for any distinct indices $i \not= j$, we have $X_i \not= X_j$. In other words, there is no collision among the $X$ values. We rewrite its probability as
 $$\Pr[\overline{E}] = \Pr[\bigwedge_{1\leq i < j \leq q} : X_i \not = X_j].$$
-Note that the events $X_i \not = X_j$ and $X_{i'} \not = X_{j'}$ are independent if $\{i,j\} \not= \{i',j'\}$. To see this, we can compute
-$$\Pr[X_i \not = X_j \wedge X_{i'} \not = X_{j'}] = \Pr[X_i \not = X_j]\Pr[X_{i'} \not = X_{j'} | X_i \not = X_j].$$
-Note that each $X_i$ is sampled uniformly and independently. If $i, j, i', j'$ are all distinct, it is clear that
-$$\Pr[X_{i'} \not = X_{j'} | X_i \not = X_j] = 1-\frac{1}{N} = \Pr[X_{i'} \not = X_{j'} ].$$
-Otherwise, w.l.o.g. we assume $i=i'$ and $j \not= j'$, then we have
-$$\Pr[X_{i'} \not = X_{j'} | X_i \not = X_j] = \Pr[X_{i'} \not = X_{j'} | X_{i'} \not = X_j] = 1-\frac{1}{N} = \Pr[X_{i'} \not = X_{j'} ].$$
-For either case we have
-$$\Pr[X_i \not = X_j \wedge X_{i'} \not = X_{j'}] = \Pr[X_i \not = X_j]\Pr[X_{i'} \not = X_{j'}].$$
-Hence for $\overline{E}$, we have
-$$\Pr[\overline{E}] = \prod_{1\leq i < j \leq q}\Pr[X_i \not = X_j] = \left( 1 - \frac{1}{N} \right)^{\binom{q}{2}}.$$
+%Note that the events $X_i \not = X_j$ and $X_{i'} \not = X_{j'}$ are independent if $\{i,j\} \not= \{i',j'\}$. To see this, we can compute
+%$$\Pr[X_i \not = X_j \wedge X_{i'} \not = X_{j'}] = \Pr[X_i \not = X_j]\Pr[X_{i'} \not = X_{j'} | X_i \not = X_j].$$
+%Note that each $X_i$ is sampled uniformly and independently. If $i, j, i', j'$ are all distinct, it is clear that
+%$$\Pr[X_{i'} \not = X_{j'} | X_i \not = X_j] = 1-\frac{1}{N} = \Pr[X_{i'} \not = X_{j'} ].$$
+%Otherwise, w.l.o.g. we assume $i=i'$ and $j \not= j'$, then we have
+%$$\Pr[X_{i'} \not = X_{j'} | X_i \not = X_j] = \Pr[X_{i'} \not = X_{j'} | X_{i'} \not = X_j] = 1-\frac{1}{N} = \Pr[X_{i'} \not = X_{j'} ].$$
+%For either case we have
+%$$\Pr[X_i \not = X_j \wedge X_{i'} \not = X_{j'}] = \Pr[X_i \not = X_j]\Pr[X_{i'} \not = X_{j'}].$$
+%Hence for $\overline{E}$, we have
+%$$\Pr[\overline{E}] = \prod_{1\leq i < j \leq q}\Pr[X_i \not = X_j] = \left( 1 - \frac{1}{N} \right)^{\binom{q}{2}}.$$
+
+TODO: A GAP! To show $\Pr[\overline{E}] \leq \left( 1 - \frac{1}{N} \right)^{\binom{q}{2}}$.
+
 Here we need to use a bound:
 \begin{lemma}
 \label{lem:1}
