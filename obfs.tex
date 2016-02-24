@@ -67,8 +67,9 @@ $\underleftarrow{\quad #1 \quad}$ }
 
 \newcommand{\tab}{\hspace{0.3in}}
 
-\newcommand{\io}{$i\mathcal{O}$}
-\newcommand{\dio}{$di\mathcal{O}$}
+\newcommand{\io}{i\mathcal{O}}
+\newcommand{\dio}{di\mathcal{O}}
+\newcommand{\bpo}{bp\mathcal{O}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Theorems & Definitions
 
@@ -107,7 +108,9 @@ $\underleftarrow{\quad #1 \quad}$ }
 \section{Introduction}
 Cryptographic obfuscation has received extensive attention from the research community this century. Informally, obfuscation is a family of algorithms (or obfuscators) that can transform the input (e.g., programs or circuits) to some ``unintelligible'' form, while the functionality of the input is preserved. For example, a good obfuscator is like a compiler, which takes a program written in source code as input, and outputs quite unreadable binary code. Ideally, the binary code should not reflect any information about the source code except the functionality, i.e., input-output behavior. Given only the binary code, any adversary cannot learn any information except that can be learned by observing the inputs and outputs of the program, i.e., observing the black box of the program. This ideal and natural notion can completely defeat any attempts to reveal the source code given the obfuscated code. Such attempts include software reverse engineering. Hence it would be a great news if this notion could be achieved. Unfortunately, Barak et al. \cite{barak2001possibility} have shown that there is no \emph{general} way to achieve this notion, which was formalized as \emph{Virtual Black Box} (VBB) in their paper. Even though there is still some hope to achieve VBB for specific inputs, e.g., point functions \cite{canetti1997towards, canetti1998perfectly, wee2005obfuscating}, the notion of VBB is generally too strong in the sense that it is likely that most programs of interest cannot be VBB obfuscated in practice \cite{goldwasser2005impossibility}. Hence after \cite{barak2001possibility}, the possibilities of relaxation have also been extensively investigated.
 
-Due to the pessimistic impossibility results of VBB, Barak et al. \cite{barak2001possibility} suggested two relaxed notions of obfuscation: \emph{Indistinguishability Obfuscation} (\io) and further relaxed \emph{Differing-input Obfuscation} (\dio).
+Due to the pessimistic impossibility results of VBB, Barak et al. \cite{barak2001possibility} suggested two relaxed notions of obfuscation: \emph{Indistinguishability Obfuscation} ($\io$) and \emph{Differing-inputs Obfuscation} ($\dio$). $\io$ only requires that two programs (or circuits) with the same functionality should have indistinguishable obfuscations. It turns out an inefficient $\io$ construction of any circuit can be easily found, e.g., the lexicographically first circuit with the same size and functionality \cite{barak2001possibility}. How to efficiently construct $\io$ is still a quite popular open problem. Note that $\io$ only considers the case of identical functionality, whereas there is no secure guarantee on the case when two program or circuits as input compute different functions. $\dio$ discusses the latter case. Informally, for any two programs, if any adversary cannot efficiently tell on which input these two programs give different outputs, then she cannot efficiently distinguish the $\dio$-obfuscated programs of them, either. Clearly if these two programs have the same functionality, then any adversary cannot find such an input, and thus cannot distinguish the $\dio$ obfuscations. Hence $\dio$ implies $\io$. How to construct $\dio$ is also very interesting.
+
+From strong to weak notions, now we have $\mathrm{VBB} > di\mathcal{O} > i\mathcal{O}$. We already know many negative results on VBB \cite{barak2001possibility,goldwasser2005impossibility,bitansky2014impossibility}, and many positive results on $\io$, e.g., many constructions \cite{garg2013candidate,pass2014,gentry2015,bitansky2015,koppula2015}. An interesting question naturally arises: where is the boundary between these negative and positive results? Can we formalize the boundary if it exists? To answer this question, Goldwasser and Rothblum \cite{goldwasser2007best} give another important notion: \emph{best-possible Obfuscation} ($\bpo$), which is like a boundary notion between VBB and $\io$.
 \bibliographystyle{alpha}
 \bibliography{obfs}
 	
