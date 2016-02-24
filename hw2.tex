@@ -235,7 +235,9 @@ $$\Pr[\overline{E}] = \Pr[\bigwedge_{1\leq i < j \leq q} : X_i \not = X_j].$$
 %Hence for $\overline{E}$, we have
 %$$\Pr[\overline{E}] = \prod_{1\leq i < j \leq q}\Pr[X_i \not = X_j] = \left( 1 - \frac{1}{N} \right)^{\binom{q}{2}}.$$
 
-TODO: A GAP! To show $\Pr[\overline{E}] \leq \left( 1 - \frac{1}{N} \right)^{\binom{q}{2}}$.
+%TODO: A GAP! To show $\Pr[\overline{E}] \leq \left( 1 - \frac{1}{N} \right)^{\binom{q}{2}}$.
+We have
+$$\Pr[\overline{E}] = (1-\frac{1}{N})(1-\frac{2}{N})\cdots(1-\frac{q-1}{N}).$$
 
 Here we need to use a bound:
 \begin{lemma}
@@ -246,7 +248,7 @@ $1-\frac{1}{N} \leq e^{-\frac{1}{N}}$ for all $N\geq 1$.
 The function $f(x) \eqdef e^x-1-x$ achieves its minimum value 0 at $x=0$, since its derivative $f'(x) = e^x-1$ has $f'(0)=0$ and $f(x)$ is convex. Let $x=-\frac{1}{N}$ and the lemma follows.
 \end{proof}
 By using Lemma \ref{lem:1}, we have
-$$\Pr[\overline{E}] \leq e^{-\frac{1}{N}\binom{q}{2}} = e^{-\frac{q(q-1)}{2N}},$$
+$$\Pr[\overline{E}] \leq e^{-\sum_{i=1}^{q-1}\frac{i}{N}} = e^{-\frac{q(q-1)}{2N}},$$
 and $\Pr[E] = 1-\Pr[\overline{E}]$ finishes the proof.
 \end{proof}
 
