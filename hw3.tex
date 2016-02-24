@@ -301,7 +301,7 @@ Note that after the query $E(0^\lambda)$, $C'||0 \in \C$ but $C'||1 \not\in \C$.
 
 {\bf c) [Points: 2]} Prove that $SE'$ is not IND-CCA secure.
 \begin{proof}
-We give the adversary $A$ that can break IND-CCA security of $SE'$.
+We give the PPT adversary $A$ that can break IND-CCA security of $SE'$.
 \begin{quote}
 {\bf Adversary} $A^{O, D}$: // $O$ can be $LR_0^k$ or $LR_1^k$.
 \begin{enumerate}
@@ -382,7 +382,7 @@ which is overwhelming.
 Any integer coprime with $n$ can generate $\Z_n$.
 \end{claim}
 \begin{proof}
-It suffices to show $i\cdot x \not= j \cdot x$ in $\Z_n$ for any $1\leq j < i \leq n$ and any $x$ coprime with $n$. Assume by contradiction $i\cdot x = j \cdot x \mod n$ for some $i > j$. Then $(i-j)\cdot x =0 \mod n$, i.e., there exists some integer $k$ s.t. $(i-j)\cdot x = k\cdot n$. Since $x$ is coprime with $n$, $(i-j)$ must be a multiple of $n$. However, $i-j < n$.
+It suffices to show $i\cdot x \not= j \cdot x$ in $\Z_n$ for any $1\leq j < i \leq n$ and any $x$ coprime with $n$. Assume by contradiction $i\cdot x = j \cdot x \mod n$ for some $i > j$. Then $(i-j)\cdot x =0 \mod n$, i.e., there exists some integer $k$ s.t. $(i-j)\cdot x = k\cdot n$. Since $x$ is coprime with $n$, $(i-j)$ must be a multiple of $n$. However, $0 < i-j < n$.
 \end{proof}
 Other elements in $\Z_{10}$ cannot generate the whole group, since 1 cannot be generated. Let $y$ be any element not coprime with $n$. Assume by contradiction there exists some integer $k$ s.t. $k\cdot y = 1 \mod n$, i.e., $k\cdot y + k' n = 1$ for some integer $k'$, which implies $y$ is coprime with $n$ by Theorem 1.8 in \cite{Shoup09}.
 
@@ -390,6 +390,7 @@ Other elements in $\Z_{10}$ cannot generate the whole group, since 1 cannot be g
 
 {\bf Solution}: By multiplication modulo 17, we have 
 $$\angles{3} = \{3, 9, 10, 13, 5, 15, 11, 16, 14, 8, 7, 4, 12, 2, 6, 1\}.$$
+So 3 is a generator of $\Z_{17}^*$.
 
 {\bf c) [Points: 3]} Let $G$ be a group with $|G| = p$ elements, for a prime number $p\geq 2$. Prove that $G$ is a cyclic group.
 \begin{proof}
