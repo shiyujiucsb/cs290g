@@ -120,7 +120,7 @@ Using $Y$ and the result $Y' = \CBC_k (M')$ of the query $M'$ to $\CBC_k$, we ca
 Use this to describe a concrete attacker $A$ making two queries!
 
 \begin{proof}
-We directly give the adversary, and then observe the $M$, $M'$, $Y$ and $Y'$ that are used.
+We directly give the PPT adversary $A$, and then observe the $M$, $M'$, $Y$ and $Y'$ that are used.
 \begin{quote}
 {\bf Adversary} $A^{\Eval, \Vrfy}$:
 \begin{enumerate}
@@ -148,7 +148,7 @@ Note that the adversary $A$ can also query $\Vrfy(0^n10^{n-1}||Y, Y)$. The advan
 {\bf b) [Points: 4]} How can we modify the encoding of $M$ into blocks
 $M[1], \cdots, M[\ell]$ so that the attack from {\bf a)} is not possible any more?
 
-{\bf Solution}: Note that in {\bf a)} we query two messages: $0^n$ and $0^n10^{n-1}||(Y \oplus 1^n)$. $0^n$ is a proper prefix of the other. If we require any queried message cannot be a prefix of any other one, such attack will fail. As suggested by \cite{BKR94}, assuming $\ell < 2^n$, this can be done by prepending the block length $\ell$ before $M[1], \cdots, M[\ell]$.
+{\bf Solution}: Note that in {\bf a)} we query two messages: $0^n$ and $0^n10^{n-1}||(Y \oplus 1^n)$. $0^n$ is a proper prefix of the other. If we require any queried message in $\Eval$ and $\Vrfy$ cannot be a prefix of any other one, such attack will fail. As suggested by \cite{BKR94}, assuming $\ell < 2^n$, this can be done by prepending the block length $\ell$ before $M[1], \cdots, M[\ell]$.
 \begin{quote}
 {\bf Procedure} $\CBC_k (M)$: // $M \in bits^*$
 \begin{enumerate}
@@ -227,7 +227,7 @@ Similarly we can define another adversary $A'$ that can perfectly simulate $A$.
 \item $\WIN \gets \false$
 \item $\M \gets \emptyset$
 \item $k \getsr Kg(1^\lambda)$
-\item $A'$ runs $A^{E,D}$
+\item $A'$ simulates $A^{E,D}$
 \end{enumerate}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -250,9 +250,9 @@ Similarly we can define another adversary $A'$ that can perfectly simulate $A$.
 \end{enumerate}
 \end{minipage}
 \end{quote}
-Clearly $A'$ wins iff $A$ wins. Thus
+Clearly $A'$ wins iff $A$ wins. From the view of $A$, the game is the same as $Exp_{SE'}^{int-ptxt}$. Thus
 $$\Adv_{SE'}^{int-ptxt}(A) = \Adv_{SE}^{int-ptxt}(A').$$
-Since all the additional steps take polynomial time, $A'$ is PPT if $A$ is PPT.
+Since all the steps except $A$ in procedures $Exp_{SE}^{int-ptxt}(A')$, $E(\cdot)$ and $D(\cdot)$ take polynomial time, $A'$ is PPT if $A$ is PPT.
 \end{proof}
 
 {\bf b) [Points: 4]} Prove that $SE'$ is not INT-CTXT secure.
@@ -287,7 +287,7 @@ The game-based INT-CTXT security of $SE'$ is defined as following.
 \end{enumerate}
 \end{minipage}
 \end{quote}
-Again the advantage of $A$ is the probability to win. We can construct a PPT adversary $A$ that can achieve noticeable advantage.
+Again the advantage of $A$ is the probability to win. We can construct a PPT adversary $A$ that can achieve non-negligible advantage (in fact, the advantage can be 1).
 \begin{quote}
 {\bf Adversary} $A^{E,D}$:
 \begin{enumerate}
@@ -296,12 +296,12 @@ Again the advantage of $A$ is the probability to win. We can construct a PPT adv
 \item Query $D(C'||1)$
 \end{enumerate}
 \end{quote}
-Note that after the query $E(0^\lambda)$, $C'||0 \in \C$ but $C'||1 \not\in \C$. Since $C' \gets Enc_k(M)$, $M = Dec_k(C')$ cannot be $\bot$. Hence the if-condition in $D$ must be satisfied, and thus the advantage $\Adv_{SE'}^{int-ctxt}(A) = 1$.
+Note that after the query $E(0^\lambda)$, $C'||0 \in \C$ but $C'||1 \not\in \C$. Since $C' \getsr Enc_k(M)$, $M \gets Dec_k(C')$ cannot be $\bot$. Hence the if-condition in $D$ must be satisfied, and thus the advantage $\Adv_{SE'}^{int-ctxt}(A) = 1$.
 \end{proof}
 
 {\bf c) [Points: 2]} Prove that $SE'$ is not IND-CCA secure.
 \begin{proof}
-We give the PPT adversary $A$ that can break IND-CCA security of $SE'$.
+We give the PPT adversary $A$ that can break IND-CCA security of $SE'$ by achieving non-negligible advantage.
 \begin{quote}
 {\bf Adversary} $A^{O, D}$: // $O$ can be $LR_0^k$ or $LR_1^k$.
 \begin{enumerate}
@@ -329,7 +329,7 @@ In the following, let additionally $\MAC : \bits^\lambda \times \bits^* \to \bit
 {\bf Procedure} $Enc''_{k_{SE}||k_{\MAC}}(M)$:
 \begin{enumerate}
 \item $C \getsr Enc_{k_{SE}} (M)$
-\item $T \getsr \MAC_{k_{\MAC}}(M)$
+\item $T \gets \MAC_{k_{\MAC}}(M)$
 \item {\bf Return} $C||T$
 \end{enumerate}
 \end{minipage}
@@ -348,7 +348,7 @@ In the following, let additionally $\MAC : \bits^\lambda \times \bits^* \to \bit
 
 {\bf d) [Points: 6]} Prove that if $\MAC$ is UF-CMA secure, then $SE''$ is {\it never} IND-CPA secure, no matter how secure $SE$ is.
 \begin{proof}
-Assume $\MAC$ is deterministic. Denote by $k = k_{SE}||k_{\MAC}$. We have the following adversary $A$ that can break IND-CPA security of $SE''$.
+Note that here $\MAC$ is deterministic. Denote by $k = k_{SE}||k_{\MAC}$. We have the following adversary $A$ that can break IND-CPA security of $SE''$.
 \begin{quote}
 {\bf Adversary} $A^O$: // $O$ can be $LR_0^k$ or $LR_1^k$.
 \begin{enumerate}
@@ -360,16 +360,16 @@ Assume $\MAC$ is deterministic. Denote by $k = k_{SE}||k_{\MAC}$. We have the fo
 \end{quote}
 Note that if $O = LR_0^k$, then $T_1 = \MAC_{k_{\MAC}}(0^\lambda) = T_2$, and thus $A$ always returns 1. If $O = LR_1^k$, then $A$ returns 1 iff $T_1 = T_2$, i.e., $\MAC_{k_{\MAC}}(0^\lambda) = \MAC_{k_{\MAC}}(1^\lambda)$. Since $\MAC$ is UF-CMA secure, this happens with only negligible probability. Suppose an adversary $A'$ who guesses the messages $0^\lambda$ and $1^\lambda$ collide:
 \begin{quote}
-{\bf Adversary} $A'$:
+{\bf Adversary} $A'^{\Eval, \Vrfy}$:
 \begin{enumerate}
 \item $T \gets \textsf{Eval}(0^\lambda)$
 \item Query $\textsf{Vrfy}(1^\lambda, T)$
 \end{enumerate}
 \end{quote}
 We have
-$$\Pr[T_1 = T_2] = \Pr[k \getsr Kg''(1^\lambda) : A^{LR_1^k}=1] = \Adv_{\MAC}^{uf-cma}(A'),$$
-which is negligible. Putting both probabilities together, we have
-$$\Adv_{SE''}^{ind-cpa}(A) = \bigg| \Pr[A^{LR_0^k}=1] -\Pr[A^{LR_0^k}=1] \bigg| = 1 - \Adv_{\MAC}^{uf-cma}(A'),$$
+$$\Pr[k \getsr Kg''(1^\lambda) : A^{LR_1^k}=1] = \Pr[T_1 = T_2] =  \Pr[\textrm{$A'^{\Eval, \Vrfy}$ wins}] = \Adv_{\MAC}^{uf-cma}(A'),$$
+which is negligible. Putting both probabilities together, given $k \getsr Kg''(1^\lambda)$, we have 
+$$\Adv_{SE''}^{ind-cpa}(A) = \bigg| \Pr[A^{LR_0^k}=1] -\Pr[A^{LR_1^k}=1] \bigg| = 1 - \Adv_{\MAC}^{uf-cma}(A'),$$
 which is overwhelming.
 \end{proof}
 
@@ -399,9 +399,9 @@ We first need a claim.
 Given any finite group $G$, for any element $x\in G$, its generated subset $\angles{x}$ is a subgroup of $G$.
 \end{claim}
 \begin{proof}
-Denote by 1 the identity (aka neutral element) of $G$. Clearly the identity $x^0 = 1$. By pigeonhole principle, there exists a positive integer $k$ s.t. $x^k = 1$, since $G$ is finite. Hence the inverse for any element $x^i \in \angles{x}$ ($0\leq i \leq k-1$) can be found: $x^{k-i} \cdot x^i = x^{k} = 1$, i.e., $(x^i)^{-1} = x^{k-i}$. Hence $\angles{x}$ is a subgroup of $G$.
+Denote by 1 the identity (aka neutral element) of $G$. Clearly the identity $x^0 = 1$. By pigeonhole principle, there exists two integers $i < j$ s.t. $x^i = x^j$, since $G$ is finite. Hence there exists $k = j-i$ s.t. $x^k = 1$. Hence the inverse for any element $x^i \in \angles{x}$ ($0\leq i \leq k-1$) can be found: $x^{k-i} \cdot x^i = x^{k} = 1$, i.e., $(x^i)^{-1} = x^{k-i}$. Hence $\angles{x}$ is a subgroup of $G$.
 \end{proof}
-By Lagrange's theorem, for any $x\in G$, $|\angles{x}|$ divides $|G|$. Since $|G|$ is a prime, $|\angles{x}|$ can only be 1 or $|G|$. If $x=1$ the identity of $G$, then $\angles{1} = \{1\}$. Otherwise, $|\angles{x}|>1$ and thus it must be $|\angles{x}| = |G|$, i.e., $x$ generates the whole $G$.
+By Lagrange's theorem, for any $x\in G$, $|\angles{x}|$ divides $|G|$. Since $|G|$ is a prime, $|\angles{x}|$ can only be 1 or $|G|$. If $x=1$, the identity of $G$, then $\angles{1} = \{1\}$. Otherwise, $|\angles{x}|>1$ (since it at least contains $x$ and 1) and thus it must be $|\angles{x}| = |G|$, i.e., $x$ generates the whole $G$.
 
 Lagrange's theorem can be found in \cite{Shoup09}.
 \end{proof}
@@ -425,10 +425,10 @@ We can give such a PPT distinguisher as following.
 \begin{quote}
 {\bf Distinguisher} $D (A, B, C)$: // $A = g^{x_A}$, $B = g^{x_B}$, $C = g^{x_C}$ or $g^{x_Ax_B}$
 \begin{enumerate}
-\item $a \gets A^{P-1} \mod P$
-\item $b \gets B^{P-1} \mod P$
-\item $c \gets C^{P-1} \mod P$
-\item {\bf if} $(a=1 \vee b=1) \wedge c=1$ or none of $a, b, c$ is 1 {\bf then}
+\item $a \gets A^{(P-1)/2} \mod P$
+\item $b \gets B^{(P-1)/2} \mod P$
+\item $c \gets C^{(P-1)/2} \mod P$
+\item {\bf if} $(a=1 \vee b=1) \wedge c=1$ {\bf or} none of $a, b, c$ is 1 {\bf then}
 \item \tab {\bf return} 1.
 \item {\bf else return} 0.
 \end{enumerate}
@@ -526,9 +526,9 @@ It can be constructed as following.
 {\bf d) [Points: 2]} How does this simplify the task of proving ind-cpa security of $PKE$? Is an
 analogous statement true in the secret-key case?
 
-{\bf Solution}: One query is enough! We only need to consider the games that allow at most one query, i.e., if all the advantages for such games are negligible, and then we can immediately conclude that the $PKE$ scheme is ind-cpa secure.
+{\bf Solution}: One query is enough! We only need to consider the games that allow at most one query, i.e., if all the advantages for such games are negligible, then we can immediately conclude that the $PKE$ scheme is ind-cpa secure.
 
-It is not true for the secret-key case. Intuitively, for secret-key case, the adversary cannot encrypt any message all by herself, since there is no such analogue of public key $pk$. Thus there is no way to simulate the hybrid oracles in the proof. Any adversary must rely on the encryption oracle to get multiple ciphertexts on chosen messages.
+It is not true for the secret-key case. Intuitively, for secret-key case, the adversary cannot encrypt any message all by herself, since there is no such analogue of public key $pk$. Thus there is no way to simulate the hybrid oracles in the proof. Any adversary must rely on the encryption oracle to get multiple ciphertexts on chosen messages. For example, in one-time pad, just one query to $LR_b^k$ is not sufficient to tell $b$. If the adversary queries two identical messages $(m, m)$, then the encryption oracle behaves identically whatever $b$ is, and thus no knowledge about $b$ is given to the adversary. If query two different messages $(m,m')$ and suppose the answer is $c$, then $k = c \oplus m$ or $k = c \oplus m'$, each of which has probability $1/2$. Hence $b$ is still uniformly distributed. However, two queries to $LR_b^k$ can easily give a correct decision on $b$, as in Lecture 4.2.
 
 \begin{thebibliography}{10}
 \bibitem{BKR94}
