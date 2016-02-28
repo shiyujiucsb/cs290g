@@ -1,0 +1,437 @@
+\documentclass[12pt]{article}
+\usepackage{url,amsmath,setspace,amssymb,amsthm,amsfonts}
+%\usepackage{hyperref}
+
+\setlength{\oddsidemargin}{.25in}
+\setlength{\evensidemargin}{.25in}
+\setlength{\textwidth}{6.25in}
+\setlength{\topmargin}{-0.4in}
+\setlength{\textheight}{8.5in}
+
+\newcommand{\heading}[5]{
+   \renewcommand{\thepage}{#1-\arabic{page}}
+   \noindent
+   \begin{center}
+   \framebox[\textwidth]{
+     \begin{minipage}{0.9\textwidth} \onehalfspacing
+       {\bf CS 290G -- Introduction to Modern Cryptography} \hfill #2
+
+       {\centering \Large #5
+       
+       }\medskip
+
+       {\it #3 \hfill #4}
+     \end{minipage}
+   }
+   \end{center}
+}
+
+\newcommand{\handout}[3]{\heading{#1}{#2}{Instructor:
+Stefano Tessaro}{Student: Shiyu Ji, Yi Yang}{#3}}
+
+\setlength{\parindent}{0in}
+
+\newcommand{\eqdef}{\stackrel{def}{=}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\bits}{\{0,1\}}
+\newcommand{\inr}{\in_{\mbox{\tiny R}}}
+%\newcommand{\getsr}{\gets_{\mbox{\tiny R}}}
+\newcommand{\getsr}{\stackrel{\$}{\gets}}
+\newcommand{\getsn}{\stackrel{n}{\gets}}
+\newcommand{\st}{\mbox{ s.t. }}
+\newcommand{\etal}{{\it et al }}
+\newcommand{\into}{\rightarrow}
+
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\e}{\epsilon}
+\newcommand{\ee}{\varepsilon}
+\newcommand{\ceil}[1]{{\lceil{#1}\rceil}}
+\newcommand{\floor}[1]{{\lfloor{#1}\rfloor}}
+\newcommand{\angles}[1]{\langle #1 \rangle}
+\newcommand{\Com}{{\sf Com}}
+\newcommand{\desc}{{\sf desc}}
+
+\newcommand{\rightstep}[1]{%
+$\underrightarrow{\quad #1 \quad}$ }
+
+\newcommand{\leftstep}[1]{%
+$\underleftarrow{\quad #1 \quad}$ }
+\newcommand{\Adv}{\textsf{Adv}}
+\newcommand{\tab}{\hspace{0.3in}}
+\newcommand{\MAC}{\textsf{MAC}}
+\newcommand{\CBC}{\textsf{CBC}}
+\newcommand{\Eval}{\textsf{Eval}}
+\newcommand{\Vrfy}{\textsf{Vrfy}}
+\newcommand{\WIN}{\textsf{WIN}}
+\newcommand{\true}{\textsf{true}}
+\newcommand{\false}{\textsf{false}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\C}{\mathcal{C}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Theorems & Definitions
+
+
+\newtheorem{theorem}{Theorem}[section]
+
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{subclaim}{Claim}[theorem]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{observation}[theorem]{Observation}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{construction}[theorem]{Construction}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{counterexample}[theorem]{Counterexample}
+\newtheorem{algorithm1}[theorem]{Algorithm}
+\newtheorem{protocol}[theorem]{Protocol}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{fact}[theorem]{Fact}
+
+%\bibliographystyle{plain}
+
+\newcommand{\PKE}{\textsf{PKE}}
+\newcommand{\Kg}{\textsf{Kg}}
+\newcommand{\Enc}{\textsf{Enc}}
+\newcommand{\Dec}{\textsf{Dec}}
+\newcommand{\pk}{\textsf{pk}}
+\newcommand{\sk}{\textsf{sk}}
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\LR}{\textsf{LR}}
+
+\begin{document}
+\handout{3}{Due: Mar 11, 2016}{Homework 4}
+\section{Task 1 - CCA Security and Malleability}
+We say that a public-key encryption scheme $\PKE = (\Kg, \Enc, \Dec)$ is $f$-\emph{malleable} for an efficiently computable function $f$ if given an encryption $C \getsr \Enc(\pk, m)$ of an arbitrary message $m$ under some valid key $\pk$ (with associated public key $\sk$), we can efficiently compute $C'$ such that $\Dec(\sk, C') = f(m)$.
+
+{\bf a) [Points: 4]} Prove that if $f$ is such that there exist $m$ and $m'$ in the message space of $\PKE$ with $f(m) \not= f(m')$, $m \not= f(m)$, $m' \not= f(m')$, and $\PKE$ is $f$-malleable, then $\PKE$ is not ind-cca secure.
+\begin{proof}
+Let $M_f$ be an efficient algorithm that computes $C'$ given $C$ and $\pk$ as above.
+Consider the following PPT adversary:
+\begin{quote}
+{\bf Adversary} $\A^{O,D}(\pk)$: //$O$ is $\LR_0$ or $\LR_1$:
+\begin{enumerate}
+\item $C \getsr O(m,m')$
+\item $C' \gets M_f(C, \pk)$
+\item $m'' \gets D(C')$
+\item {\bf if} $m'' = f(m)$ {\bf then return} 1
+\item {\bf else return} 0
+\end{enumerate}
+\end{quote}
+Clearly if $b=0$, then $C' \getsr \Enc(\pk, m)$ and thus $\Dec(\sk, C') = f(m)$. Since $m \not= f(m)$, we have $C \not= C'$ and thus $C' \not\in \mathcal{C}$. Hence $m'' = f(m)$ and $\A$ will return 1 with probability 1. 
+
+If $b=1$, then $C' \getsr \Enc(\pk, m')$ and thus $\Dec(\sk, C') = f(m')$. Since $m' \not= f(m')$, we have $C \not= C'$ and thus $C' \not \in \mathcal{C}$. Hence $m'' = f(m')$. Since $f(m') \not= f(m)$, $\A$ will return 0 with probability 1.
+
+Hence the advantage of $\A$ is 1, implying $\PKE$ is not ind-cca secure. 
+\end{proof}
+
+{\bf b) [Points: 2]} Use {\bf a)} to show that the ElGamal cryptosystem is not ind-cca secure.
+\begin{proof}
+It suffices to show that ElGamal cryptosystem is $f$-malleable for some function $f$. Denote by $G$ the cyclic group generated by $g$. Given the function $f : G \to G$ s.t. $f(m) \eqdef g\cdot m$ for any message $m\in G$, the malleability function $M_f$ can be defined as
+$$M_f(C_1, C_2) \eqdef (C_1, g\cdot C_2),$$
+where $C_1 = g^R$, $C_2 = m \cdot \pk^R$ and $R \getsr \{0,1,\cdots,|G|-1\}$. 
+Note that $M_f$ can be efficiently computable.
+Clearly
+$$C' \eqdef M_f(g^R, m \cdot \pk^R) = (g^R, g\cdot m \cdot \pk^R)$$
+satisfies
+$$\Dec(\sk, C') = g\cdot m \cdot \pk^R \cdot (g^{R\cdot\sk})^{-1} = g\cdot m \cdot g^{R\cdot\sk} \cdot g^{-R\cdot\sk} = g \cdot m.$$
+Hence EGamal is $f$-malleable.
+\end{proof}
+
+\newcommand{\HE}{\textsf{HE}}
+{\bf c) [Points: 4]} Prove that no homomorphic encryption scheme can be ind-cca secure.
+\begin{proof}
+It suffices to show that every homomorphic encryption scheme is $f$-malleable for some function $f$.
+Denote by $+$ the binary operation to be preserved by the homomorphic encryption scheme $\HE = (\Kg, \Enc, \Dec)$. Define $f$ to map any message $m$ to $m+m_0$, where we fix $m_0$ to be any message in the message space. Clearly $\Enc(m)+\Enc(m_0) = \Enc(m+m_0)$. By adding $\Enc(m_0)$ to a ciphertext of any message $m$, we can obtain a ciphertext of $m+m_0$. This addition is efficient. Hence $\HE$ is not $f$-malleable.
+\end{proof}
+
+{\bf d) [Points: 2]} Are your answers above still valid if the attacker can only ask for decryptions
+before invoking the $\LR$ oracle?
+
+{\bf Solution}. No. Our argument depends on the fact that we can transform the ciphertext $c$ of $m$ or $m'$ into another ciphertext $c'$, which is not in $\mathcal{C}$.
+Then the decryption oracle will not return $\bot$, and the returned answer is guaranteed to be $f(m)$ or $f(m')$. 
+However, the only way to obtain the ciphertext $c$ is by querying $\LR$ oracle. This query cannot be simulated because we have no knowledge whether $\LR$ chooses $m$ or $m'$. Thus if decryption after $\LR$ query is not allowed, then our argument will not work any more.
+
+\newcommand{\D}{\mathcal{D}}
+\newcommand{\G}{\mathbb{G}}
+\newcommand{\NP}{\mathcal{NP}}
+\newcommand{\ddh}{\textsf{ddh}}
+\section{Task 2 - NP Languages}
+Fix a group $\G$ with prime order $q$, and let $g_1$ be a generator of $\G$. Now consider the $\NP$-languages (which are subsets of $\G \times \G \times \G$)
+$$L = \{(g_2= g_1^\alpha, g_1^r, g_2^r) : \alpha, r \in \Z_q\}$$
+$$\overline{L} = \{(g_2 = g_1^\alpha, g_1^r, g_2^{r'}) : \alpha, r, r' \in \Z_q, r\not= r' \}.$$
+Prove that if the DDH assumption with respect to the fixed generator $g_1$ holds in $\G$ (i.e., $(g_1^a, g_1^b, g_1^{ab})$ and $(g_1^a, g_1^b, g_1^c)$ are computationally indistinguishable for $a,b,c \getsr \Z_q$), then samples $x \getsr L$ and $x \getsr \overline{L}$ are also computationally indistinguishable.
+\begin{proof}
+Assume by contradiction $x \getsr L$ and $x \getsr \overline{L}$ are not computationally indistinguishable. Then there exists a PPT distinguisher $\D$ s.t. its advantage
+$$\Adv_L^{\NP}(\D) \eqdef |\Pr[x \getsr L : \D(x) = 1] - \Pr[x \getsr \overline{L} : \D(x) = 1]|$$
+is non-negligible. It suffices to give a PPT distinguisher $\D'$ s.t. its advantage
+$$\Adv_{\G,g}^{\ddh}(\D') \eqdef |\Pr[a,b \getsr \Z_q : \D'(g_1^a, g_1^b, g_1^{ab}) = 1] - \Pr[a,b,c \getsr \Z_q : \D'(g_1^a, g_1^b, g_1^c) = 1]|$$
+is also non-negligible.
+We give such an adversary $\D'$ as following.
+\begin{quote}
+{\bf Adversary} $\D' (A, B, C)$: // $A = g_1^a$, $B = g_1^b$, $C = g_1^{ab}$ or $g_1^c$.
+\begin{enumerate}
+\item $b \getsr \D(A, B, C)$
+\item {\bf return} $b$.
+\end{enumerate}
+\end{quote}
+If $C = g_1^{ab}$, then $(A, B, C) \in L$. If $C = g_1^c$, then only with probability $1/q$, $(A, B, C) \in L$, because $c = ab$ has probability $1/q$. Hence
+$$\begin{aligned}
+& \Adv_{\G,g}^{\ddh}(\D')\\
+=& |\Pr[a,b \getsr \Z_q : \D(g_1^a, g_1^b, g_1^{ab}) = 1] - \Pr[a,b,c \getsr \Z_q : \D(g_1^a, g_1^b, g_1^c) = 1]| \\
+=& \left|\Pr[x \getsr L : \D(x) = 1] - \frac{1}{q}\Pr[x \getsr L : \D(x) = 1] - \left(1-\frac{1}{q}\right)\Pr[x \getsr \overline{L} : \D(x) = 1]\right| \\
+=& \left(1-\frac{1}{q}\right) \Adv_L^{\NP}(\D),
+\end{aligned}$$
+which is non-negligible.
+\end{proof}
+
+\newcommand{\DS}{\mathcal{DS}}
+\newcommand{\Sign}{\textsf{Sign}}
+\section{Task 3 - Lamport Signatures}
+Let $f : \bits^\lambda \to \bits^\lambda$ be a one-way function, and let $\ell$ be an even number. Recall that when using $f$ to instantiate Lamport's signature scheme for messages of length $\ell/2$ (thus allowing us to sign $2^{\ell/2}$ messages), the signing and verification keys consist of $\ell$ $\lambda$-bit strings. Instead, we are going to construct a signature scheme $\DS = (\Kg, \Sign, \Vrfy)$ with larger message space, i.e., larger than $2^{\ell/2}$.
+
+{\bf a) [Points: 3]} Let $S_{\ell}$ be the set of $\ell$-bit strings with exactly $\ell/2$ bits equal one. (E.g., for $\ell = 4$, strings like 1100, 0101, etc are elements of $S_{\ell}.$)\footnote{Also, note that $S_{\ell}$ has $\binom{\ell}{\ell/2}$ elements, which is approximately $2^{\ell}/\sqrt{\ell}$ elements.}
+
+Argue that for all distinct $\ell$-bit strings $X, X' \in S_{\ell}$, i.e., $X \not= X'$, there exist $i \not= j$ such that $X[i]=1$, $X'[i]=0$, and $X[j]=0$, $X'[j]=1$.
+\begin{proof}
+Since $X \not= X'$, there exists an index $i \in \{1, 2, \cdots, \ell\}$ s.t. $X[i] \not= X'[i]$. Without loss of generality we assume $X[i]=1$ and $X'[i]=0$. Define two sets $A \eqdef \{k | k\not=i \wedge X[k] = 0\}$ and $B \eqdef \{k | k\not=i \wedge X'[k] = 0\}$. Since every string in $S_{\ell}$ is 0-1 balanced, we have $|A| = \ell/2$ and $|B| = \ell/2 -1$. Thus there exists an index $j$ s.t. $j \in A$ but $j \not\in B$. Hence $X[j]=0$ and $X[j]=1$. We have found a pair $(i,j)$ as desired.
+\end{proof}
+
+\newcommand{\vk}{\textsf{vk}}
+{\bf b) [Points: 9]} Show how to use $f$ to build a signature scheme $\DS = (\Kg, \Sign, \Vrfy)$ with message space $\M = S_{\ell}$ and with both verification and signing keys consisting of $\ell$ $\lambda$-bit strings. Argue (informally) that the resulting scheme is \emph{one-time} uf-cma secure.
+{\bf Construction}: 
+The signature scheme $\DS = (\Kg, \Sign, \Vrfy)$ is given as following:
+\begin{itemize}
+\item {\bf Key Generation}. The key generation algorithm $\Kg$ generates $\ell$ random $\lambda$-bit binary strings $x_1, x_2, \cdots, x_{\ell} \getsr \bits^\lambda$, and computes $y_i = f(x_i)$ for each $i=1,2,\cdots,\ell$. Then set
+$$\sk = (x_1,x_2,\cdots,x_{\ell}), \vk = (y_1, y_2,\cdots,y_{\ell}).$$
+\item {\bf Signing}. To sign a message $m \in \bits^\ell$ with bits $m=m_1m_2\cdots m_{\ell}$, given signing key $\sk$ as above, the signing algorithm $\Sign_{\sk}(m)$ returns the signature $\sigma = (\sigma_1, \sigma_2, \cdots, \sigma_\ell)$, where for each $i=1,2,\cdots, \ell$, we have 
+$$\sigma_i = \begin{cases}
+x_i & \textrm{if $m_i=0$} \\
+y_i & \textrm{if $m_i=1$}
+\end{cases}.$$
+\item {\bf Verification}. Given a signature $\sigma = (\sigma_1, \sigma_2, \cdots, \sigma_\ell)$, a message $m = m_1m_2\cdots m_{\ell}$, and the verification key $\vk = (y_1,y_2,\cdots, y_{\ell})$, the verification algorithm $\Vrfy_{\vk}(m,\sigma)$ returns 1 iff for any $i=1,2,\cdots, \ell$, we have 1) if $m_i=0$, then $f(\sigma_i) = y_i$, and 2) if $m_i=1$, then $\sigma_i = y_i$.
+\end{itemize}
+Clearly the scheme $\DS$ satisfies the syntactic and correctness requirements. We next show it is one-time uf-cma secure.
+\newcommand{\poly}{\mathsf{poly}}
+\begin{lemma}
+If $f$ is one-way, and $\ell = \poly(\lambda)$, then $\DS$ is one-time uf-cma secure.
+\end{lemma}
+\newcommand{\SO}{\textsf{S}}
+\begin{proof}
+The proof follows the similar lines of the proof of Lamport's signature to be one-time uf-cma secure. For any adversary $\A$ for the one-time uf-cma experiment which invokes the signing oracle $\SO$ exactly once, we will show that there exists an adversary $\A'$ aiming to invert $f$ s.t. 
+$$\Adv_{\DS}^{\textsf{ot-uf-cma}}(\A) \leq \ell\cdot\Adv_{f}^{\textsf{ow}}(\A').$$
+Moreover, $\A'$ is PPT iff $\A$ is PPT. 
+
+We give the construction of $\A'$ as following.
+\begin{quote}
+{\bf Adversary} $\A'(y)$: // $y\in\bits^\lambda$
+\begin{enumerate}
+\item $i^* \getsr \{1,\cdots,\ell\}$
+\item $y_{i^*} \gets y$
+\item {\bf for} each $i \in \{1,\cdots,\ell\}\setminus\{i^*\}$ {\bf do}
+\item \tab $x_i \getsr \bits^\lambda$, $y_i \gets f(x_i)$
+\item $\vk \gets (y_1, \cdots, y_{\ell})$
+\item $(m', \sigma'=(\sigma'_1\cdots\sigma'_{\ell}))\getsr \A^{\SO}(\vk)$ // $m'\not=m$, where $\A$ queried $m$ to $\SO$
+\item $x_{i^*} \gets \sigma'_{i^*}$
+\item {\bf return} $x_{i^*}$
+\end{enumerate}
+\end{quote}
+The signing oracle $\SO$ is defined as
+\begin{quote}
+{\bf Procedure} $\SO(m)$: // $m\in\bits^\ell$
+\begin{enumerate}
+\item {\bf for} $i=1$ to $\ell$ {\bf do}
+\item \tab {\bf if} $i = i^*$ and $m_i=1$ {\bf then}
+\item \tab \tab $\sigma_{i} \gets y$
+\item \tab {\bf else if} $i=i^*$ and $m_i=0$ {\bf then}
+\item \tab \tab $\sigma_{i} \gets \bot$
+\item \tab {\bf else if} $m_i=1$ {\bf then} $\sigma_i \gets y_i$
+\item \tab {\bf else} $\sigma_i \gets x_i$
+\item {\bf return} $\sigma = (\sigma_1, \cdots, \sigma_{\ell})$
+\end{enumerate}
+\end{quote}
+Define the event $G$ that for the message $m$ sent to $\SO$ and $m'$ output by $\A'$, we have $m_{i^*} = 1$ and $m'_{i^*} = 0$. Define the event $F$ that $G$ happens and $(m',\sigma')$ is a valid forge, i.e., $m'\not=m$ and for each $i=1,\cdots,\ell$, we have 1) $f(\sigma'_i)=y_i$ if $m'_i=0$, and 2) $\sigma'_i=y_i$ if $m'_i=1$.
+
+Note that if $G$ happens, $\SO$ will not return $\bot$, and if $F$ happens, we have $m'_{i^*} = 0$ and thus
+$$f(\sigma'_{i^*}) = y_{i^*} = y$$
+which successfully inverts the one-way function $f$ on $y$ by giving a preimage $\sigma'_{i^*}$. 
+Hence
+$$\Adv_{f}^{\textsf{ow}}(\A') \geq \Pr[F\wedge G] = \Pr[G]\cdot\Pr[F|G].$$
+Note that when $G$ happens, $\SO$ simulates the signing oracle in the one-time uf-cma experiment of $\A$, and $\A$ wins iff $(m',\sigma')$ is a valid forge, i.e., $F$ also occurs. Thus $\Adv_{\DS}^{\textsf{ot-uf-cma}}(\A) = \Pr[F|G]$.
+Based on {\bf a)}, if $m\not=m'$, then there must exist at least one index $j$ s.t. $m_j=1$ and $m'_j=0$. Define $J \eqdef \{j|m_j=1 \wedge m'_j=0\}$, and we have $|J|\geq 1$. Hence $\Pr[G] = \Pr[i^* = j|j\in J] \geq 1/\ell$. Putting everything together we have
+$$\Adv_{\DS}^{\textsf{ot-uf-cma}}(\A) \leq \ell\cdot\Adv_{f}^{\textsf{ow}}(\A').$$
+Every step in $\A'$ except those in $\A$ can be done in polynomial time. Thus $\A'$ if PPT iff $\A$ is PPT.
+\end{proof}
+
+\newcommand{\OTS}{\overline{\textsf{OTS}}}
+\section{Task 4 - Digital Signatures}
+Recall the construction of a multi-message secure signature scheme from a one-time signature
+scheme $\OTS$ given in class. In particular, to sign a message $M$, we choose a random $X \getsr \bits^n$. Then, we compute for all $i=1,\cdots,n$
+$$\sigma_i \gets \OTS.\Sign_{\sk_{X[1,\cdots,i-1]}}(\vk_{X[1,\cdots,i-1]||0} || \vk_{X[1,\cdots,i-1]||1})$$
+where $(\sk_{\varepsilon}, \vk_{\varepsilon}) = (\sk, \vk)$. Finally, we compute $\sigma_{n+1} \gets \Sign_{\sk_X}(M)$, and output 
+$$\sigma = (X, \vk_0, \vk_1, \vk_{X[1]||0}, \vk_{X[1]||1},\cdots,\vk_{X[1,\cdots,n-1]||0},\vk_{X[1,\cdots,n-1]||1}, \sigma_1,\cdots,\sigma_n,\sigma_{n+1}).$$
+Remember, that pairs $(\sk_Y,\vk_Y)$ for $Y\not=\varepsilon$ are generated by invoking $\OTS.\Kg$ whenever necessary (e.g., with randomness derived from a PRF invocation on input $Y$).
+
+Why is it necessary to sign both $\vk_{X[1,\cdots,n-1]||0}$ and $\vk_{X[1,\cdots,n-1]||1}$? Explain what could go wrong if we only sign $\vk_{X[1,\cdots,i]}$ instead, i.e., $\sigma_i \gets \OTS.\Sign_{\sk_{X[1,\cdots,i-1]}}(\vk_{X[1,\cdots,i]})$.
+\begin{proof}
+We claim that if we only sign the $\vk$ on the path of $X$, then the resulted signature scheme $\DS$ is not always multi-message uf-cma secure.
+
+Suppose the adversary makes two signing queries on messages $m$ and $m'$ respectively, and with overwhelming probability the signing oracle chooses two different paths $X$ and $X'$. Thus there exists an index $i$ s.t. $X[i] \not= X'[i]$ and $X[j] = X'[j]$ for any $j<i$. Without loss of generality we assume $X[i]=0$ and $X'[i]=1$. Then in $\DS$, the signature of $m$ contains 
+$$\sigma_i^m = \OTS.\Sign_{\sk_{X[1,\cdots,i-1]}}(\vk_{X[1,\cdots,i-1,0]}).$$
+The signature of $m'$ contains
+$$\sigma_i^{m'} = \OTS.\Sign_{\sk_{X[1,\cdots,i-1]}}(\vk_{X[1,\cdots,i-1,1]}).$$
+Since $\vk_{X[1,\cdots,i-1,0]}$ and $\vk_{X[1,\cdots,i-1,1]}$ are generated by $\OTS.\Kg$ independently, with overwhelming probability they are different. Thus with overwhelming probability the signing key $\sk_{X[1,\cdots,i-1]}$ will be used \emph{twice} to generate $\sigma_i^m$ and $\sigma_i^{m'}$. Note that the scheme $\OTS$ is only \emph{one-time} secure. With two different messages as input, the information of the signing key $\sk_{X[1,\cdots,i-1]}$ may be leaked to the adversary by signing twice, e.g., Lamport's signature scheme. The leaked information may compromise the signing key, or at least significantly reduce the size of the signing key space. Once a signing key at one node $X_k$ is compromised, the adversary can forge the signature of any message by choose a path $X$ with prefix $X_k$.
+\end{proof}
+
+\section{Task 5 - Bilinear Maps}
+Let $\G$, $\G_T$ be prime order groups, where $|\G| = |\G_T| = q$, and let $g \not = 1$ be some arbitrary generator of $\G$. Further, let $e : \G \times \G \to \G_T$ be bilinear map as defined in class.
+
+{\bf a) [Points: 4]} Prove that for every two group elements $x, y \in \G$, and any $a, b \in \Z_q$, we have $e(x^a, y^b) = e(x, y)^{ab}$.
+\begin{proof}
+Since $g$ is a generator of $\G$, let $x = g^{\alpha}$ and $y = g^{\beta}$. Hence
+$$e(x^a, y^b) = e(g^{\alpha \cdot a}, g^{\beta \cdot b}) = e(g,g)^{\alpha \cdot a \cdot \beta \cdot b},$$
+and 
+$$e(x,y)^{ab} = e(g^{\alpha}, g^{\beta})^{ab} = e(g,g)^{\alpha \cdot a \cdot \beta \cdot b}.$$
+\end{proof}
+
+\newcommand{\DLP}{\textsf{DLP}}
+{\bf b) [Points: 8]} Show that if the discrete logarithm ($\DLP$) problem is hard in $\G$ (with respect to $g$), then it is also hard in $\G_T$ (with respect to $e(g,g)$).
+\begin{proof}
+Assume by contradiction $\DLP$ can be efficiently solved by some PPT algorithm $\A$ in $\G_T$ (with respect to $e(g,g)$). It suffices to give a PPT algorithm $\A'$ that can solve $\DLP$ in $\G$ (with respect to $g$). We give the construction of such an algorithm $\A'$ as following.
+\begin{quote}
+{\bf Procedure} $\A'(y)$: // $y = g^x$, $x\in\Z_q$.
+\begin{enumerate}
+\item $y' \gets e(g,y)$
+\item $x' \getsr \A(y')$
+\item {\bf return} $x'$.
+\end{enumerate}
+\end{quote}
+Note that 
+$$y' = e(g,y) = e(g, g^x) = e(g,g)^x.$$
+Thus if $\A$ solves $\DLP$ in $\G_T$ correctly, then $x'=x$ and $\A'$ also successfully finds the correct answer $x$. Clearly in $\A'$, each step except those in $\A$ takes polynomial time. Hence $\A'$ is PPT iff $\A$ is PPT. 
+\end{proof}
+
+\section{Task 6 - CCA-security from IBE}
+Give a proof that the construction of a public-key encryption scheme from an ind-cpa
+secure IBE scheme and a one-time signature scheme given in Lecture 8.2 is ind-cca secure.
+\newcommand{\Exp}{\textsf{Exp}}
+\newcommand{\cpa}{\textsf{ind-cpa}}
+\newcommand{\cca}{\textsf{ind-cca}}
+\newcommand{\msk}{\textsf{msk}}
+\newcommand{\pp}{\textsf{pp}}
+\newcommand{\IBE}{\textsf{IBE}}
+\newcommand{\OT}{\textsf{OT}}
+\newcommand{\KeyExt}{\textsf{KeyExt}}
+\newcommand{\bad}{\textsf{bad}}
+\begin{proof}
+We first define the ind-cca game as following.
+\begin{quote}
+{\bf Experiment} $\Exp_{\PKE}^{\cca-b}(\A)$:
+\begin{enumerate}
+\item $\C \gets \emptyset$
+\item $(\pk, \sk) \getsr \IBE.\Kg(1^\lambda)$
+\item $b' \getsr \A^{\LR_b, \D}(\pk)$
+\item {\bf return} $b'$
+\end{enumerate}
+\end{quote}
+We need to define the oracles $\LR_b$ and $\D$ used above.
+\begin{quote}
+\begin{minipage}[t]{0.4\textwidth}
+{\bf Procedure} $\LR_b(M_0,M_1)$:
+\begin{enumerate}
+\item $(\sk',\vk') \getsr \OT.\Kg(1^\lambda)$
+\item $C \getsr \IBE.\Enc(\pk,\vk',M_b)$
+\item $\sigma \gets \OT.\Sign_{\sk'}(C)$
+\item $\C \gets \C \cup \{C\}$
+\item {\bf return} $(\vk', C, \sigma)$
+\end{enumerate}
+\end{minipage}
+\begin{minipage}[t]{0.4\textwidth}
+{\bf Procedure} $\D(\vk', C,\sigma)$:
+\begin{enumerate}
+\item {\bf if} $C \in \C$ {\bf then return} $\bot$
+\item {\bf if} $\OT.\Vrfy_{\vk'}(C,\sigma)=1$ {\bf then}
+\item \tab $\sk_{\vk'} \getsr \KeyExt(\sk, \vk')$
+\item \tab $m \gets \IBE.\Dec(\sk_{\vk'}, C)$
+\item \tab {\bf return} $m$
+\item {\bf else return} $\bot$
+\end{enumerate}
+\end{minipage}
+\end{quote}
+Our goal is to show that the advantage
+%$$\Adv_{\PKE}^{\cca}(\A) \eqdef | \Pr[\textrm{$b'=1$ in $\Exp_{\PKE}^{\cca-0}$}]-\Pr[\textrm{$b'=1$ in $\Exp_{\PKE}^{\cca-1}$}] |$$
+$$\Adv_{\PKE}^{\cca}(\A) \eqdef | 2\cdot\Pr[\textrm{$b'=b$ in $\Exp_{\PKE}^{\cca-b}$}]-1 |$$
+is negligible. We can achieve this by defining a sequence of games.
+\begin{itemize}
+\item Game $G_0$ is defined as $\Exp_{\PKE}^{\cca-b}$, where $b \gets \bits$. 
+\begin{quote}
+{\bf Game} $G_0$:
+\begin{enumerate}
+\item $b \getsr \bits$
+\item $\C \gets \emptyset$
+\item $(\pk, \sk) \getsr \IBE.\Kg(1^\lambda)$
+\item $b' \getsr \A^{\LR_b, \D}(\pk)$
+\item {\bf if} $b' = b$ {\bf then return} 1
+\item {\bf else return} 0
+\end{enumerate}
+\end{quote}
+In addition, revise the decryption oracle $\D$ by adding a flag $\bad$, which is initially $\false$.
+\begin{quote}
+{\bf Procedure} $\D(\vk', C,\sigma)$:
+\begin{enumerate}
+\item {\bf if} $C \in \C$ {\bf then return} $\bot$
+\item {\bf if} $\OT.\Vrfy_{\vk'}(C,\sigma)=1$ {\bf then}
+\item \tab $\sk_{\vk'} \getsr \KeyExt(\sk, \vk')$
+\item \tab $m \gets \IBE.\Dec(\sk_{\vk'}, C)$
+\item \tab $\bad \gets \true$
+\item \tab {\bf return} $m$.
+\item {\bf else return} $\bot$
+\end{enumerate}
+\end{quote}
+\item Game $G_1$ is defined as $G_0$ except $\D$ is revised to
+\begin{quote}
+{\bf Procedure} $\D(\vk', C,\sigma)$:
+\begin{enumerate}
+\item {\bf if} $C \in \C$ {\bf then return} $\bot$
+\item {\bf if} $\OT.\Vrfy_{\vk'}(C,\sigma)=1$ {\bf then}
+\item \tab $\sk_{\vk'} \getsr \KeyExt(\sk, \vk')$
+\item \tab $m \gets \IBE.\Dec(\sk_{\vk'}, C)$
+\item \tab $\bad \gets \true$
+\item \tab {\bf return} $\bot$.
+\item {\bf else return} $\bot$
+\end{enumerate}
+\end{quote}
+\item Game $G_2$ is defined as $G_1$ except $\LR_b$ is revised to
+\begin{quote}
+{\bf Procedure} $\LR_b(\vk',M_0,M_1)$:
+\begin{enumerate}
+\item $C \getsr \IBE.\Enc(\pk,\vk',M_b)$
+\item $\C \gets \C \cup \{C\}$
+\item {\bf return} $C$
+\end{enumerate}
+\end{quote}
+\end{itemize}
+We have the following observations.
+\begin{itemize}
+\item $\Adv_{\PKE}^{\cca}(\A) = 2\cdot\Pr[G_0 \Rightarrow 1]-1$.
+\item $\Pr[G_0 \Rightarrow 1] - \Pr[G_1 \Rightarrow 1] \leq \Pr[\textrm{$G_1$ sets $\bad = \true$}]$.
+\item There exists an adversary $\A'$ s.t. 
+	$$\Adv_{\OT}^{\textsf{uf-cma}}(\A') = \Pr[\textrm{$G_1$ sets $\bad = \true$}].$$
+\item $\Pr[G_2 \Rightarrow 1] \geq \Pr[G_1 \Rightarrow 1]$, since every query to $\LR_b$ in $G_1$ can be simulated by the adversary $\A$ in $G_2$.
+\item There exists an adversary $\A''$ s.t.
+$$\Adv_{\IBE}^{\cpa}(\A'') = 2\cdot\Pr[G_2 \Rightarrow 1] - 1.$$
+\end{itemize}
+Putting everything together, we have
+$$\Adv_{\PKE}^{\cca}(\A) \leq 2\cdot\Adv_{\OT}^{\textsf{uf-cma}}(\A') + \Adv_{\IBE}^{\cpa}(\A'')$$
+which is negligible.
+\end{proof}
+
+\end{document}
