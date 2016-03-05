@@ -60,6 +60,8 @@ $\underrightarrow{\quad #1 \quad}$ }
 \newcommand{\leftstep}[1]{%
 $\underleftarrow{\quad #1 \quad}$ }
 
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\Sim}{\mathcal{S}}
 \newcommand{\Adv}{\mathsf{Adv}}
 \newcommand{\poly}{\mathsf{poly}}
 \newcommand{\MAC}{\mathsf{MAC}}
@@ -114,9 +116,89 @@ From strong to weak notions, now we have $\mathrm{VBB} > di\mathcal{O} > i\mathc
 
 For the rest of this tutorial, we first give the definitions of the notions, i.e., VBB, $\io$, $\dio$ and $\bpo$. Then we summarize the relations between them. Last we summarize the positive and negative results about the notions.
 
+\newcommand{\bigoh}{\mathcal{O}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\VBB}{\mathsf{VBB}}
 \section{Definitions}
+Throughout this tutorial, we only consider the obfuscation of probabilistic programs, or formally Turing machines (TM) with random tape. All the probabilities are taken over the randomness of the programs. The notions and definitions for circuits are mostly similar. However, the proofs for circuits can be very different and often require more techniques. We also give a brief discussion on the relations between the definitions. More details will follow in Section \ref{sec:rel}.
+\subsection{Virtual Black-box Obfuscation}
+\begin{definition}
+\label{def:vbb}
+A TM {\bf virtual black-box obfuscator} is a probabilistic algorithm $\bigoh$ that takes a program $M$ and outputs a new program $\bigoh(M)$, and satisfies the following properties:
+\begin{itemize}
+\item \emph{Preserving Functionality}: For any program $M$, the probability
+$\Pr[\exists x \in \bits^* : \bigoh(M)(x) \not= M(x)]$
+is negligible on $|M|$, the description size of $M$.
+\item \emph{Polynomial Slowdown}: There exists a polynomial $p(\cdot)$ s.t. for any program $M$, if $M$ halts in $t$ steps on some input $x$, then $\bigoh(M)$ halts within $p(t)$ steps on the same input $x$, and the size of $\bigoh(M)$ is upper bounded: $|\bigoh(M)| \leq p(|M|)$, or denote by $|\bigoh(M)| = \poly(|M|)$.
+\item \emph{Virtual Black-box}: For any polynomial probabilistic-time (PPT) adversary $\A$, there exists a PPT simulator $\Sim$ such that for any program $M$, the advantage 
+$$\Adv_{M,\Sim}^{\VBB}(\A) \eqdef \left| \Pr[\A(\bigoh(M)) = 1] - \Pr[\Sim^{M}(1^{|M|}) = 1] \right|$$
+is negligible on $|M|$.
+\end{itemize}
+\end{definition}
+
+It is not difficult to see that there cannot exist such an algorithm $\bigoh$ that can VBB-obfuscate every program with arbitrary input length. To see this, consider the program defined as:
+$$M(b,x) = 
+\begin{cases}
+\beta & \textrm{if $b=0$ and $x=\alpha$} \\
+(\alpha, \beta) & \textrm{if $b=1$ and $x$ halts in $\poly(n)$ steps on input $(0,\alpha)$ and outputs $\beta$} \\
+0 & \textrm{otherwise} \\
+\end{cases}$$
+where $\alpha, \beta \getsr \bits^\lambda$, where $\lambda$ is the security parameter.
+Note that the output distribution of $M$ is statistically close to that of zero function, which outputs 0 on any input. Thus any simulator that only has oracle access to $M$ can only learn $\alpha$ and $\beta$ with negligible probability. However, for any obfuscated $\bigoh(M)$, with overwhelming probability,
+$$\bigoh(M)(1, \bigoh(M)) = M(1, \bigoh(M)) = (\alpha, \beta)$$
+since with overwhelming probability
+$$\bigoh(M)(0,\alpha) = M(0,\alpha) = \beta.$$ 
+That is, the adversary $\A$ can obtain the succinct description of $M$ by computing $\bigoh(M)$ on the input $(1, \bigoh(M))$. Hence this program $M$ cannot be VBB-obfuscated. This fact gives us the feeling that as a notion of program obfuscation, VBB seems too strong and needs relaxation, albeit it is natural.
+
+\subsection{Indistinguishability Obfuscation $\io$}
+\begin{definition}
+A TM {\bf indistinguishability obfuscator} is defined in the same way as Definition \ref{def:vbb}, except that the property \emph{Virtual Black-box} is replaced by the following:
+\begin{itemize}
+\item \emph{Indistinguishability}: For any polynomial probabilistic-time (PPT) adversary $\A$, for any two identically sized programs $M_1$ and $M_2$ that compute the same function, the advantage 
+$$\Adv_{M_1,M_2}^{\io}(\A) \eqdef \left| \Pr[\A(\bigoh(M_1)) = 1] - \Pr[\A(\bigoh(M_2)) = 1] \right|$$
+is negligible on $|M|$.
+\end{itemize}
+\end{definition}
+
+The notion of $\io$ is strictly weaker than VBB. Clearly every VBB obfuscator must be $\io$, since it is not difficult to see that there exists a PPT simulator $\Sim$ s.t. for any PPT adversary $\A$ and any two same-sized programs $M_1$, $M_2$ that compute the same function,
+$$\Adv_{M_1,M_2}^{\io}(\A) \leq \Adv_{M_1,\Sim}^{\VBB}(\A) + \Adv_{M_2,\Sim}^{\VBB}(\A).$$
+However, there exists an inefficient obfuscator $\bigoh$ that can indistinguishability obfuscated every program $M$: simply define $\bigoh(M)$ to be the lexicographically first TM of the same size $|M|$ that computes the same function of $M$. 
+
+\subsection{Differing-Inputs Obfuscation $\dio$}
+\begin{definition}
+A {\bf differing-inputs obfuscator} is defined in the same way as Definition \ref{def:vbb}, except that the property \emph{Virtual Black-box} is replaced by the following:
+\begin{itemize}
+\item \emph{Differing-inputs property}: For any PPT adversary $\A$, there is a probabilistic algorithm $\A'$ s.t. for any two same-sized programs $M_1$ and $M_2$, if the advantage
+$$\Adv_{M_1,M_2}^{\dio}(\A) \eqdef \left| \Pr[\A(\bigoh(M_1))=1] - \Pr[\A(\bigoh(M_2))=1] \right|$$
+is non-negligible, then for any programs $M_1'$ and $M_2'$ s.t. $M_i'$ computes the same function as $M_i$ for $i=1,2$, $\A'(M_1',M_2')$ can return an input $x$ s.t. $M_1(x) \not= M_2(x)$ in polynomial time $\poly(|M_1|, 1/\Adv_{M_1,M_2}^{\dio}(\A))$.
+\end{itemize}
+\end{definition}
+
+Clearly $\dio$ implies $\io$: if $M_1$ and $M_2$ compute the same function, then any algorithm $\A'$ cannot find a differing input $x$ and thus any $\A$ can never tell apart $\dio$-obfuscated $\bigoh(M_1)$ and $\bigoh(M_2)$ with non-negligible advantage, as required by $\io$.
+On the other hand, $\dio$ gives some guarantee on the case of obfuscating two programs computing different functions, whereas $\io$ has no guarantee on such case. Hence $\dio$ is stronger than $\io$.
+
+Also $\dio$ is weaker than VBB. Any VBB obfuscator must be $\dio$, since any simulator $\Sim$ in Definition \ref{def:vbb} can efficiently distinguish two oracles $M_1$ and $M_2$ computing different functions iff $\Sim$ can efficiently find the differing input.
+
+\subsection{Best-Possible Obfuscation $\bpo$}
+\begin{definition}
+\label{def:bp}
+A {\bf best-possible obfuscator} is defined in the same way as Definition \ref{def:vbb}, except that the property \emph{Virtual Black-box} is replaced by the following:
+\begin{itemize}
+\item \emph{Best-Possible Property}: There exists a PPT simulator $\Sim$ such that for any PPT adversary $\A$, for any two same-sized programs $M_1$ and $M_2$, the advantage 
+$$\Adv_{M_1,M_2,\Sim}^{\bpo}(\A) \eqdef \left| \Pr[\A(\bigoh(M_1)) = 1] - \Pr[\A(\Sim(M_2)) = 1] \right|$$
+is negligible on the program size $|M_1| = |M_2|$.
+\end{itemize}
+\end{definition}
+Clear any VBB obfuscator must be $\bpo$. Given $M_2$, one may construct the simulator $\Sim$ in Definition \ref{def:bp} by simulating $\Sim^{M_2}$, i.e., running $M_2$ on inputs without inspecting the code of $M_2$. Also any $\bpo$ obfuscator must be $\io$, since 
+$$\Adv_{M_1,M_2}^{\io}(\A) \leq \Adv_{M_1,M_2,\Sim}^{\bpo}(\A) + \Adv_{M_2,M_2,\Sim}^{\bpo}(\A).$$ 
+Thus the strength of $\bpo$ is exactly between VBB and $\io$. However, the relations between $\bpo$ and $\dio$ are more involved and hence left to Section \ref{sec:rel}.
 
 \section{Relations}
+\label{sec:rel}
+
+\subsection{Efficient Obfuscators}
+
+\subsection{Inefficient Obfuscators}
 
 \section{Negative and Positive Results}
 
