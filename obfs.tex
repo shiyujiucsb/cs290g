@@ -1,5 +1,6 @@
 \documentclass[12pt]{article}
 \usepackage{url,amsmath,setspace,amssymb,amsthm,amsfonts}
+\usepackage[all,cmtip]{xy}
 %\usepackage{hyperref}
 
 
@@ -108,7 +109,7 @@ $\underleftarrow{\quad #1 \quad}$ }
 \maketitle
 
 \section{Introduction}
-Cryptographic obfuscation has received extensive attention from the research community this century. Informally, obfuscation is a family of algorithms (or obfuscators) that can transform the input (e.g., programs or circuits) to some ``unintelligible'' form, while the functionality of the input is preserved. For example, a good obfuscator is like a compiler, which takes a program written in source code as input, and outputs quite unreadable binary code. Ideally, the binary code should not reflect any information about the source code except the functionality, i.e., input-output behavior. Given only the binary code, any adversary cannot learn any information except that can be learned by observing the inputs and outputs of the program, i.e., observing the black box of the program. This ideal and natural notion can completely defeat any attempts to reveal the source code given the obfuscated code. Such attempts include software reverse engineering. Hence it would be a great news if this notion could be achieved. Unfortunately, Barak et al. \cite{barak2001possibility} have shown that there is no \emph{general} way to achieve this notion, which was formalized as \emph{Virtual Black Box} (VBB) in their paper. Even though there is still some hope to achieve VBB for specific inputs, e.g., point functions \cite{canetti1997towards, canetti1998perfectly, wee2005obfuscating}, the notion of VBB is generally too strong in the sense that 1) all the proofs in the positive results require strong cryptographic assumptions, e.g., strong variants of DDH assumption \cite{canetti1997towards,canetti1998perfectly}, a very strong one-way permutation \cite{wee2005obfuscating}, etc., and 2) it is likely that most programs of interest cannot be VBB obfuscated in practice \cite{goldwasser2005impossibility}. Hence after \cite{barak2001possibility}, the possibilities of relaxation have also been extensively investigated.
+Cryptographic obfuscation has received extensive attention from the research community this century. Informally, obfuscation is a family of algorithms (or obfuscators) that can transform the input (e.g., programs or circuits) to some ``unintelligible'' form, while the functionality of the input is preserved. For example, a good obfuscator is like a compiler, which takes a program written in source code as input, and outputs quite unreadable binary code. Ideally, the binary code should not reflect any information about the source code except the functionality, i.e., input-output behavior. Given only the binary code, any adversary cannot learn any information except that can be learned by observing the inputs and outputs of the program, i.e., observing the black box of the program. This ideal and natural notion can completely defeat any attempts to reveal the source code given the obfuscated code. Such attempts include software reverse engineering. Hence it would be a great news if this notion could be achieved. Unfortunately, Barak et al. \cite{barak2001possibility,barak2012possibility} have shown that there is no \emph{general} way to achieve this notion, which was formalized as \emph{Virtual Black Box} (VBB) in their paper. Even though there is still some hope to achieve VBB for specific inputs, e.g., point functions \cite{canetti1997towards, canetti1998perfectly, wee2005obfuscating}, the notion of VBB is generally too strong in the sense that 1) all the proofs in the positive results require strong cryptographic assumptions, e.g., strong variants of DDH assumption \cite{canetti1997towards,canetti1998perfectly}, a very strong one-way permutation \cite{wee2005obfuscating}, etc., and 2) it is likely that most programs of interest cannot be VBB obfuscated in practice \cite{goldwasser2005impossibility}. Hence after \cite{barak2001possibility}, the possibilities of relaxation have also been extensively investigated.
 
 Due to the pessimistic impossibility results of VBB, Barak et al. \cite{barak2001possibility} suggested two relaxed notions of obfuscation: \emph{Indistinguishability Obfuscation} ($\io$) and \emph{Differing-inputs Obfuscation} ($\dio$). $\io$ only requires that two programs (or circuits) with the same functionality and size should have indistinguishable obfuscations. It turns out an inefficient $\io$ construction of any circuit can be easily found, e.g., the lexicographically first circuit with the same size and functionality \cite{barak2001possibility}. How to efficiently construct $\io$ is still a quite popular open problem. Note that $\io$ only considers the case of identical functionality, whereas there is no secure guarantee on the case when two program or circuits as input compute different functions. $\dio$ discusses the latter case. Informally, for any two programs, if any adversary cannot efficiently tell on which input these two programs give different outputs, then she cannot efficiently distinguish the $\dio$-obfuscated programs of them, either. Clearly if these two programs have the same functionality, then any adversary cannot find such an input, and thus cannot distinguish the $\dio$ obfuscations. Hence $\dio$ implies $\io$. How to construct $\dio$ is also very interesting.
 
@@ -162,22 +163,23 @@ is negligible on $|M|$.
 
 The notion of $\io$ is strictly weaker than VBB. Clearly every VBB obfuscator must be $\io$, since it is not difficult to see that there exists a PPT simulator $\Sim$ s.t. for any PPT adversary $\A$ and any two same-sized programs $M_1$, $M_2$ that compute the same function,
 $$\Adv_{M_1,M_2}^{\io}(\A) \leq \Adv_{M_1,\Sim}^{\VBB}(\A) + \Adv_{M_2,\Sim}^{\VBB}(\A).$$
-However, there exists an inefficient obfuscator $\bigoh$ that can indistinguishability obfuscated every program $M$: simply define $\bigoh(M)$ to be the lexicographically first TM of the same size $|M|$ that computes the same function of $M$. 
+However, there exists an inefficient obfuscator $\bigoh$ that can indistinguishability obfuscated every program $M$: simply define $\bigoh(M)$ to be the lexicographically first TM of the same size $|M|$ that computes the same function of $M$. Thus $\io$ is not necessarily VBB.
 
 \subsection{Differing-Inputs Obfuscation $\dio$}
 \begin{definition}
+\label{def:dio}
 A {\bf differing-inputs obfuscator} is defined in the same way as Definition \ref{def:vbb}, except that the property \emph{Virtual Black-box} is replaced by the following:
 \begin{itemize}
 \item \emph{Differing-inputs property}: For any PPT adversary $\A$, there is a probabilistic algorithm $\A'$ s.t. for any two same-sized programs $M_1$ and $M_2$, if the advantage
 $$\Adv_{M_1,M_2}^{\dio}(\A) \eqdef \left| \Pr[\A(\bigoh(M_1))=1] - \Pr[\A(\bigoh(M_2))=1] \right|$$
-is non-negligible, then for any programs $M_1'$ and $M_2'$ s.t. $M_i'$ computes the same function as $M_i$ for $i=1,2$, $\A'(M_1',M_2')$ can return an input $x$ s.t. $M_1(x) \not= M_2(x)$ in polynomial time $\poly(|M_1|, 1/\Adv_{M_1,M_2}^{\dio}(\A))$.
+is non-negligible, then for any programs $M_1'$ and $M_2'$ of size $|M_1|$ s.t. $M_i'$ computes the same function as $M_i$ for $i=1,2$, $\A'(M_1',M_2')$ can return an input $x$ s.t. $M_1(x) \not= M_2(x)$ in polynomial time $\poly(|M_1|, 1/\Adv_{M_1,M_2}^{\dio}(\A))$.
 \end{itemize}
 \end{definition}
 
 Clearly $\dio$ implies $\io$: if $M_1$ and $M_2$ compute the same function, then any algorithm $\A'$ cannot find a differing input $x$ and thus any $\A$ can never tell apart $\dio$-obfuscated $\bigoh(M_1)$ and $\bigoh(M_2)$ with non-negligible advantage, as required by $\io$.
 On the other hand, $\dio$ gives some guarantee on the case of obfuscating two programs computing different functions, whereas $\io$ has no guarantee on such case. Hence $\dio$ is stronger than $\io$.
 
-Also $\dio$ is weaker than VBB. Any VBB obfuscator must be $\dio$, since any simulator $\Sim$ in Definition \ref{def:vbb} can efficiently distinguish two oracles $M_1$ and $M_2$ computing different functions iff $\Sim$ can efficiently find the differing input.
+Also $\dio$ is weaker than VBB. Any VBB obfuscator must be $\dio$, since any simulator $\Sim$ in Definition \ref{def:vbb} can efficiently distinguish two oracles $M_1$ and $M_2$ computing different functions iff $\Sim$ can efficiently find a differing input.
 
 \subsection{Best-Possible Obfuscation $\bpo$}
 \begin{definition}
@@ -189,16 +191,41 @@ $$\Adv_{M_1,M_2,\Sim}^{\bpo}(\A) \eqdef \left| \Pr[\A(\bigoh(M_1)) = 1] - \Pr[\A
 is negligible on the program size $|M_1| = |M_2|$.
 \end{itemize}
 \end{definition}
-Clear any VBB obfuscator must be $\bpo$. Given $M_2$, one may construct the simulator $\Sim$ in Definition \ref{def:bp} by simulating $\Sim^{M_2}$, i.e., running $M_2$ on inputs without inspecting the code of $M_2$. Also any $\bpo$ obfuscator must be $\io$, since 
+Clearly any VBB obfuscator must be $\bpo$. Given $M_2$, one may construct the PPT simulator $\Sim$ in Definition \ref{def:bp} by simulating $\Sim^{M_2}(1^{|M_2|})$ in Definition \ref{def:vbb}, i.e., upon each query, the simulator runs $M_2$ on inputs without inspecting the code of $M_2$. Also any $\bpo$ obfuscator must be $\io$, since there exists a PPT $\Sim$ s.t. for any PPT adversary $\A$, for any two programs $M_1$, $M_2$ computing the same function,
 $$\Adv_{M_1,M_2}^{\io}(\A) \leq \Adv_{M_1,M_2,\Sim}^{\bpo}(\A) + \Adv_{M_2,M_2,\Sim}^{\bpo}(\A).$$ 
 Thus the strength of $\bpo$ is exactly between VBB and $\io$. However, the relations between $\bpo$ and $\dio$ are more involved and hence left to Section \ref{sec:rel}.
 
 \section{Relations}
 \label{sec:rel}
+We will summarize the relations between the definitions of VBB, $\io$, $\dio$ and $\bpo$ we have discussed previously, and will give more details in this section.
 
 \subsection{Efficient Obfuscators}
+If we only consider the efficient obfuscators, i.e., the obfuscators are PPT, then the relations between the notions above give the following diagram, in which each arrow denotes implication. PPT $\dio$, $\bpo$ and $\io$ are equivalent.
+$$
+\xymatrix{
+\mathrm{VBB} \ar[r] & \dio \ar[r] & \bpo \ar@{<->}[r] & \io} 
+$$
+Note that for efficient obfuscators, $\bpo$ coincides with $\io$. To see this, one may set the PPT simulator $\Sim$ in Definition \ref{def:bp} to be the $\io$ obfuscator $\bigoh$, which is PPT as assumed. It immediately follows that any PPT $\io$ obfuscators must be $\bpo$.
+
+$\dio$ and $\io$ turn out to be close in the sense that if there exists $\dio$ obfuscator, then efficient $\io$ is equivalent with efficient $\dio$, i.e., any PPT $\io$ must be $\dio$. Suppose PPT $\bigoh$ is $\io$ and $\bigoh'$ is (inefficient) $\dio$. Then for any adversary $\A$, for any same-sized programs $M_1$, $M_2$ computing different functions, we have
+$$\Adv_{M_1,M_2}^{\dio}(\A) \leq \Adv_{M_1,\bigoh'(M_1)}^{\io}(\A) + \Adv_{\bigoh'(M_1),\bigoh'(M_2)}^{\dio}(\A) + \Adv_{\bigoh'(M_2),M_2}^{\io}(\A).$$
+Hence if $\Adv_{M_1,M_2}^{\dio}(\A)$ is non-negligible, so is $\Adv_{\bigoh'(M_1),\bigoh'(M_2)}^{\dio}(\A)$.
+Note that
+$$\Adv_{\bigoh'(M_1),\bigoh'(M_2)}^{\dio}(\A) = \left| \Pr[\A(\bigoh(\bigoh'(M_1)))=1] - \Pr[\A(\bigoh(\bigoh'(M_2)))=1] \right|.$$
+Since $\bigoh'$ is $\dio$ and $\A(\bigoh(\cdot))$ is PPT, there exists a PPT $\A'$ that can efficiently find a differing input of $M_1$ and $M_2$. Thus $\bigoh$ must be $\dio$. However, we do not know how to build $\dio$ for general programs \cite{garg2014implausibility}. Hence $\dio$ agrees with $\io$ only \emph{conditionally}.
+
+Goldwasser et al \cite{goldwasser2007best} gave an efficient $\bpo$ obfuscator for a family of point functions in the form of polynomial-size ordered binary decision diagrams (POBDDs) \cite{bryant1986graph}, that is not VBB. The key observation is that the canonical representation of any POBDD can be efficiently computed, and one can efficiently find the $p$ given the cononical POBDD of any point function $I_p$, whereas $p$ cannot be efficiently found through oracle access only. This implies that $\bpo$ and $\io$ are both strictly weaker than VBB.
 
 \subsection{Inefficient Obfuscators}
+Now we consider the obfuscators which are not necessarily efficient. Then $\bpo$ may not agree with $\io$ any more, and hence the diagram of the relations becomes
+$$
+\xymatrix{
+\mathrm{VBB} \ar[r] \ar[d] & \dio \ar[d] \\
+\bpo \ar[r] & \io }
+$$
+The differences between inefficient $\dio$, $\bpo$ and $\io$ are sharp. Suppose we take the lexicographically first TM of the same size $|M|$ that computes the same function of $M$ as the $\io$ obfuscator of $M$. This obfuscator cannot be $\bpo$ since the first TM cannot always be efficiently found by any PPT simulator given any TM computing the same function. It cannot be $\dio$ since there is no efficient algorithm to find differing inputs given two arbitrary TMs of different functions. Thus inefficient $\io$ is not always $\bpo$ or $\dio$.
+
+Unfortunately, we do not know much about inefficient program obfuscation. Since it is still an open problem how to construct inefficient $\bpo$ \cite{goldwasser2014best} and inefficient $\dio$ \cite{garg2014implausibility}, we do not know whether inefficient $\bpo$ (or $\dio$) is strictly weaker than VBB. Also it is an interesting open problem to explore the relations between inefficient $\bpo$ and $\dio$, if any.
 
 \section{Negative and Positive Results}
 
