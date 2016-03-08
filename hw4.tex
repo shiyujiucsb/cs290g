@@ -150,7 +150,7 @@ Hence EGamal is $f$-malleable.
 {\bf c) [Points: 4]} Prove that no homomorphic encryption scheme can be ind-cca secure.
 \begin{proof}
 It suffices to show that every homomorphic encryption scheme is $f$-malleable for some function $f$.
-Denote by $+$ the binary operation to be preserved by the homomorphic encryption scheme $\HE = (\Kg, \Enc, \Dec)$. Define $f$ to map any message $m$ to $m+m_0$, where we fix $m_0$ to be any message in the message space. Clearly $\Enc(m)+\Enc(m_0) = \Enc(m+m_0)$. By adding $\Enc(m_0)$ to a ciphertext of any message $m$, we can obtain a ciphertext of $m+m_0$. This addition is efficient. Hence $\HE$ is not $f$-malleable.
+Denote by $+$ the binary operation to be preserved by the homomorphic encryption scheme $\HE = (\Kg, \Enc, \Dec)$. Define $f$ to map any message $m$ to $m+m_0$, where we fix $m_0$ to be any message in the message space. Clearly $\Enc(m)+\Enc(m_0) = \Enc(m+m_0)$. By adding $\Enc(m_0)$ to a ciphertext of any message $m$, we can obtain a ciphertext of $m+m_0$. This addition is efficient. Hence $\HE$ is $f$-malleable.
 \end{proof}
 
 {\bf d) [Points: 2]} Are your answers above still valid if the attacker can only ask for decryptions
@@ -170,7 +170,7 @@ $$L = \{(g_2= g_1^\alpha, g_1^r, g_2^r) : \alpha, r \in \Z_q\}$$
 $$\overline{L} = \{(g_2 = g_1^\alpha, g_1^r, g_2^{r'}) : \alpha, r, r' \in \Z_q, r\not= r' \}.$$
 Prove that if the DDH assumption with respect to the fixed generator $g_1$ holds in $\G$ (i.e., $(g_1^a, g_1^b, g_1^{ab})$ and $(g_1^a, g_1^b, g_1^c)$ are computationally indistinguishable for $a,b,c \getsr \Z_q$), then samples $x \getsr L$ and $x \getsr \overline{L}$ are also computationally indistinguishable.
 \begin{proof}
-Assume by contradiction $x \getsr L$ and $x \getsr \overline{L}$ are not computationally indistinguishable. Then there exists a PPT distinguisher $\D$ s.t. its advantage
+Assume by contradiction $x \getsr L$ and $x' \getsr \overline{L}$ are not computationally indistinguishable. Then there exists a PPT distinguisher $\D$ s.t. its advantage
 $$\Adv_L^{\NP}(\D) \eqdef |\Pr[x \getsr L : \D(x) = 1] - \Pr[x \getsr \overline{L} : \D(x) = 1]|$$
 is non-negligible. It suffices to give a PPT distinguisher $\D'$ s.t. its advantage
 $$\Adv_{\G,g}^{\ddh}(\D') \eqdef |\Pr[a,b \getsr \Z_q : \D'(g_1^a, g_1^b, g_1^{ab}) = 1] - \Pr[a,b,c \getsr \Z_q : \D'(g_1^a, g_1^b, g_1^c) = 1]|$$
@@ -212,7 +212,7 @@ The signature scheme $\DS = (\Kg, \Sign, \Vrfy)$ is given as following:
 \begin{itemize}
 \item {\bf Key Generation}. The key generation algorithm $\Kg$ generates $\ell$ random $\lambda$-bit binary strings $x_1, x_2, \cdots, x_{\ell} \getsr \bits^\lambda$, and computes $y_i = f(x_i)$ for each $i=1,2,\cdots,\ell$. Then set
 $$\sk = (x_1,x_2,\cdots,x_{\ell}), \vk = (y_1, y_2,\cdots,y_{\ell}).$$
-\item {\bf Signing}. To sign a message $m \in \bits^\ell$ with bits $m=m_1m_2\cdots m_{\ell}$, given signing key $\sk$ as above, the signing algorithm $\Sign_{\sk}(m)$ returns the signature $\sigma = (\sigma_1, \sigma_2, \cdots, \sigma_\ell)$, where for each $i=1,2,\cdots, \ell$, we have 
+\item {\bf Signing}. To sign a message $m \in \M$ with bits $m=m_1m_2\cdots m_{\ell}$, given signing key $\sk$ as above, the signing algorithm $\Sign_{\sk}(m)$ returns the signature $\sigma = (\sigma_1, \sigma_2, \cdots, \sigma_\ell)$, where for each $i=1,2,\cdots, \ell$, we have 
 $$\sigma_i = \begin{cases}
 x_i & \textrm{if $m_i=0$} \\
 y_i & \textrm{if $m_i=1$}
@@ -246,13 +246,13 @@ We give the construction of $\A'$ as following.
 \end{quote}
 The signing oracle $\SO$ is defined as
 \begin{quote}
-{\bf Procedure} $\SO(m)$: // $m\in\bits^\ell$
+{\bf Procedure} $\SO(m)$: // $m\in\M$
 \begin{enumerate}
 \item {\bf for} $i=1$ to $\ell$ {\bf do}
 \item \tab {\bf if} $i = i^*$ and $m_i=1$ {\bf then}
 \item \tab \tab $\sigma_{i} \gets y$
 \item \tab {\bf else if} $i=i^*$ and $m_i=0$ {\bf then}
-\item \tab \tab $\sigma_{i} \gets \bot$
+\item \tab \tab {\bf return} $\bot$
 \item \tab {\bf else if} $m_i=1$ {\bf then} $\sigma_i \gets y_i$
 \item \tab {\bf else} $\sigma_i \gets x_i$
 \item {\bf return} $\sigma = (\sigma_1, \cdots, \sigma_{\ell})$
@@ -321,7 +321,7 @@ Thus if $\A$ solves $\DLP$ in $\G_T$ correctly, then $x'=x$ and $\A'$ also succe
 
 \section{Task 6 - CCA-security from IBE}
 Give a proof that the construction of a public-key encryption scheme from an ind-cpa
-secure IBE scheme and a one-time signature scheme given in Lecture 8.2 is ind-cca secure.
+secure IBE scheme and a strongly unforgeable one-time signature scheme given in Lecture 8.2 is ind-cca secure.
 \newcommand{\Exp}{\textsf{Exp}}
 \newcommand{\cpa}{\textsf{ind-cpa}}
 \newcommand{\cca}{\textsf{ind-cca}}
@@ -331,17 +331,19 @@ secure IBE scheme and a one-time signature scheme given in Lecture 8.2 is ind-cc
 \newcommand{\OT}{\textsf{OT}}
 \newcommand{\KeyExt}{\textsf{KeyExt}}
 \newcommand{\bad}{\textsf{bad}}
+\newcommand{\VK}{\mathcal{VK}}
 \begin{proof}
 We first define the ind-cca game as following.
 \begin{quote}
 {\bf Experiment} $\Exp_{\PKE}^{\cca-b}(\A)$:
 \begin{enumerate}
-\item $\C \gets \emptyset$
+\item $\VK, \C \gets \emptyset$
 \item $(\pk, \sk) \getsr \IBE.\Kg(1^\lambda)$
 \item $b' \getsr \A^{\LR_b, \D}(\pk)$
 \item {\bf return} $b'$
 \end{enumerate}
 \end{quote}
+It can be shown that we only need to consider that $\A$ queries $\LR_b$ at most once. 
 We need to define the oracles $\LR_b$ and $\D$ used above.
 \begin{quote}
 \begin{minipage}[t]{0.4\textwidth}
@@ -350,14 +352,16 @@ We need to define the oracles $\LR_b$ and $\D$ used above.
 \item $(\sk',\vk') \getsr \OT.\Kg(1^\lambda)$
 \item $C \getsr \IBE.\Enc(\pk,\vk',M_b)$
 \item $\sigma \gets \OT.\Sign_{\sk'}(C)$
-\item $\C \gets \C \cup \{C\}$
+\item $\C \gets \C \cup \{(\vk', C, \sigma)\}$
+\item $\VK \gets \VK \cup \{\vk'\}$
 \item {\bf return} $(\vk', C, \sigma)$
 \end{enumerate}
 \end{minipage}
 \begin{minipage}[t]{0.4\textwidth}
 {\bf Procedure} $\D(\vk', C,\sigma)$:
 \begin{enumerate}
-\item {\bf if} $C \in \C$ {\bf then return} $\bot$
+\item {\bf if} $(\vk', C,\sigma) \in \C$ {\bf then}
+\item \tab {\bf return} $\bot$
 \item {\bf if} $\OT.\Vrfy_{\vk'}(C,\sigma)=1$ {\bf then}
 \item \tab $\sk_{\vk'} \getsr \KeyExt(\sk, \vk')$
 \item \tab $m \gets \IBE.\Dec(\sk_{\vk'}, C)$
@@ -368,7 +372,7 @@ We need to define the oracles $\LR_b$ and $\D$ used above.
 \end{quote}
 Our goal is to show that the advantage
 %$$\Adv_{\PKE}^{\cca}(\A) \eqdef | \Pr[\textrm{$b'=1$ in $\Exp_{\PKE}^{\cca-0}$}]-\Pr[\textrm{$b'=1$ in $\Exp_{\PKE}^{\cca-1}$}] |$$
-$$\Adv_{\PKE}^{\cca}(\A) \eqdef | 2\cdot\Pr[\textrm{$b'=b$ in $\Exp_{\PKE}^{\cca-b}$}]-1 |$$
+$$\Adv_{\PKE}^{\cca}(\A) \eqdef  2\cdot\Pr[\textrm{$b'=b$ in $\Exp_{\PKE}^{\cca-b}$}]-1 $$
 is negligible. We can achieve this by defining a sequence of games.
 \begin{itemize}
 \item Game $G_0$ is defined as $\Exp_{\PKE}^{\cca-b}$, where $b \gets \bits$. 
@@ -387,11 +391,12 @@ In addition, revise the decryption oracle $\D$ by adding a flag $\bad$, which is
 \begin{quote}
 {\bf Procedure} $\D(\vk', C,\sigma)$:
 \begin{enumerate}
-\item {\bf if} $C \in \C$ {\bf then return} $\bot$
+\item {\bf if} $(\vk', C,\sigma) \in \C$ {\bf then return} $\bot$
 \item {\bf if} $\OT.\Vrfy_{\vk'}(C,\sigma)=1$ {\bf then}
 \item \tab $\sk_{\vk'} \getsr \KeyExt(\sk, \vk')$
 \item \tab $m \gets \IBE.\Dec(\sk_{\vk'}, C)$
-\item \tab $\bad \gets \true$
+\item \tab {\bf if} $\vk' \in \VK$ {\bf then}
+\item \tab \tab \tab $\bad \gets \true$
 \item \tab {\bf return} $m$.
 \item {\bf else return} $\bot$
 \end{enumerate}
@@ -400,43 +405,57 @@ In addition, revise the decryption oracle $\D$ by adding a flag $\bad$, which is
 \begin{quote}
 {\bf Procedure} $\D(\vk', C,\sigma)$:
 \begin{enumerate}
-\item {\bf if} $C \in \C$ {\bf then return} $\bot$
+\item {\bf if} $(\vk', C,\sigma) \in \C$ {\bf then return} $\bot$
 \item {\bf if} $\OT.\Vrfy_{\vk'}(C,\sigma)=1$ {\bf then}
 \item \tab $\sk_{\vk'} \getsr \KeyExt(\sk, \vk')$
 \item \tab $m \gets \IBE.\Dec(\sk_{\vk'}, C)$
-\item \tab $\bad \gets \true$
-\item \tab {\bf return} $\bot$.
+\item \tab {\bf if} $\vk' \in \VK$ {\bf then}
+\item \tab \tab \tab $\bad \gets \true$
+\item \tab \tab \tab {\bf return} $\bot$
+\item \tab {\bf return} $m$.
 \item {\bf else return} $\bot$
 \end{enumerate}
 \end{quote}
-\item Game $G_2$ is defined as $G_1$ except $\LR_b$ is revised to
+\item Game $G_2$ is defined as $G_1$ except $\D$ is revised to
 \begin{quote}
-{\bf Procedure} $\LR_b(\vk',M_0,M_1)$:
+{\bf Procedure} $\D(\vk', C,\sigma)$: // $\sigma$ is not used
 \begin{enumerate}
-\item $C \getsr \IBE.\Enc(\pk,\vk',M_b)$
-\item $\C \gets \C \cup \{C\}$
-\item {\bf return} $C$
+\item {\bf if} $\vk' \in \VK$ {\bf then return} $\bot$
+\item $\sk_{\vk'} \getsr \KeyExt(\sk, \vk')$
+\item $m \gets \IBE.\Dec(\sk_{\vk'}, C)$
+\item {\bf return} $m$.
 \end{enumerate}
 \end{quote}
+%\item Game $G_2$ is defined as $G_1$ except $\LR_b$ is revised to
+%\begin{quote}
+%{\bf Procedure} $\LR_b(\vk',M_0,M_1)$:
+%\begin{enumerate}
+%\item $C \getsr \IBE.\Enc(\pk,\vk',M_b)$
+%\item $\C \gets \C \cup \{(\vk', C,\sigma)\}$
+%\item {\bf return} $C$
+%\end{enumerate}
+%\end{quote}
 \end{itemize}
 We have the following observations.
 \begin{itemize}
 \item $\Adv_{\PKE}^{\cca}(\A) = 2\cdot\Pr[G_0 \Rightarrow 1]-1$.
 \item $\Pr[G_0 \Rightarrow 1] - \Pr[G_1 \Rightarrow 1] \leq \Pr[\textrm{$G_1$ sets $\bad = \true$}]$.
-\item There exists an adversary $\A'$ s.t. 
-	$$\Adv_{\OT}^{\textsf{uf-cma}}(\A') = \Pr[\textrm{$G_1$ sets $\bad = \true$}].$$
-\item $\Pr[G_2 \Rightarrow 1] \geq \Pr[G_1 \Rightarrow 1]$, since every query to $\LR_b$ in $G_1$ can be simulated by the adversary $\A$ in $G_2$, i.e., for each query $(M_0,M_1)$ to $\LR_b$ in $G_1$, $\A$ in $G_2$ can do the following:
-	\begin{enumerate}
-	\item $(\sk',\vk') \getsr \OT.\Kg(1^\lambda)$
-	\item $C \getsr \LR_b(\vk', M_0, M_1)$
-	\item $\sigma \gets \OT.\Sign_{\sk'}(C)$
-	\item {\bf return} $(\vk', C, \sigma)$
-	\end{enumerate}
-\item There exists an adversary $\A''$ s.t.
+\item Focusing on $\bad$, $G_1$ is the strong unforgeablity game for $\OT$, i.e., the adversary can only query $\LR_b$ at most once, and a true $\bad$ means a valid forge of message-signature pair with the key $\vk'$. Hence there exists an adversary $\A'$ s.t. 
+	$$\Adv_{\OT}^{\textsf{st-uf}}(\A') = \Pr[\textrm{$G_1$ sets $\bad = \true$}].$$
+%\item $\Pr[G_2 \Rightarrow 1] \geq \Pr[G_1 \Rightarrow 1]$, since the query (at most once) to $\LR_b$ in $G_1$ can be simulated by the adversary $\A$ in $G_2$, i.e., for each query $(M_0,M_1)$ to $\LR_b$ in $G_1$, $\A$ in $G_2$ can do the following:
+	%\begin{enumerate}
+	%\item $(\sk',\vk') \getsr \OT.\Kg(1^\lambda)$
+	%\item $C \getsr \LR_b(\vk', M_0, M_1)$
+	%\item $\sigma \gets \OT.\Sign_{\sk'}(C)$
+	%\item {\bf return} $(\vk', C, \sigma)$
+	%\end{enumerate}
+\item $\D$ in $G_2$ gives more information to $\A$ than $\D$ in $G_1$. Hence 
+$$\Pr[G_1 \Rightarrow 1] \leq \Pr[G_2 \Rightarrow 1].$$
+\item Note that if $G_2 \Rightarrow 1$, then $\A$ can correctly outputs the challenge bit $b$ in the ind-cpa security game for $\IBE$, i.e., query $\vk'$ to the key-extraction oracle $\KeyExt$ whenever query $(\vk', C,\sigma)$ to $\D$ in $G_2$ and compute $m$ based on the answer $\sk_{\vk'}$ from $\KeyExt$. Thus there exists an adversary $\A''$ s.t.
 $$\Adv_{\IBE}^{\cpa}(\A'') = 2\cdot\Pr[G_2 \Rightarrow 1] - 1.$$
 \end{itemize}
 Putting everything together, we have
-$$\Adv_{\PKE}^{\cca}(\A) \leq 2\cdot\Adv_{\OT}^{\textsf{uf-cma}}(\A') + \Adv_{\IBE}^{\cpa}(\A'')$$
+$$\Adv_{\PKE}^{\cca}(\A) \leq 2\cdot\Adv_{\OT}^{\textsf{st-uf}}(\A') + \Adv_{\IBE}^{\cpa}(\A'')$$
 which is negligible.
 \end{proof}
 
