@@ -108,7 +108,7 @@ $\underleftarrow{\quad #1 \quad}$ }
 \newcommand{\LR}{\textsf{LR}}
 
 \begin{document}
-\handout{3}{Due: Mar 11, 2016}{Homework 4}
+\handout{4}{Due: Mar 11, 2016}{Homework 4}
 \section{Task 1 - CCA Security and Malleability}
 We say that a public-key encryption scheme $\PKE = (\Kg, \Enc, \Dec)$ is $f$-\emph{malleable} for an efficiently computable function $f$ if given an encryption $C \getsr \Enc(\pk, m)$ of an arbitrary message $m$ under some valid key $\pk$ (with associated public key $\sk$), we can efficiently compute $C'$ such that $\Dec(\sk, C') = f(m)$.
 
@@ -440,8 +440,8 @@ We have the following observations.
 \begin{itemize}
 \item $\Adv_{\PKE}^{\cca}(\A) = 2\cdot\Pr[G_0 \Rightarrow 1]-1$.
 \item $\Pr[G_0 \Rightarrow 1] - \Pr[G_1 \Rightarrow 1] \leq \Pr[\textrm{$G_1$ sets $\bad = \true$}]$.
-\item Focusing on $\bad$, $G_1$ is the strong unforgeablity game for $\OT$, i.e., the adversary can only query $\LR_b$ at most once, and a true $\bad$ means a valid forge of message-signature pair with the key $\vk'$. Hence there exists an adversary $\A'$ s.t. 
-	$$\Adv_{\OT}^{\textsf{st-uf}}(\A') = \Pr[\textrm{$G_1$ sets $\bad = \true$}].$$
+\item Focusing on $\bad$, $G_1$ is the strong unforgeablity game for $\OT$, i.e., the adversary can only query $\LR_b$ at most once, obtaining at most one valid message-signature pair from $\LR_b$, and a true $\bad$ at the end of the game means a valid forge of message-signature pair with the key $\vk'$. Hence
+	$$\Adv_{\OT}^{\textsf{st-uf}}(\A) = \Pr[\textrm{$G_1$ sets $\bad = \true$}].$$
 %\item $\Pr[G_2 \Rightarrow 1] \geq \Pr[G_1 \Rightarrow 1]$, since the query (at most once) to $\LR_b$ in $G_1$ can be simulated by the adversary $\A$ in $G_2$, i.e., for each query $(M_0,M_1)$ to $\LR_b$ in $G_1$, $\A$ in $G_2$ can do the following:
 	%\begin{enumerate}
 	%\item $(\sk',\vk') \getsr \OT.\Kg(1^\lambda)$
@@ -451,11 +451,11 @@ We have the following observations.
 	%\end{enumerate}
 \item $\D$ in $G_2$ gives more information to $\A$ than $\D$ in $G_1$. Hence 
 $$\Pr[G_1 \Rightarrow 1] \leq \Pr[G_2 \Rightarrow 1].$$
-\item Note that if $G_2 \Rightarrow 1$, then $\A$ can correctly outputs the challenge bit $b$ in the ind-cpa security game for $\IBE$, i.e., query $\vk'$ to the key-extraction oracle $\KeyExt$ whenever query $(\vk', C,\sigma)$ to $\D$ in $G_2$ and compute $m$ based on the answer $\sk_{\vk'}$ from $\KeyExt$. Thus there exists an adversary $\A''$ s.t.
-$$\Adv_{\IBE}^{\cpa}(\A'') = 2\cdot\Pr[G_2 \Rightarrow 1] - 1.$$
+\item Note that if $G_2 \Rightarrow 1$, then $\A$ can correctly output the challenge bit $b$ in the ind-cpa security game for $\IBE$, i.e., query $\vk'$ to the key-extraction oracle $\KeyExt$ whenever query $(\vk', C,\sigma)$ to $\D$ in $G_2$ and compute $m$ based on the answer $\sk_{\vk'}$ from $\KeyExt$. Thus 
+$$\Adv_{\IBE}^{\cpa}(\A) = 2\cdot\Pr[G_2 \Rightarrow 1] - 1.$$
 \end{itemize}
-Putting everything together, we have
-$$\Adv_{\PKE}^{\cca}(\A) \leq 2\cdot\Adv_{\OT}^{\textsf{st-uf}}(\A') + \Adv_{\IBE}^{\cpa}(\A'')$$
+Putting everything together, we have for any PPT $\A$
+$$\Adv_{\PKE}^{\cca}(\A) \leq 2\cdot\Adv_{\OT}^{\textsf{st-uf}}(\A) + \Adv_{\IBE}^{\cpa}(\A)$$
 which is negligible.
 \end{proof}
 

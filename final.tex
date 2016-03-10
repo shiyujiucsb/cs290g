@@ -1,0 +1,509 @@
+\documentclass[12pt]{article}
+\usepackage{url,amsmath,setspace,amssymb,amsthm,amsfonts}
+%\usepackage{hyperref}
+
+\setlength{\oddsidemargin}{.25in}
+\setlength{\evensidemargin}{.25in}
+\setlength{\textwidth}{6.25in}
+\setlength{\topmargin}{-0.4in}
+\setlength{\textheight}{8.5in}
+
+\newcommand{\heading}[5]{
+   \renewcommand{\thepage}{\arabic{page}}
+   \noindent
+   \begin{center}
+   \framebox[\textwidth]{
+     \begin{minipage}{0.9\textwidth} \onehalfspacing
+       {\bf CS 290G -- Introduction to Modern Cryptography} \hfill #2
+
+       {\centering \Large #5
+       
+       }\medskip
+
+       {\it #3 \hfill #4}
+     \end{minipage}
+   }
+   \end{center}
+}
+
+\newcommand{\handout}[3]{\heading{#1}{#2}{Instructor:
+Stefano Tessaro}{Student: Shiyu Ji}{#3}}
+
+\setlength{\parindent}{0in}
+
+\newcommand{\eqdef}{\stackrel{def}{=}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\bits}{\{0,1\}}
+\newcommand{\inr}{\in_{\mbox{\tiny R}}}
+%\newcommand{\getsr}{\gets_{\mbox{\tiny R}}}
+\newcommand{\getsr}{\stackrel{\$}{\gets}}
+\newcommand{\getsn}{\stackrel{n}{\gets}}
+\newcommand{\st}{\mbox{ s.t. }}
+\newcommand{\etal}{{\it et al }}
+\newcommand{\into}{\rightarrow}
+
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\e}{\epsilon}
+\newcommand{\ee}{\varepsilon}
+\newcommand{\ceil}[1]{{\lceil{#1}\rceil}}
+\newcommand{\floor}[1]{{\lfloor{#1}\rfloor}}
+\newcommand{\angles}[1]{\langle #1 \rangle}
+\newcommand{\Com}{{\sf Com}}
+\newcommand{\desc}{{\sf desc}}
+
+\newcommand{\rightstep}[1]{%
+$\underrightarrow{\quad #1 \quad}$ }
+
+\newcommand{\leftstep}[1]{%
+$\underleftarrow{\quad #1 \quad}$ }
+\newcommand{\Adv}{\textsf{Adv}}
+\newcommand{\tab}{\hspace{0.3in}}
+\newcommand{\MAC}{\textsf{MAC}}
+\newcommand{\CBC}{\textsf{CBC}}
+\newcommand{\Eval}{\textsf{Eval}}
+\newcommand{\Vrfy}{\textsf{Vrfy}}
+\newcommand{\WIN}{\textsf{WIN}}
+\newcommand{\true}{\textsf{true}}
+\newcommand{\false}{\textsf{false}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\C}{\mathcal{C}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Theorems & Definitions
+
+
+\newtheorem{theorem}{Theorem}[section]
+
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{subclaim}{Claim}[theorem]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{observation}[theorem]{Observation}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{construction}[theorem]{Construction}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{counterexample}[theorem]{Counterexample}
+\newtheorem{algorithm1}[theorem]{Algorithm}
+\newtheorem{protocol}[theorem]{Protocol}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{fact}[theorem]{Fact}
+
+%\bibliographystyle{plain}
+
+\newcommand{\PKE}{\textsf{PKE}}
+\newcommand{\Kg}{\textsf{Kg}}
+\newcommand{\Enc}{\textsf{Enc}}
+\newcommand{\Dec}{\textsf{Dec}}
+\newcommand{\pk}{\textsf{pk}}
+\newcommand{\sk}{\textsf{sk}}
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\LR}{\textsf{LR}}
+
+\begin{document}
+\handout{}{Due: Mar 18, 2016}{The Final}
+
+{\bf Note}. Using QED to mark the end of each solution, I abuse the proof environment a lot. Many of them are not necessarily proofs. 
+
+\section{Task 1 - Number Theory}
+
+{\bf a) [Points: 2]} How many elements does $\Z_{35}^*$ have?
+\begin{proof}
+$35 = 5 * 7$, and 5, 7 are both prime. Based on Euler's totient function $\varphi(pq) = (p-1)(q-1)$ where both $p$ and $q$ are prime, we have
+$$\varphi(35) = 4 \times 6 = 24.$$
+Since Euler's totient function $\varphi(n)$ gives the order of the multiplicative group $\Z_n^*$, we have $|\Z_{35}^*| = 24$.
+\end{proof}
+
+{\bf b) [Points: 4]} Compute $2^{600000}\mod 65$.
+\begin{proof}
+Compute Euler's totient function,
+$$\varphi(65) = \varphi(5 \times 13) = 4 \times 12 = 48.$$
+Based on Euler's Totient Theorem, for any positive integers $a$ and $n$ s.t. $a$ is coprime to $n$,
+$$a^{\varphi(n)} \equiv 1 \mod n.$$
+Note that 2 is coprime to 65. Thus $2^{48} \equiv 1 \mod 65$. Hence
+$$2^{600000} \mod 65 = 2^{600000\mod 48} \mod 65 = 2^0 \mod 65 = 1.$$
+\end{proof}
+
+{\bf c) [Points: 4]} Find all square roots of 4 in $\Z_{15}^*$.
+\begin{proof}
+The square roots of 4 in $\Z_{15}^*$ are 2 and 13. $2\times 2 \equiv 4 \mod 15$. $13 \times 13 \equiv (-2)\times(-2) \equiv 4 \mod 15$.
+\end{proof}
+
+{\bf d) [Points: 5]} Let $N = P\cdot Q$ for two distinct primes $P$, $Q$. Show that given $X, Y \in \Z_N$ with $X \not= \pm Y \mod N$, yet $X^2 = Y^2 \mod N$, then we can factor $N$, i.e., find $P$ and $Q$.
+\begin{proof}
+Note that $X^2 = Y^2 \mod N$ implies
+$$(X-Y)(X+Y) = 0\mod N.$$
+If $X \not= \pm Y \mod N$, then neither $X-Y$ not $X+Y$ is 0 in $\Z_N^*$. Since their product modulo $N$ is 0, which is not in $\Z_N^*$, either $X-Y$ or $X+Y$ is not in $\Z_N^*$. Without loss of generality we assume $X-Y$ is not in $\Z_N^*$. Then $X-Y$ is not coprime with $N$, and thus the gcd of $X-Y$ and $N$ gives the factorization.
+\end{proof}
+
+\section{Task 2 - Symmetric Encryption and One-Wayness}
+\newcommand{\SKE}{\mathcal{SKE}}
+\newcommand{\ow}{\mathsf{ow}}
+Let $\SKE = (\Kg, \Enc, \Dec)$ be a secret-key encryption scheme with message space $\M_{\lambda}$, i.e., for security parameter $\lambda$, the message space is $\M_{\lambda}$. For instance, we could have $\M_{\lambda} = \bits$ (in which case, the message space does not grow with $\lambda$), or $\M_{\lambda} = \bits^\lambda$.
+
+In the following, we say that $\SKE$ is \emph{one-way} if the following $\ow$ advantage is negligible for all PPT adversaries $\A$:
+$$\Adv_{\SKE}^{\ow}(\A) = \Pr[k \getsr \Kg(1^\lambda), m \getsr \M_{\lambda}, c\getsr \Enc(k,m), m' \getsr \A(c): m'=m].$$
+
+{\bf a) [Points: 8]} Show that $\M_{\lambda}$ has size $|\M_{\lambda}| = 2^{\omega(\log \lambda)}$, then IND-CPA security of $\SKE$ implies its one-wayness.
+\begin{proof}
+Assume by contradiction there is a PPT adversary $\A$ s.t. $\Adv_{\SKE}^{\ow}(\A)$ is non-negligible. It suffices to show $\SKE$ is not IND-CPA secure. We can build a PPT adversary $\A'$ for the IND-CPA security game:
+\begin{quote}
+{\bf Adversary} $\A'^O$: // $O$ is $\LR_0^k$ or $\LR_1^k$.
+\begin{enumerate}
+\item $m_0, m_1 \getsr \M_{\lambda}$
+\item $c \getsr O(m_0,m_1)$
+\item $m \getsr \A(c)$
+\item {\bf if} $m=m_0$ {\bf then return} 1
+\item {\bf else return} 0
+\end{enumerate}
+\end{quote}
+We can compute the advantage of $\A'$:
+$$\begin{aligned}
+&\Adv_{\SKE}^{ind-cpa}(\A') \\
+=& |\Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_0^k}=1] - \Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_1^k}=1]| \\
+=& |\Pr[k \getsr \Kg(1^\lambda), m_0 \getsr \M_{\lambda}, c \getsr \Enc(k, m_0): \A(c)=m_0] - \Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_1}=1]| \\
+=& |\Adv_{\SKE}^{\ow}(\A) - \Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_1}=1]|.
+\end{aligned}$$
+It suffices to argue $\Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_1}=1]$ is also negligible. Note that in $\A'$ the choice of $m_0$ is independent to the choice of $m_1$ and thus $\A(\Enc(k,m_1))$. Hence
+$$\begin{aligned}
+&\Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_1}=1] \\
+=& \Pr[k \getsr \Kg(1^\lambda), m_0,m_1 \getsr \M_{\lambda}, c \getsr \Enc(k, m_1): \A(c)=m_0] 
+= 1/|\M_{\lambda}|.
+\end{aligned}$$
+Since $|\M_{\lambda}| = 2^{\omega(\log \lambda)}$, $1/|\M_{\lambda}|$ is negligible as desired.
+\end{proof}
+
+{\bf b) [Points: 2]} Is the restriction on the size of $\M_{\lambda}$ necessary?
+\begin{proof}
+Yes. Without the size restriction of $\M_{\lambda}$, we cannot guarantee $1/|\M_{\lambda}|$ is negligible. Thus $\Adv_{\SKE}^{ind-cpa}(\A')$ may not be non-negligible any more. As an counterexample, suppose $\SKE$ encrypts only one bit. It is easy to see $\SKE$ cannot be one-way since random guessing one bit can invert the ciphertext with $\Adv_{\SKE}^{\ow}(\A) = 1/2$, no matter whether $\SKE$ is IND-CPA secure.
+\end{proof}
+
+\section{Task 3 - Pseudorandomness and Symmetric Encryption}
+We are given a pseudorandom permutation (PRP) $E : \bits^\lambda \times \bits^n \to \bits^n$. Then we consider the following symmetric encryption scheme $\SKE_0 = (\Kg,\Enc,\Dec)$, assuming $n=2\lambda$, and encrypting messages of length $\lambda$:
+\begin{quote}
+\begin{minipage}[t]{0.25\textwidth}
+{\bf Proc.} $\Kg(1^\lambda)$:
+\begin{enumerate}
+\item $k \getsr \bits^\lambda$
+\item {\bf Return} $k$
+\end{enumerate}
+\end{minipage}
+\begin{minipage}[t]{0.3\textwidth}
+{\bf Proc.} $\Enc(k, m)$:
+\begin{enumerate}
+\item $r \getsr \bits^\lambda$
+\item $c \getsr E_k (m||r)$
+\item {\bf return} $c$
+\end{enumerate}
+\end{minipage}
+\begin{minipage}[t]{0.3\textwidth}
+{\bf Proc.} $\Dec(k, c)$:
+\begin{enumerate}
+\item $m'||r' \gets E_k^{-1} (c)$
+\item {\bf return} $m'$
+\end{enumerate}
+\end{minipage}
+\end{quote}
+
+{\bf a) [Points: 4]} Give a proof sketch that $\SKE_0$ is IND-CPA secure if $E$ is a PRP.
+\begin{proof}
+(Sketched) Assume by contradiction $\SKE_0$ is not IND-CPA. Then there is a PPT adversary $\A$ that can tell the bit $b$ in the oracle $\LR_b^k$ with non-negligible advantage $\Adv_{\SKE_0}^{ind-cpa}(\A)$. It finishes the proof by building a PPT adversary $\A'$ that can tell apart $E_k(\cdot)$ and random permutation $RP_{n}$ with non-negligible advantage. Such an adversary $\A'$ can be built as following.
+\begin{quote}
+{\bf Adversary} $\A'^{O}$: // $O$ can be $E_k(\cdot)$ or $RP_n$
+\begin{enumerate}
+\item $b \getsr \bits$
+\item $b' \getsr \A^{\widetilde{O}_b}$
+\item {\bf if} $b=b'$ {\bf then return} 1
+\item {\bf else return} 0
+\end{enumerate}
+\end{quote}
+The oracle $\widetilde{O}_b$ simulated by $\A'$ is defined as:
+\begin{quote}
+{\bf Oracle} $\widetilde{O}_b(m_0,m_1)$:
+\begin{enumerate}
+\item $r \getsr \bits^\lambda$
+\item $c \getsr O(m_b || r)$
+\item {\bf return} $c$
+\end{enumerate}
+\end{quote}
+Note that in $\A'$ every step except those in $\A$ takes polynomial time. Thus $\A'$ is PPT iff $\A$ is PPT.
+To argue the advantage of $\A'$ is non-negligible, we can define a sequence of games:
+\begin{itemize}
+\item Define the game $G_0$ as $\A'$ where $O = E_k(\cdot)$. 
+\item Define $G_1$ the same as $G_0$ except $O=RP_n$. 
+\item Define $G_2$ the same as $G_1$ except that the oracle $\widetilde{O}$ just randomly chooses $c \getsr \bits^n$ and returns $c$. 
+\end{itemize}
+We also have the following observations:
+\begin{itemize}
+\item Since in $G_0$, $\widetilde{O}$ simulates the encrypting oracle $\Enc(k,\cdot)$, we have
+$$\Adv_{\SKE_0}^{ind-cpa}(\A) = 2\cdot\Pr[G_0 \Rightarrow 1] - 1$$
+is non-negligible.
+\item Note that if $O = RP_n$, the answers from $\widetilde{O}_b$ are uniformly distributed \emph{unconditionally}, since $RP_n$ take a uniformly random $r$ as input. Thus
+$$\Pr[G_1 \Rightarrow 1] = \Pr[G_2 \Rightarrow 1].$$
+\item In $G_2$, since the answers from $\widetilde{O}$ are independently and uniformly random, $\Pr[G_2 \Rightarrow 1] = 1/2$.
+\end{itemize}
+Since
+$$\Adv_{E_k}^{prp}(\A') = \Pr[G_0 \Rightarrow 1] - \Pr[G_1 \Rightarrow 1],$$
+we have $\Adv_{E_k}^{prp}(\A')$ must be non-negligible as desired. One can also summarize the proof idea above in one line: for any PPT adversary $\A$, there exists a PPT adversary $\A'$ s.t.
+$$\Adv_{\SKE_0}^{ind-cpa}(\A) = \Adv_{E_k}^{prp}(\A').$$
+\end{proof}
+
+\newcommand{\E}{\mathsf{E}}
+\newcommand{\D}{\mathsf{D}}
+{\bf b) [Points: 4]} Show that $\SKE_0$ is not INT-CTXT secure. Give a concrete attack!
+\begin{proof}
+See Lecture 5.2 for the definition of INT-CTXT security game.
+Since $E_k$ is a permutation, for any $y \in \bits^n$, there exists a preimage $x \in \bits^n$ s.t. $E_k(x) = y$.
+To win the INT-CTXT security game, the adversary $\A$ can just choose $y \getsr \bits^n$ and then query $y$ to the decryption oracle $\D$. Since $\A$ never queried the encryption oracle $\E$, $\C$ is empty. Since there must exist a preimage $x = E_k^{-1}(y)$, $\D$ will not return $\bot$ and $\A$ will win the game with advantage 1. 
+\end{proof}
+
+{\bf c) [Points: 2]} Show that $\SKE_0$ is not INT-PTXT secure. Give a concrete attack!
+\begin{proof}
+See Lecture 5.2 for the definition of INT-PTXT security game.
+The adversary defined in {\bf b)} can also win the INT-PTXT security game. The reasoning is similar: since $\A$ never queried $\E$, $\M$ is empty, and thus the preimage $x = E_k^{-1}(y)$ is not in $\M$. Hence $\D$ will not return $\bot$ and $\A$ will win with advantage 1.
+\end{proof}
+
+Consider now the following modification of $\SKE_0$ above, which we refer to as $\SKE_1$, and which consists of the following three algorithms (here, we are assuming that $n=3\lambda$):
+\begin{quote}
+\begin{minipage}[t]{0.25\textwidth}
+{\bf Proc.} $\Kg(1^\lambda)$:
+\begin{enumerate}
+\item $k \getsr \bits^\lambda$
+\item {\bf Return} $k$
+\end{enumerate}
+\end{minipage}
+\begin{minipage}[t]{0.3\textwidth}
+{\bf Proc.} $\Enc(k, m)$:
+\begin{enumerate}
+\item $r \getsr \bits^\lambda$
+\item $c \getsr E_k (m||r||0^\lambda)$
+\item {\bf return} $c$
+\end{enumerate}
+\end{minipage}
+\begin{minipage}[t]{0.3\textwidth}
+{\bf Proc.} $\Dec(k, c)$:
+\begin{enumerate}
+\item $m'||r'||z' \gets E_k^{-1} (c)$
+\item {\bf if} $z'=0^\lambda$ {\bf then return} $m'$
+\item {\bf else return} $\bot$
+\end{enumerate}
+\end{minipage}
+\end{quote}
+
+{\bf d) [Points: 2]} Is $\SKE_1$ still IND-CPA secure? Either explain why the argument from {\bf a)} still works, or give an attack.
+\begin{proof}
+Yes. $\SKE_1$ is IND-CPA secure. The security proof should follow the similar lines in {\bf a)}: any adversary $\A'$ cannot efficiently tell apart the left or right world in the IND-CPA security game, unless there is a PPT $\A'$ that can efficiently tell apart the distributions of $E_k(\cdot)$ and $RP_n$. Since the input to $E_k(\cdot)$ still contains uniformly random $r$, the output of $E_k(\cdot)$ is still pseudorandom if $E_k$ is PRP. Thus any PPT adversary cannot efficiently tell apart the output of $E_k(\cdot)$ or $RP_n$. Padding $0^\lambda$ to the message cannot change this fact.
+\end{proof}
+
+{\bf e) [Points: 3]} Do the attacks of {\bf b)} and {\bf c)} extend to $\SKE_1$?
+\begin{proof}
+No. In $\SKE_1$, the range size of $E_k$ is $|\bits^{3\lambda}| = 2^{3\lambda}$, but only $2^{2\lambda}$ strings in the range have preimages, ending with $0^\lambda$. The probability that a string chosen at uniformly random has a preimage ending with $0^\lambda$ is $2^{-\lambda}$, which is negligible. Hence the probability that $\D$ will not return $\bot$ is negligible. The adversary $\A$ in {\bf b)} and {\bf c)} will fail with overwhelming probability.
+\end{proof}
+
+\newcommand{\G}{\mathbb{G}}
+\section{Task 4 - Hybrid Encryption}
+Let $\G = \angles{g}$ be a cyclic group with generator $g \in \G$ and prime order $|\G|=q$.
+Assume that we are given a \emph{secret-key} encryption scheme $\SKE = (\Kg^\SKE,\Enc^\SKE,\Dec^\SKE)$ with message space $\M$ such that $\Kg^\SKE$ generates uniform random elements of $\G$. Then consider the following \emph{public-key} encryption scheme $\PKE = (\Kg,\Enc,\Dec)$, with message space $\M$:
+\begin{quote}
+\begin{minipage}[t]{0.25\textwidth}
+{\bf Proc.} $\Kg(1^\lambda)$:
+\begin{enumerate}
+\item $\sk \getsr \Z_q$
+\item $\pk \gets g^\sk$
+\item {\bf Return} $(\pk,\sk)$
+\end{enumerate}
+\end{minipage}
+\begin{minipage}[t]{0.3\textwidth}
+{\bf Proc.} $\Enc(\pk, m)$:
+\begin{enumerate}
+\item $r \getsr \Z_q, k \gets \pk^r$
+\item $d \getsr \Enc_k^\SKE(m)$
+\item {\bf return} $c=(g^r,d)$
+\end{enumerate}
+\end{minipage}
+\begin{minipage}[t]{0.3\textwidth}
+{\bf Proc.} $\Dec(\sk, (y,d))$:
+\begin{enumerate}
+\item $k \gets y^\sk$
+\item $m \gets \Dec_k^\SKE(d)$
+\item {\bf return} $m$
+\end{enumerate}
+\end{minipage}
+\end{quote}
+
+{\bf a) [Points: 3]} Show that $\PKE$ is correct, i.e., decryption is correct if $\SKE$ is correct.
+\begin{proof}
+Based on the construction of $\Dec(\sk,(y,d))$ we have
+$$\Dec_k^\SKE(d) = \Dec_{y^{\sk}}^\SKE(d).$$
+For any ciphertext $c = (g^r,d)$ generated by $\Enc$, if $c = (y,d)$, then
+$$\Dec_{y^{\sk}}^\SKE(d) = \Dec_{g^{r\cdot\sk}}^\SKE(d) = \Dec_{g^{r\cdot\sk}}^\SKE(\Enc_k^\SKE(m)) = \Dec_{g^{r\cdot\sk}}^\SKE(\Enc_{\pk^r}^\SKE(m))
+=\Dec_{g^{r\cdot\sk}}^\SKE(\Enc_{g^{r\cdot\sk}}^\SKE(m)).$$
+Thus $\Dec(\sk,(y,d)) = m$ if $(y,d)$ is generated by $\Enc(\pk,m)$ and $\SKE$ is correct.
+\end{proof}
+
+{\bf b) [Points: 3]} Give a concrete secret-key scheme $\SKE$ such that one recovers the original ElGamal encryption scheme from the above generic construction.
+\begin{proof}
+We directly give the construction as following:
+\begin{quote}
+\begin{minipage}[t]{0.25\textwidth}
+{\bf Proc.} $\Kg^\SKE(1^\lambda)$:
+\begin{enumerate}
+\item $k \getsr \G$
+\item {\bf Return} $k$
+\end{enumerate}
+\end{minipage}
+\begin{minipage}[t]{0.3\textwidth}
+{\bf Proc.} $\Enc^\SKE(k, m)$:
+\begin{enumerate}
+\item $c \getsr m\cdot k$ (in $\G$)
+\item {\bf return} $c$
+\end{enumerate}
+\end{minipage}
+\begin{minipage}[t]{0.3\textwidth}
+{\bf Proc.} $\Dec^\SKE(k, c)$:
+\begin{enumerate}
+\item $m \gets c\cdot k^{-1}$ (in $\G$)
+\item {\bf return} $m$
+\end{enumerate}
+\end{minipage}
+\end{quote}
+Its effectiveness and correctness immediately follow.
+\end{proof}
+
+{\bf c) [Points: 5]} Assume that the Decisional Diffie-Hellman (DDH) assumption holds in $\G$ with respect to $g$, and that $\SKE$ is IND-CPA secure. Then give a proof sketch showing that $\PKE$ is IND-CPA secure.
+\begin{proof}
+(Sketched) First of all in IND-CPA security game for \emph{public} key encryption scheme $\PKE$, we only need to consider the case that the adversary queries $\LR$ at most once (this can be proved by standard hybrid argument). For any PPT adversary $\A$, we define the game $G_0$ to be the IND-CPA security game for $\PKE$.
+\begin{quote}
+\begin{minipage}[t]{0.4\textwidth}
+{\bf Game} $G_0$:
+\begin{enumerate}
+\item $\sk \getsr \Z_q$
+\item $\pk \gets g^\sk$
+\item $b \getsr \bits$
+\item $b' \gets \A^{\LR_b}(\pk)$
+\item {\bf if} $b=b'$ {\bf then return} 1
+\item {\bf else return} 0
+\end{enumerate}
+\end{minipage}
+\begin{minipage}[t]{0.4\textwidth}
+{\bf Proc.} $\LR_b(m_0, m_1)$:
+\begin{enumerate}
+\item $r \getsr \Z_q, k \gets \pk^r$
+\item $d \getsr \Enc_k^\SKE(m_b)$
+\item {\bf return} $c=(g^r,d)$
+\end{enumerate}
+\end{minipage}
+\end{quote}
+Clearly $\Adv_{\PKE}^{ind-cpa}(\A) \leq 2\cdot \Pr[G_0 \Rightarrow 1]-1$.
+We still have two more games to define.
+The first one just moves the steps except $\Enc^\SKE$ in $\LR_b$ to the main game. Then $\Enc^\SKE$ is exposed to the adversary and thus we can use the argument of IND-CPA secure $\SKE$.
+\begin{quote}
+\begin{minipage}[t]{0.4\textwidth}
+{\bf Game} $G_1$:
+\begin{enumerate}
+\item $\sk \getsr \Z_q, \pk \gets g^\sk$
+\item $r \getsr \Z_q, k \gets \pk^r$
+\item $b \getsr \bits, b' \gets \A^{\LR_b}(\pk)$
+\item {\bf if} $b=b'$ {\bf then return} 1
+\item {\bf else return} 0
+\end{enumerate}
+\end{minipage}
+\begin{minipage}[t]{0.4\textwidth}
+{\bf Proc.} $\LR_b(m_0, m_1)$:
+\begin{enumerate}
+\item $d \getsr \Enc_k^\SKE(m_b)$
+\item {\bf return} $c=(g^r,d)$
+\end{enumerate}
+\end{minipage}
+\end{quote}
+Since $\A$ can query $\LR_b$ at most once, $G_0$ and $G_1$ are the same from the view of $\A$. Hence $\Pr[G_0 \Rightarrow 1] = \Pr[G_1 \Rightarrow 1]$.
+
+In the second game $G_2$, we just revise $k \gets \pk^r$ to $k \getsr \Z_q$. This change leverages the DDH assumption, i.e., the distributions of $(\pk = g^\sk, g^r, k=g^{r\cdot\sk})$ and $(\pk = g^\sk, g^r, g^c)$, $c \getsr \Z_q$ are computationally indistinguishable. Except this change, anything else keeps the same to $\A$. Thus
+$$\Adv_{\G}^{ddh}(\A) = \Pr[G_1 \Rightarrow 1] - \Pr[G_2 \Rightarrow 1].$$
+Since the key $k$ in $G_2$ is chosen at uniformly random and is independent of $b$, $\A$ exactly faces the IND-CPA security game for $\SKE$. Hence $\Pr[G_2 \Rightarrow 1] = \Adv_{\SKE}^{ind-cpa}(\A)$.
+
+Putting everything together we have 
+$$\Adv_{\PKE}^{ind-cpa}(\A) \leq \Adv_{\G}^{ddh}(\A) + \Adv_{\SKE}^{ind-cpa}(\A)$$
+for any PPT adversary $\A$.
+\end{proof}
+
+{\bf d) [Points: 4]} In {\bf c)}, can we weaken the assumption on $\SKE$ to something simpler than full-fledged IND-CPA security?
+\begin{proof}
+Yes. Consider the OTP-like $\SKE$ in {\bf b)}, which is clearly not IND-CPA secure. However, if the key $k$ is chosen at uniformly random, and $\A$ only queries at most once, then $\SKE$ can also securely hide $b$ by the argument of information theoretical security.
+\end{proof}
+
+\section{Task 5 - One-way Functions and Signatures}
+{\bf a) [Points: 5]} Let $f : \bits^\lambda \to \bits^\lambda$ be a one-way function. Consider the function $g : \bits^{\lambda-1} \to \bits^\lambda$ such that $g(x) = f(0||x)$. Prove that $g$ is also a one-way function.
+\begin{proof}
+Assume by contradiction there exists a PPT $\A$ s.t. $\Adv_{g}^{\ow}(\A)$ is non-negligible. It suffices to give a PPT $\A'$ with non-negligible $\Adv_f^{\ow}(\A')$. Such an $\A'$ can be as following:
+\begin{quote}
+{\bf Adversary} $\A'(y)$: // $y=f(x)$ for some $x \in \bits^\lambda$
+\begin{enumerate}
+\item $z \getsr \A(y)$
+\item {\bf if} $f(0||z) = y$ {\bf then}
+\item \tab {\bf return} $0||z$
+\item {\bf else return} $\bot$
+\end{enumerate}
+\end{quote}
+Note that every step except those in $\A$ takes polynomial time. Thus $\A'$ is PPT iff $\A$ is PPT.
+Denote $x[0]$ the first bit of $x$.
+We can estimate the advantage of $\A'$:
+$$\begin{aligned}
+&\Adv_f^{\ow}(\A') = \Pr[x\getsr\bits^\lambda, x' \getsr \A'(f(x)): f(x')=f(x)] \\
+\geq& \Pr[x\getsr\bits^\lambda, x' \getsr \A'(f(x)): f(x')=f(x) \wedge x[0]=0].
+\end{aligned}$$
+Note that conditioned on $x[0]=0$,
+$$\begin{aligned}
+&\Pr[x\getsr\bits^\lambda, x' \getsr \A'(f(x)): f(x')=f(x) \wedge x[0]=0] \\
+=&\frac{1}{2}\Pr[x\getsr\bits^\lambda, x[0]=0, x' \getsr \A'(f(x)): f(x')=f(x)] \\
+=&\frac{1}{2}\Pr[x\getsr\bits^\lambda, x[0]=0, 0||z \getsr \A'(f(x)): f(0||z)=f(x)] \\
+=&\frac{1}{2}\Pr[w\getsr\bits^{\lambda-1}, z \getsr \A(f(0||w)): g(z)=f(0||z)=f(0||w)=g(w)] \\
+=&\frac{1}{2}\Adv_g^{\ow}(\A).
+\end{aligned}$$
+Hence $\Adv_f^{\ow}(\A')\geq \frac{1}{2}\Adv_g^{\ow}(\A)$, which is non-negligible.
+\end{proof}
+
+{\bf b) [Points: 4]} Use {\bf a)} to give a one-way function $h : \bits^\lambda \to \bits^\lambda$ such that for every $x\in\bits^\lambda$ it is easy to find $x'\not = x$ such that $h(x)=h(x')$.
+\begin{proof}
+Consider $h(b||w) \eqdef f(0||w)$, where $b\in\bits$ and $w\in\bits^{\lambda-1}$.
+Following the similar lines in the proof of {\bf a)} we can show $h$ is one-way. However given any $x=b||w$, $x'\eqdef (1-b)||w$ satisfies $h(x)=h(x')$.
+\end{proof}
+
+\newcommand{\vk}{\mathsf{vk}}
+Recall that a signature scheme is one-time \emph{strongly} unforgeable if given a message-signature
+pair $(m,\sigma)$ (for $m$ chosen adaptively by the adversary depending on the verification key $\vk$), the adversary cannot come up, except with negligible probability, with $(m',\sigma') \not= (m,\sigma)$ such that $\sigma'$ is a valid signature on $m'$. In particular, contrary to regular unforgeability, it must be hard also to find a second signature $\sigma'$ on a message for which the
+adversary has already learnt a signature $\sigma \not= \sigma'$.
+
+Consider Lamport's signature scheme based on a one-way function $f : \bits^\lambda \to \bits^\lambda$ as presented in class.
+
+{\bf c) [Points: 3]} Give an example of a one-way function $f$ such that the Lamport signature scheme is not strongly unforgeable.
+\begin{proof}
+Given a valid message-signature pair $(m,\sigma)$ in which $\sigma_i = (\vk_{i,m_i}, f(\vk_{i,1-m_i}))$. If we can efficiently find $x_i \not= \vk_{i,m_i}$ but $f(x_i) = f(\vk_{i,m_i})$ for some $i$, then the pair $(m,\sigma')$ defined by
+$$\sigma'_j = \begin{cases}
+\sigma_j & \textrm{if $j\not=i$} \\
+(x_i, f(\vk_{i,1-m_i})) & \textrm{if $j=i$}
+\end{cases}$$
+can also be accepted by the verification. Thus $(m,\sigma')$ is a valid forge. 
+Thus any one-way function that leaves us chance to find such $x_i$ given $\vk_{i,m_i}$ cannot give a strongly unforgeable Lamport signature scheme. The one-way function $h$ given in {\bf b)} is a candidate.
+
+This reveals strong unforgeability is stronger than one-time UF-CMA.
+\end{proof} 
+
+{\bf d) [Points: 3]} Give a sufficient (structural) condition on the one-way function $f$ such that
+the Lamport signature scheme is strongly unforgeable.
+\begin{proof}
+First of all we know for any one-way function $f$, Lamport signature scheme is one-time UF-CMA. The only difference between strong unforgeability and one-time UF-CMA is whether the adversary can efficiently forge a new signature for the queried message. If we require $f$ to be strong enough to eradicate the possibility of forging signature for the queried message, then the resulted Lamport signature scheme is strongly unforgeable. This involves the following condition:
+\begin{quote}
+\item Given $x$, it should be infeasible to find a different $x'$ s.t. $f(x)=f(x')$.
+\end{quote}
+To show this condition is sufficient, assume by contradiction we can still efficiently find a valid forge $(m,\sigma')$ for $(m,\sigma)$ s.t. $\sigma' \not= \sigma$. Then there exists an offset $i$ s.t. $\sigma_i = (\vk_{i,m_i}, f(\vk_{i,1-m_i})) \not= (x, y) = \sigma'_i$. First $y$ must equal to $f(\vk_{i,1-m_i})$; otherwise it cannot pass the verification. Hence $x\not= \vk_{i,m_i}$. This implies a preimage of $f(\vk_{i,m_i})$ distinct from $\vk_{i,m_i}$ can be efficiently found, which contradicts the condition above.
+\end{proof}
+
+\end{document}
