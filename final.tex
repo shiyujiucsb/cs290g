@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
 \usepackage{url,amsmath,setspace,amssymb,amsthm,amsfonts}
-%\usepackage{hyperref}
+\usepackage{hyperref}
 
 \setlength{\oddsidemargin}{.25in}
 \setlength{\evensidemargin}{.25in}
@@ -140,7 +140,7 @@ The square roots of 4 in $\Z_{15}^*$ are 2 and 13. $2\times 2 \equiv 4 \mod 15$.
 \begin{proof}
 Note that $X^2 = Y^2 \mod N$ implies
 $$(X-Y)(X+Y) = 0\mod N.$$
-If $X \not= \pm Y \mod N$, then neither $X-Y$ not $X+Y$ is 0 in $\Z_N^*$. Since their product modulo $N$ is 0, which is not in $\Z_N^*$, either $X-Y$ or $X+Y$ is not in $\Z_N^*$. Without loss of generality we assume $X-Y$ is not in $\Z_N^*$. Then $X-Y$ is not coprime with $N$, and thus the gcd of $X-Y$ and $N$ gives the factorization.
+If $X \not= \pm Y \mod N$, then neither $X-Y$ nor $X+Y$ is 0 in $\Z_N^*$. Since their product modulo $N$ is 0, which is not in $\Z_N^*$, either $X-Y$ or $X+Y$ is not in $\Z_N^*$. Without loss of generality we assume $X-Y$ is not in $\Z_N^*$. Then $X-Y$ is not coprime with $N$, and thus the gcd of $X-Y$ and $N$ gives the factorization.
 \end{proof}
 
 \section{Task 2 - Symmetric Encryption and One-Wayness}
@@ -168,12 +168,12 @@ We can compute the advantage of $\A'$:
 $$\begin{aligned}
 &\Adv_{\SKE}^{ind-cpa}(\A') \\
 =& |\Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_0^k}=1] - \Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_1^k}=1]| \\
-=& |\Pr[k \getsr \Kg(1^\lambda), m_0 \getsr \M_{\lambda}, c \getsr \Enc(k, m_0): \A(c)=m_0] - \Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_1}=1]| \\
-=& |\Adv_{\SKE}^{\ow}(\A) - \Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_1}=1]|.
+=& |\Pr[k \getsr \Kg(1^\lambda), m_0 \getsr \M_{\lambda}, c \getsr \Enc(k, m_0): \A(c)=m_0] - \Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_1^k}=1]| \\
+=& |\Adv_{\SKE}^{\ow}(\A) - \Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_1^k}=1]|.
 \end{aligned}$$
-It suffices to argue $\Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_1}=1]$ is also negligible. Note that in $\A'$ the choice of $m_0$ is independent to the choice of $m_1$ and thus $\A(\Enc(k,m_1))$. Hence
+Since $\Adv_{\SKE}^{\ow}(\A)$ is non-negligible, it suffices to argue $\Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_1^k}=1]$ is negligible. Note that in $\A'$ the choice of $m_0$ is independent to the choice of $m_1$ and thus $\A(\Enc(k,m_1))$. Hence
 $$\begin{aligned}
-&\Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_1}=1] \\
+&\Pr[k \getsr \Kg(1^\lambda): \A'^{\LR_1^k}=1] \\
 =& \Pr[k \getsr \Kg(1^\lambda), m_0,m_1 \getsr \M_{\lambda}, c \getsr \Enc(k, m_1): \A(c)=m_0] 
 = 1/|\M_{\lambda}|.
 \end{aligned}$$
@@ -182,7 +182,7 @@ Since $|\M_{\lambda}| = 2^{\omega(\log \lambda)}$, $1/|\M_{\lambda}|$ is negligi
 
 {\bf b) [Points: 2]} Is the restriction on the size of $\M_{\lambda}$ necessary?
 \begin{proof}
-Yes. Without the size restriction of $\M_{\lambda}$, we cannot guarantee $1/|\M_{\lambda}|$ is negligible. Thus $\Adv_{\SKE}^{ind-cpa}(\A')$ may not be non-negligible any more. As an counterexample, suppose $\SKE$ encrypts only one bit. It is easy to see $\SKE$ cannot be one-way since random guessing one bit can invert the ciphertext with $\Adv_{\SKE}^{\ow}(\A) = 1/2$, no matter whether $\SKE$ is IND-CPA secure.
+Yes. Without the size restriction of $\M_{\lambda}$, we cannot guarantee $1/|\M_{\lambda}|$ is negligible. Thus $\Adv_{\SKE}^{ind-cpa}(\A')$ may not be non-negligible any more. As a counterexample, suppose $\SKE$ encrypts only one bit. It is easy to see $\SKE$ cannot be one-way since random guessing one bit can invert the ciphertext with $\Adv_{\SKE}^{\ow}(\A) = 1/2$, no matter whether $\SKE$ is IND-CPA secure.
 \end{proof}
 
 \section{Task 3 - Pseudorandomness and Symmetric Encryption}
@@ -245,14 +245,14 @@ We also have the following observations:
 \item Since in $G_0$, $\widetilde{O}$ simulates the encrypting oracle $\Enc(k,\cdot)$, we have
 $$\Adv_{\SKE_0}^{ind-cpa}(\A) = 2\cdot\Pr[G_0 \Rightarrow 1] - 1$$
 is non-negligible.
-\item Note that if $O = RP_n$, the answers from $\widetilde{O}_b$ are uniformly distributed \emph{unconditionally}, since $RP_n$ take a uniformly random $r$ as input. Thus
+\item Note that if $O = RP_n$, the answers from $\widetilde{O}_b$ are uniformly distributed \emph{unconditionally}, since $RP_n$ takes a uniformly random $r$ as input. Thus
 $$\Pr[G_1 \Rightarrow 1] = \Pr[G_2 \Rightarrow 1].$$
 \item In $G_2$, since the answers from $\widetilde{O}$ are independently and uniformly random, $\Pr[G_2 \Rightarrow 1] = 1/2$.
 \end{itemize}
 Since
 $$\Adv_{E_k}^{prp}(\A') = \Pr[G_0 \Rightarrow 1] - \Pr[G_1 \Rightarrow 1],$$
 we have $\Adv_{E_k}^{prp}(\A')$ must be non-negligible as desired. One can also summarize the proof idea above in one line: for any PPT adversary $\A$, there exists a PPT adversary $\A'$ s.t.
-$$\Adv_{\SKE_0}^{ind-cpa}(\A) = \Adv_{E_k}^{prp}(\A').$$
+$$\Adv_{\SKE_0}^{ind-cpa}(\A) = 2\cdot\Adv_{E_k}^{prp}(\A').$$
 \end{proof}
 
 \newcommand{\E}{\mathsf{E}}
